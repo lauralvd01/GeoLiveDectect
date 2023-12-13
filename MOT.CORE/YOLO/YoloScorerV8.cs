@@ -29,11 +29,17 @@ namespace MOT.CORE.YOLO
         private YoloScorerV8()
         {
             _yoloModel = Activator.CreateInstance<TYoloModel>();
+
+            if (predictor_V8 == null)
+                predictor_V8 = new YoloV8("Assets/Models/Yolo/yolo640v8.onnx");   // https://github.com/dme-compunet/YOLOv8
         }
 
         public YoloScorerV8(byte[] model, SessionOptions sessionOptions = null) : this()
         {
             _inferenceSession = new InferenceSession(model, sessionOptions ?? new SessionOptions());
+
+            if (predictor_V8 == null)
+                predictor_V8 = new YoloV8("Assets/Models/Yolo/yolo640v8.onnx");   // https://github.com/dme-compunet/YOLOv8
         }
 
 
@@ -74,8 +80,7 @@ namespace MOT.CORE.YOLO
         static public YoloV8 predictor_V8 = null;
         public IReadOnlyList<IPrediction> Predict(Bitmap image, float targetConfidence, params DetectionObjectType[] targetDetectionTypes)
         {
-            if(predictor_V8==null)
-                predictor_V8 = new YoloV8("D:\\LEVRAUDLaura\\Dev\\LowerPythonEnv\\RealTimeMOT\\Live\\Models\\Train15\\best.onnx");   // https://github.com/dme-compunet/YOLOv8
+            
 
 
 

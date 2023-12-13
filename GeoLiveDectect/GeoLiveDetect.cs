@@ -29,6 +29,7 @@ using System.Runtime.InteropServices;
 using System.Windows.Controls;
 using Google.Protobuf.WellKnownTypes;
 using System.Xml.Linq;
+using System.Security.Cryptography.X509Certificates;
 
 
 
@@ -44,15 +45,20 @@ namespace GeoLiveDectect
         {
             this.mWindow = window;
 
-            //test_1b();
-            //test2();
+            initLogs();
+
+            test_1b();
             //test3();
-            test4();
+            //test4();
         }
+
+        
 
 
         public async void test()
-        {            
+        {
+            DebugTimer testTimer = new DebugTimer("Test", true);
+
             var imagePath = "D:\\LEVRAUDLaura\\Dev\\LowerPythonEnv\\inputVideos\\vg\\vg_1\\0131.jpg";
             using var predictor = new YoloV8("D:\\LEVRAUDLaura\\Dev\\LowerPythonEnv\\RealTimeMOT\\Live\\Models\\Train15\\best.onnx");   // https://github.com/dme-compunet/YOLOv8
 
@@ -65,46 +71,53 @@ namespace GeoLiveDectect
             using var ploted = await result.PlotImageAsync(image);
 
             ploted.Save("./pose_demo.jpg");
-
-
-            /*
-            CultureInfo culture = (CultureInfo)CultureInfo.CurrentCulture.Clone();
-            culture.NumberFormat.NumberDecimalSeparator = ".";
-            //culture.DateTimeFormat.DateSeparator = "/";
-            //culture.DateTimeFormat.ShortDatePattern = "dd/MM/yyyy";
-            Thread.CurrentThread.CurrentCulture = culture;
-            Thread.CurrentThread.CurrentUICulture = culture;
-            */
-
+            
+            testTimer.stop();
+            console_writeLine(testTimer.displayStats());
         }
 
 
 
+
+
+        /****************************************************************************************************
+        *                                                                                                   *
+        ****************************************************************************************************/
         public void test_1b()
         {
-            var imagePath = "D:\\LEVRAUDLaura\\Dev\\LowerPythonEnv\\inputVideos\\vg\\vg_1\\0131.jpg";
-            using var predictor = new YoloV8("D:\\LEVRAUDLaura\\Dev\\LowerPythonEnv\\RealTimeMOT\\Live\\Models\\Train15\\best.onnx");   // https://github.com/dme-compunet/YOLOv8
+            DebugTimer testTimer = new DebugTimer("Test1b", true);
+
+            var imagePath = "Assets/Input/0131.jpg";
+            using var predictor = new YoloV8("Assets/Models/Yolo/yolo640v8.onnx");   // https://github.com/dme-compunet/YOLOv8
 
             
             ImageSelector aa = new ImageSelector(imagePath);
-
+            DebugTimer debugT = new DebugTimer("YoloV8Detect");
 
             IDetectionResult result;
 
             int inc = 0;
             while (inc < 60)
             {
+                debugT.start();
                 result = predictor.Detect(aa);
-                Debug.WriteLine("image " + (inc++));
+                debugT.stop();
+
+                console_writeLine("image " + (inc++) +" LastDuration: "+ debugT.lastDuration);
             }
 
-            int ab = 42;
+            console_writeLine(debugT.displayStats());
+
+            testTimer.stop();
+            console_writeLine(testTimer.displayStats());
         }
 
 
 
 
-
+        /****************************************************************************************************
+        *                                                                                                   *
+        ****************************************************************************************************
         public void test2() 
         {
             try
@@ -112,17 +125,22 @@ namespace GeoLiveDectect
                 Thread thread = new Thread(new ThreadStart(threadTest2));
                 thread.Start();
             }
-            catch (Exception e) { Debug.WriteLine(e.ToString()); }
+            catch (Exception e) { console_writeLine(e.ToString()); }
         }
-
         public void threadTest2()
         {
-            Debug.WriteLine("Ca marche. Au revoir");
+            console_writeLine("Ca marche. Au revoir");
         }
 
 
+
+        /****************************************************************************************************
+        *                                                                                                   *
+        ****************************************************************************************************/
         public void test3()
         {
+            DebugTimer testTimer = new DebugTimer("Test3", true);
+
             CommandLineOptions options = new CommandLineOptions();
             options.SourceFilePath = "Assets/Input/vg_1.mp4";
             options.TargetFilePath = "Assets/Output/vg_1.mp4";
@@ -149,6 +167,8 @@ namespace GeoLiveDectect
 
             videoCapture.Read(readBuffer);
 
+            DebugTimer debugT = new DebugTimer("MatcherRun");
+
             int inc = 0;
             while (readBuffer.IsEmpty == false)
             {
@@ -157,12 +177,16 @@ namespace GeoLiveDectect
                 //Bitmap frame_test = new Bitmap("D:\\LEVRAUDLaura\\Dev\\LowerPythonEnv\\inputVideos\\vg\\vg_1\\0131.jpg");   // Todo remove
                 //frame = frame_test;
 
+                debugT.start();
                 IReadOnlyList<ITrack> tracks = matcher.Run(frame, targetConfidence, DetectionObjectType.sailboat);
+                debugT.stop();
+                
 
                 DrawTracks(frame, tracks);
 
                 videoWriter.Write(frame.ToImage<Emgu.CV.Structure.Bgr, byte>());
-                Debug.WriteLine("image " + (inc++) + " tracks: " + tracks.Count);
+                console_writeLine("image " + (inc++) + " tracks: " + tracks.Count);
+                console_writeLine("LastDuration: " + debugT.lastDuration);
 
                 videoCapture.Read(readBuffer);
 
@@ -170,8 +194,12 @@ namespace GeoLiveDectect
                     break;
             }
 
+            console_writeLine(debugT.displayStats());
             matcher.Dispose();
             videoWriter.Dispose();
+
+            testTimer.stop();
+            console_writeLine(testTimer.displayStats());
         }
 
 
@@ -186,6 +214,8 @@ namespace GeoLiveDectect
         ****************************************************************************************************/
         public void test4()         //test 3 en multithread
         {
+            DebugTimer testTimer = new DebugTimer("Test4", true);
+
             CultureInfo culture = (CultureInfo)CultureInfo.CurrentCulture.Clone();
             culture.NumberFormat.NumberDecimalSeparator = ".";
             //culture.DateTimeFormat.DateSeparator = "/";
@@ -244,7 +274,7 @@ namespace GeoLiveDectect
             }
             catch (Exception e) 
             {
-                Debug.WriteLine(e.ToString());
+                console_writeLine(e.ToString());
                 return;
             }
 
@@ -255,7 +285,7 @@ namespace GeoLiveDectect
             }
             catch (Exception e)
             {
-                Debug.WriteLine(e.ToString());
+                console_writeLine(e.ToString());
                 return;
             }
 
@@ -266,7 +296,7 @@ namespace GeoLiveDectect
             }
             catch (Exception e)
             {
-                Debug.WriteLine(e.ToString());
+                console_writeLine(e.ToString());
                 return;
             }
 
@@ -298,11 +328,6 @@ namespace GeoLiveDectect
             {
                 Bitmap frame = readBuffer.ToBitmap();
 
-                //Bitmap frame_test = new Bitmap("D:\\LEVRAUDLaura\\Dev\\LowerPythonEnv\\inputVideos\\vg\\vg_1\\0131.jpg");   // Todo remove
-                //frame = frame_test;
-
-
-
                 DetectionObjectType[] targetDetectionTypes = new DetectionObjectType[1];
                 targetDetectionTypes[0] = DetectionObjectType.sailboat;
 
@@ -312,47 +337,36 @@ namespace GeoLiveDectect
 
 
 
-                //IReadOnlyList<ITrack> tracks = matcher.Run(frame, targetConfidence, DetectionObjectType.sailboat);
-
-                //IReadOnlyList<ITrack> tracks = new List<ITrack>();
-                //DrawTracks(frame, tracks);
-
-                //videoWriter.Write(frame.ToImage<Emgu.CV.Structure.Bgr, byte>());
-                //Debug.WriteLine("image " + (inc++) + " tracks: " + tracks.Count);
-
-
                 Double nowSecond = Math.Floor((getNowUtcTime_microSecond() - startUtcTime) / (1000.0 * 1000.0));
                 if (nowSecond != previousSecond)
-                    Debug.WriteLine("nowSecond :" + nowSecond);
+                    console_writeLine("nowSecond :" + nowSecond);
                 previousSecond = nowSecond;
 
 
-                Debug.WriteLine("inc:" + inc++);
+                console_writeLine("inc:" + inc++);
                 if (inc >= 60)
                     break;
 
 
                 waitUntil(startUtcTime, inc, timeBetweenTrame);
                 videoCapture.Read(readBuffer);
-
-                if(readBuffer.IsEmpty)
-                {
-                    int aa = 42;
-                }
             }
 
-            Debug.WriteLine("Main Thread Waiting Others");
+            console_writeLine("Main Thread Waiting Others");
 
             askExistPredictionYoloThread = true;
             askExistMatcherThread = true;
             askExitVideoWriterThread = true;
-            while(isPredictionYoloThreadFinished || isMatcherThreadFinished || isVideoWriterThreadFinished)
+            while((!isPredictionYoloThreadFinished) || (!isMatcherThreadFinished) || (!isVideoWriterThreadFinished))
                 Thread.Sleep(100);
 
             matcher.Dispose();
             videoWriter.Dispose();
 
-            Debug.WriteLine("Main Thread Waiting End: Goodbye");
+            testTimer.stop();
+            console_writeLine(testTimer.displayStats());
+
+            console_writeLine("Main Thread Waiting End: Goodbye");
         }
 
 
@@ -410,29 +424,39 @@ namespace GeoLiveDectect
             askExistPredictionYoloThread = false;
             isPredictionYoloThreadFinished = false;
 
-            while (!askExistPredictionYoloThread)
+            DebugTimer debugT = new DebugTimer("PredicThread");
+
+            while ((!askExistPredictionYoloThread) || (listPredictTask.Count() != 0))
             {
-                                                                                    //todo revoir c# event massage ( fonction bloquante jusqu'a evenement fournit depuis l'externe == meilleur que le sleep)
+                //todo revoir c# event massage ( fonction bloquante jusqu'a evenement fournit depuis l'externe == meilleur que le sleep)
 
                 if(listPredictTask.Count()!=0)
                 {
                     coudlUse_listPredictTask = false;
-                    Debug.WriteLine("NbPredict = " + listPredictTask.Count());
+                    console_writeLine("NbPredict = " + listPredictTask.Count());
                     PredictTask pt = listPredictTask.ElementAt(0);
                     listPredictTask.RemoveAt(0);
                     coudlUse_listPredictTask = true;
 
-
+                    debugT.start();
                     IPrediction[] detectedObjects = predictMatcher.Run_T_Predict(pt.frame, pt.targetConfidence, pt.targetDetectionTypes);
-                    Prediction pr = new Prediction(getNowUtcTime_microSecond(), pt, detectedObjects);
+                    debugT.stop();
+                    console_writeLine("LastPredict take " + debugT.lastDuration + " s");
 
+                    Prediction pr = new Prediction(getNowUtcTime_microSecond(), pt, detectedObjects);
                     while (!coudlUse_listMatcherTask) { };          //attente lock de la liste
                     listPrediction.Add(pr);
+
+                    Thread.Sleep(0);                                //pour laisser les autres Threads l'occasion de respirer.
+                }else{
+                    Thread.Sleep(waitDuration);
                 }
 
-                Thread.Sleep(waitDuration);
+                
             }
             isPredictionYoloThreadFinished = true;
+
+            console_writeLine(debugT.displayStats(true));
         }
 
 
@@ -465,28 +489,38 @@ namespace GeoLiveDectect
         {
             askExistMatcherThread = false;
             isMatcherThreadFinished = false;
+            DebugTimer debugT = new DebugTimer("MatchThread");
 
-            while (!askExistMatcherThread)
+            //while (!askExistMatcherThread)
+            while ((!askExistMatcherThread)|| (listPrediction.Count() != 0))      //version on attend la fin du traitement pour quitter
             {
                 if (listPrediction.Count() != 0)
                 {
                     coudlUse_listMatcherTask = false;
-                    Debug.WriteLine("NbPredictions = " + listPrediction.Count());
+                    console_writeLine("NbPredictions = " + listPrediction.Count());
                     Prediction pt = listPrediction.ElementAt(0);
                     listPrediction.RemoveAt(0);
                     coudlUse_listMatcherTask = true;
 
-
+                    debugT.start();
                     IReadOnlyList<ITrack> tracks = predictMatcher.Run_T_Match(pt.detectedObjects, pt.predict.frame);
-                    Match pr = new Match(getNowUtcTime_microSecond(), pt, tracks);
+                    debugT.stop();
+                    console_writeLine("LastMatch take " + debugT.lastDuration + " s");
 
+                    Match pr = new Match(getNowUtcTime_microSecond(), pt, tracks);
                     while (!coudlUse_listMatchs) { };          //attente lock de la liste
                     listMatch.Add(pr);
+
+                    Thread.Sleep(0);                                //pour laisser les autres Threads l'occasion de respirer.
+                }
+                else{
+                    Thread.Sleep(waitDuration);
                 }
 
-                Thread.Sleep(waitDuration);
+                
             }
             isMatcherThreadFinished = true;
+            console_writeLine(debugT.displayStats(true));
         }
 
 
@@ -508,12 +542,12 @@ namespace GeoLiveDectect
 
             int inc = 0;
 
-            while (!askExitVideoWriterThread)
+            while ((!askExitVideoWriterThread) || (listMatch.Count() != 0))
             {
                 if (listMatch.Count() != 0)
                 {
                     coudlUse_listMatchs = false;
-                    Debug.WriteLine("NbMatchs = " + listMatch.Count());
+                    console_writeLine("NbMatchs = " + listMatch.Count());
                     Match pt = listMatch.ElementAt(0);
                     listMatch.RemoveAt(0);
                     coudlUse_listMatchs = true;
@@ -522,7 +556,7 @@ namespace GeoLiveDectect
                     DrawTracks(pt.prediction.predict.frame, pt.tracks);
 
                     videoWriter.Write(pt.prediction.predict.frame.ToImage<Emgu.CV.Structure.Bgr, byte>());
-                    Debug.WriteLine("image " + (inc++) + " tracks: " + pt.tracks.Count);
+                    console_writeLine("image " + (inc++) + " tracks: " + pt.tracks.Count);
 
                 }
 
@@ -534,47 +568,16 @@ namespace GeoLiveDectect
 
 
 
-        /****************************************************************************************************
-        /********************************************* Tools ************************************************
-        ****************************************************************************************************/
 
-        public static void waitUntil(long startUtcTime, int inc, int timeBetweenTrame)
-        {
-            bool useSleep = false;
 
-            if (timeBetweenTrame != 0)
-            {
-                long endTimeSleep = startUtcTime/1000 + inc * timeBetweenTrame;
 
-                long diff = endTimeSleep - (getNowUtcTime_microSecond() / 1000);
-                if (diff > 0)
-                {
-                    if (useSleep)
-                    {
-                        Thread.Sleep((int)diff);                             //in ms => bad on Windows
-                    }else{
-                        while (getNowUtcTime_microSecond() / 1000 < endTimeSleep)
-                            Thread.Sleep(0);                            //https://blogs.msmvps.com/peterritchie/2007/04/26/thread-sleep-is-a-sign-of-a-poorly-designed-program/
-                                                                        // if not working think about : https://docs.microsoft.com/en-us/dotnet/api/system.timers.timer?redirectedfrom=MSDN&view=netcore-3.1
-                    }
-                }
 
-                if (diff >= 0)
-                    Console.WriteLine("sleep delay +" + diff.ToString() + " ms");
-            }
-
-        }
+        
 
 
         /****************************************************************************************************
         *                                                                                                   *
         ****************************************************************************************************/
-        static long getNowUtcTime_microSecond()                     // https://stackoverflow.com/questions/17632584/how-to-get-the-unix-timestamp-in-c-sharp
-        {
-            return (long)((DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1)).Ticks / TimeSpan.TicksPerMillisecond) * 1000.0);      //in microSecond
-        }
-
-
         private static Matcher ConstructMatcherFromOptions(CommandLineOptions options)
         {
             IPredictor predictor = ConstructPredictorFromOptions(options);
@@ -606,6 +609,7 @@ namespace GeoLiveDectect
 
             return matcher;
         }
+
 
 
         private static IPredictor ConstructPredictorFromOptions(CommandLineOptions options)
@@ -673,6 +677,103 @@ namespace GeoLiveDectect
 
             graphics.Dispose();
         }
+
+
+
+        /****************************************************************************************************
+        /********************************************* Tools ************************************************
+        ****************************************************************************************************/
+
+        public static void waitUntil(long startUtcTime, int inc, int timeBetweenTrame)
+        {
+            bool useSleep = false;
+
+            if (timeBetweenTrame != 0)
+            {
+                long endTimeSleep = startUtcTime / 1000 + inc * timeBetweenTrame;
+
+                long diff = endTimeSleep - (getNowUtcTime_microSecond() / 1000);
+                if (diff > 0)
+                {
+                    if (useSleep)
+                    {
+                        Thread.Sleep((int)diff);                             //in ms => bad on Windows
+                    }
+                    else
+                    {
+                        while (getNowUtcTime_microSecond() / 1000 < endTimeSleep)
+                            Thread.Sleep(0);                            //https://blogs.msmvps.com/peterritchie/2007/04/26/thread-sleep-is-a-sign-of-a-poorly-designed-program/
+                                                                        // if not working think about : https://docs.microsoft.com/en-us/dotnet/api/system.timers.timer?redirectedfrom=MSDN&view=netcore-3.1
+                    }
+                }
+
+                if (diff >= 0)
+                    Console.WriteLine("sleep delay +" + diff.ToString() + " ms");
+            }
+
+        }
+
+
+
+        /****************************************************************************************************
+        *                                                                                                   *
+        ****************************************************************************************************/
+        static long getNowUtcTime_microSecond()                     // https://stackoverflow.com/questions/17632584/how-to-get-the-unix-timestamp-in-c-sharp
+        {
+            return (long)((DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1)).Ticks / TimeSpan.TicksPerMillisecond) * 1000.0);      //in microSecond
+        }
+
+
+
+        public void initLogs()
+        {
+            CultureInfo culture = (CultureInfo)CultureInfo.CurrentCulture.Clone();
+            culture.NumberFormat.NumberDecimalSeparator = ".";
+            //culture.DateTimeFormat.DateSeparator = "/";
+            //culture.DateTimeFormat.ShortDatePattern = "dd/MM/yyyy";
+            Thread.CurrentThread.CurrentCulture = culture;
+            Thread.CurrentThread.CurrentUICulture = culture;
+
+
+            string logFolder = "./logs";
+            if (!Directory.Exists(logFolder))
+            {
+                try
+                {
+                    Directory.CreateDirectory(logFolder);
+                }
+                catch (Exception e)
+                {
+                    console_writeLine(e.ToString());
+                    logFolder = ".";
+                }
+            }
+            string baseFilename = logFolder + "/GeoLiveDetect";
+            //baseFilename += "_"+ DateTime.UtcNow.ToString("yyyyMMddTHHmmss");       // version pour avoir un fichier de log par execution. string iso8601String = DateTime.UtcNow.ToString("yyyyMMddTHH:mm:ssZ");
+
+            try
+            {
+                _file_txt_log = new System.IO.StreamWriter(baseFilename + ".log");
+                _file_txt_log.AutoFlush = true;                                                  //file saved on each write(), instead of close()
+            }
+            catch (Exception e) { console_writeLine(e.ToString()); }
+        }
+
+        public static System.IO.StreamWriter? _file_txt_log = null;
+        static void console_writeLine(string text, System.IO.StreamWriter? file_txt_log = null)
+        {
+            Debug.WriteLine(text);
+
+            if (file_txt_log != null)
+                file_txt_log.WriteLine(text);
+            else if(_file_txt_log != null)
+                _file_txt_log.WriteLine(text);
+        }
+
+
+
+
+
     }
 
     
