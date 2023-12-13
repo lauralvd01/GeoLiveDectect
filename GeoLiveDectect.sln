@@ -1,0 +1,34 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.8.34330.188
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GeoLiveDectect", "GeoLiveDectect\GeoLiveDectect.csproj", "{3D64C0EB-00E8-4C1B-8163-B7295325773D}"
+	ProjectSection(ProjectDependencies) = postProject
+		{4DF4241B-2936-434F-833A-4E23447E3A36} = {4DF4241B-2936-434F-833A-4E23447E3A36}
+	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MOT.CORE", "MOT.CORE\MOT.CORE.csproj", "{4DF4241B-2936-434F-833A-4E23447E3A36}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{3D64C0EB-00E8-4C1B-8163-B7295325773D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3D64C0EB-00E8-4C1B-8163-B7295325773D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3D64C0EB-00E8-4C1B-8163-B7295325773D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3D64C0EB-00E8-4C1B-8163-B7295325773D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4DF4241B-2936-434F-833A-4E23447E3A36}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4DF4241B-2936-434F-833A-4E23447E3A36}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4DF4241B-2936-434F-833A-4E23447E3A36}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4DF4241B-2936-434F-833A-4E23447E3A36}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {2412894B-DB7E-4ADD-AF5D-F7AE6524C7C1}
+	EndGlobalSection
+EndGlobal

@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "GeoLiveDectect": {
+      "commandName": "Project",
+      "workingDirectory": "$(SolutionDir)"
+    }
+  }
+}

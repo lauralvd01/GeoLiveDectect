@@ -1,0 +1,30 @@
+
+MulConfidence = ObjConfidence * ClsConfidence
+	ClsConfidence
+	
+	
+	
+_inputNames = _inference.InputMetadata.Keys.ToArray();
+_metadata = metadata ?? YoloV8Metadata.Parse(_inference.ModelMetadata.CustomMetadataMap);
+
+_parameters = YoloV8Parameters.Default =
+
+public YoloV8Parameters()
+{
+    Confidence = 0.3f;
+    IoU = 0.45f;
+    KeepOriginalAspectRatio = true;
+    SuppressParallelInference = false;
+}	
+
+
+
+
+
+-reduire la liste des detectedObjects
+
+
+
+-s D:\LEVRAUDLaura\Dev\MOT-DeepSort-CS-main\src\MOT\Assets\Input\P1033675.mp4 -t D:\LEVRAUDLaura\Dev\MOT-DeepSort-CS-main\src\MOT\Assets\Output\P1033675.mp4 -d D:\LEVRAUDLaura\Dev\MOT-DeepSort-CS-main\src\MOT\Assets\Models\Yolo\yolo640v5.onnx -m 0 -y 1 -v 0 -a D:\LEVRAUDLaura\Dev\MOT-DeepSort-CS-main\src\MOT\Assets\Models\Reid\osnet_x1_0_msmt17.onnx  
+
+-s D:\LEVRAUDLaura\Dev\MOT-DeepSort-CS-main\src\MOT\Assets\Input\vg_1.mp4 -t D:\LEVRAUDLaura\Dev\MOT-DeepSort-CS-main\src\MOT\Assets\Output\vg_1.mp4 -d D:\LEVRAUDLaura\Dev\MOT-DeepSort-CS-main\src\MOT\Assets\Models\Yolo\yolo640v8.onnx -m 0 -y 2 -v 0 -a D:\LEVRAUDLaura\Dev\MOT-DeepSort-CS-main\src\MOT\Assets\Models\Reid\osnet_x1_0_msmt17.onnx  
