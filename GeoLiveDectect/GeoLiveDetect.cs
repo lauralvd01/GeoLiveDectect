@@ -30,34 +30,46 @@ using System.Windows.Controls;
 using Google.Protobuf.WellKnownTypes;
 using System.Xml.Linq;
 using System.Security.Cryptography.X509Certificates;
+using System.Windows.Media.Imaging;
+using System.Windows.Media;
+using static GeoLiveDectect.MainWindow;
 
+
+
+// - Todo : 2 gros soucis
+//  -les images resortent des thread pas dans la bon ordre, ce qui n'est pas top poures les Match.
+//  -les quand on ferme la fenetre, il nous reste les Thread qui tournent derriere , jusqu'a l'infini , et au dela.
 
 
 
 namespace GeoLiveDectect
 {
-    
+
     internal class GeoLiveDetect
     {
-        MainWindow? mWindow = null;
+        static MainWindow? mWindow = null;
 
         public void init(MainWindow window)
         {
-            this.mWindow = window;
+            mWindow = window;
 
             initLogs();
 
-            test_1b();
+            //test_1b();
             //test3();
-            //test4();
+            test5();
         }
 
-        
+
+        static public bool forceExitVideoReadThread = false;
+        static public bool isVideoReadThreadFinished = false;
+
 
 
         public async void test()
         {
             DebugTimer testTimer = new DebugTimer("Test", true);
+            isVideoReadThreadFinished = false;
 
             var imagePath = "D:\\LEVRAUDLaura\\Dev\\LowerPythonEnv\\inputVideos\\vg\\vg_1\\0131.jpg";
             using var predictor = new YoloV8("D:\\LEVRAUDLaura\\Dev\\LowerPythonEnv\\RealTimeMOT\\Live\\Models\\Train15\\best.onnx");   // https://github.com/dme-compunet/YOLOv8
@@ -71,9 +83,10 @@ namespace GeoLiveDectect
             using var ploted = await result.PlotImageAsync(image);
 
             ploted.Save("./pose_demo.jpg");
-            
+
             testTimer.stop();
             console_writeLine(testTimer.displayStats());
+            isVideoReadThreadFinished = true;
         }
 
 
@@ -86,30 +99,32 @@ namespace GeoLiveDectect
         public void test_1b()
         {
             DebugTimer testTimer = new DebugTimer("Test1b", true);
+            isVideoReadThreadFinished = false;
 
             var imagePath = "Assets/Input/0131.jpg";
             using var predictor = new YoloV8("Assets/Models/Yolo/yolo640v8.onnx");   // https://github.com/dme-compunet/YOLOv8
 
-            
+
             ImageSelector aa = new ImageSelector(imagePath);
             DebugTimer debugT = new DebugTimer("YoloV8Detect");
 
             IDetectionResult result;
 
             int inc = 0;
-            while (inc < 60)
+            while ((inc < 60)&& (!forceExitVideoReadThread))
             {
                 debugT.start();
                 result = predictor.Detect(aa);
                 debugT.stop();
 
-                console_writeLine("image " + (inc++) +" LastDuration: "+ debugT.lastDuration);
+                console_writeLine("image " + (inc++) + " LastDuration: " + debugT.lastDuration);
             }
 
             console_writeLine(debugT.displayStats());
 
             testTimer.stop();
             console_writeLine(testTimer.displayStats());
+            isVideoReadThreadFinished = true;
         }
 
 
@@ -140,6 +155,7 @@ namespace GeoLiveDectect
         public void test3()
         {
             DebugTimer testTimer = new DebugTimer("Test3", true);
+            isVideoReadThreadFinished = false;
 
             CommandLineOptions options = new CommandLineOptions();
             options.SourceFilePath = "Assets/Input/vg_1.mp4";
@@ -159,7 +175,7 @@ namespace GeoLiveDectect
 
             VideoWriter videoWriter = new VideoWriter(options.TargetFilePath, -1, targetFps, new System.Drawing.Size(width, height), true);
 
-          
+
             Matcher matcher = ConstructMatcherFromOptions(options);
             float targetConfidence = float.Clamp(options.TargetConfidence ?? 0.0f, 0.0f, 1.0f);
 
@@ -167,20 +183,36 @@ namespace GeoLiveDectect
 
             videoCapture.Read(readBuffer);
 
-            DebugTimer debugT = new DebugTimer("MatcherRun");
+            //DebugTimer debugT = new DebugTimer("MatcherRun");
+            DebugTimer debugT = new DebugTimer("PredictRun");
+            DebugTimer debugT_b = new DebugTimer("MatchRun");
 
             int inc = 0;
-            while (readBuffer.IsEmpty == false)
+            while ((readBuffer.IsEmpty == false)&& (!forceExitVideoReadThread))
             {
                 Bitmap frame = readBuffer.ToBitmap();
 
                 //Bitmap frame_test = new Bitmap("D:\\LEVRAUDLaura\\Dev\\LowerPythonEnv\\inputVideos\\vg\\vg_1\\0131.jpg");   // Todo remove
                 //frame = frame_test;
 
+                //Test fonction normale
+                //debugT.start();
+                //IReadOnlyList<ITrack> tracks = matcher.Run(frame, targetConfidence, DetectionObjectType.sailboat);
+                //debugT.stop();
+
+
+                //Test function splittées
                 debugT.start();
-                IReadOnlyList<ITrack> tracks = matcher.Run(frame, targetConfidence, DetectionObjectType.sailboat);
+                IPrediction[] detectedObjects = matcher.Run_T_Predict(frame, targetConfidence, DetectionObjectType.sailboat);
                 debugT.stop();
-                
+                console_writeLine("LastPredict take " + debugT.lastDuration + " s");
+
+                debugT_b.start();
+                IReadOnlyList<ITrack> tracks = matcher.Run_T_Match(detectedObjects, frame);
+                debugT_b.stop();
+                console_writeLine("LastMatch take " + debugT.lastDuration + " s");
+
+
 
                 DrawTracks(frame, tracks);
 
@@ -195,11 +227,14 @@ namespace GeoLiveDectect
             }
 
             console_writeLine(debugT.displayStats());
+            console_writeLine(debugT_b.displayStats());
             matcher.Dispose();
             videoWriter.Dispose();
 
+
             testTimer.stop();
             console_writeLine(testTimer.displayStats());
+            isVideoReadThreadFinished = true;
         }
 
 
@@ -215,6 +250,7 @@ namespace GeoLiveDectect
         public void test4()         //test 3 en multithread
         {
             DebugTimer testTimer = new DebugTimer("Test4", true);
+            isVideoReadThreadFinished = false;
 
             CultureInfo culture = (CultureInfo)CultureInfo.CurrentCulture.Clone();
             culture.NumberFormat.NumberDecimalSeparator = ".";
@@ -222,7 +258,7 @@ namespace GeoLiveDectect
             //culture.DateTimeFormat.ShortDatePattern = "dd/MM/yyyy";
             Thread.CurrentThread.CurrentCulture = culture;
             Thread.CurrentThread.CurrentUICulture = culture;
-            
+
 
             CommandLineOptions options = new CommandLineOptions();
             options.SourceFilePath = "Assets/Input/vg_1.mp4";
@@ -269,10 +305,11 @@ namespace GeoLiveDectect
 
             try
             {
-                Thread thread = new Thread(new ThreadStart(thread_PredictionYolo));
+                //Thread thread = new Thread(new ThreadStart(thread_PredictionYolo));                   //Thread snas params
+                Thread thread = new Thread(() => GeoLiveDetect.thread_PredictionYolo(0));             // Thread with params https://stackoverflow.com/questions/1195896/threadstart-with-parameters
                 thread.Start();
             }
-            catch (Exception e) 
+            catch (Exception e)
             {
                 console_writeLine(e.ToString());
                 return;
@@ -324,16 +361,16 @@ namespace GeoLiveDectect
             Double previousSecond = Math.Floor((getNowUtcTime_microSecond() - startUtcTime) / (1000.0 * 1000.0));
 
             int inc = 0;
-            while (readBuffer.IsEmpty == false)
+            while ((readBuffer.IsEmpty == false)&& (!forceExitVideoReadThread))
             {
                 Bitmap frame = readBuffer.ToBitmap();
 
                 DetectionObjectType[] targetDetectionTypes = new DetectionObjectType[1];
                 targetDetectionTypes[0] = DetectionObjectType.sailboat;
 
-                PredictTask pt = new PredictTask(getNowUtcTime_microSecond(), frame, targetConfidence, targetDetectionTypes);
+                PredictTask pt = new PredictTask(getNowUtcTime_microSecond(), frame, targetConfidence, targetDetectionTypes,inc);
                 while (!coudlUse_listPredictTask) { };          //attente lock de la liste
-                listPredictTask.Add(pt);
+                listPredictTask.ElementAt(0).Add(pt);
 
 
 
@@ -357,8 +394,15 @@ namespace GeoLiveDectect
             askExistPredictionYoloThread = true;
             askExistMatcherThread = true;
             askExitVideoWriterThread = true;
-            while((!isPredictionYoloThreadFinished) || (!isMatcherThreadFinished) || (!isVideoWriterThreadFinished))
+
+
+
+            bool isFinishedAll = !((!isPredictionYoloThreadFinished.ElementAt(0)) || (!isMatcherThreadFinished) || (!isVideoWriterThreadFinished));
+            while (!isFinishedAll)
+            {
                 Thread.Sleep(100);
+                isFinishedAll = !((!isPredictionYoloThreadFinished.ElementAt(0)) || (!isMatcherThreadFinished) || (!isVideoWriterThreadFinished));
+            }
 
             matcher.Dispose();
             videoWriter.Dispose();
@@ -367,7 +411,184 @@ namespace GeoLiveDectect
             console_writeLine(testTimer.displayStats());
 
             console_writeLine("Main Thread Waiting End: Goodbye");
+            isVideoReadThreadFinished = true;
         }
+
+
+
+
+
+
+
+        
+
+        /****************************************************************************************************
+        *                                                                                                   *
+        ****************************************************************************************************/
+        public void test5()         //test 3 en multithread + X thread pour les predictions
+        {
+            DebugTimer testTimer = new DebugTimer("Test5", true);
+            isVideoReadThreadFinished = false;
+
+            CultureInfo culture = (CultureInfo)CultureInfo.CurrentCulture.Clone();
+            culture.NumberFormat.NumberDecimalSeparator = ".";
+            //culture.DateTimeFormat.DateSeparator = "/";
+            //culture.DateTimeFormat.ShortDatePattern = "dd/MM/yyyy";
+            Thread.CurrentThread.CurrentCulture = culture;
+            Thread.CurrentThread.CurrentUICulture = culture;
+
+
+            CommandLineOptions options = new CommandLineOptions();
+            options.SourceFilePath = "Assets/Input/vg_1.mp4";
+            options.TargetFilePath = "Assets/Output/vg_1.mp4";
+            options.DetectorFilePath = "Assets/Models/Yolo/yolo640v8.onnx";
+            options.MatcherType = 0;
+            options.YoloVersion = YoloVersion.Yolo640v8;
+            options.AppearanceExtractorVersion = AppearanceExtractorVersion.OSNet;
+            options.AppearanceExtractorFilePath = "Assets/Models/Reid/osnet_x1_0_msmt17.onnx";
+
+
+
+            int timeBetweenTrame = 40;
+
+            int nbThreadsPredict = 4;
+
+            List<Thread> listThreads = new List<Thread>();
+            for (int i = 0; i < nbThreadsPredict; i++)
+            {
+                try
+                {
+                    int a = i;
+                    Thread thread = new Thread(() => GeoLiveDetect.thread_PredictionYolo(a));             // Thread with params https://stackoverflow.com/questions/1195896/threadstart-with-parameters
+                    thread.Start();
+                    listThreads.Add(thread);
+                }
+                catch (Exception e)
+                {
+                    console_writeLine("Error on Thread " + i + " :" + e.ToString());
+                    return;
+                }
+            }
+
+            try
+            {
+                Thread thread = new Thread(new ThreadStart(thread_Matcher));
+                thread.Start();
+                listThreads.Add(thread);
+            }
+            catch (Exception e)
+            {
+                console_writeLine(e.ToString());
+                return;
+            }
+
+            try
+            {
+                Thread thread = new Thread(new ThreadStart(thread_VideoWriter));
+                thread.Start();
+                listThreads.Add(thread);
+            }
+            catch (Exception e)
+            {
+                console_writeLine(e.ToString());
+                return;
+            }
+
+
+
+            VideoCapture videoCapture = new VideoCapture(options.SourceFilePath);
+
+            double targetFps = options.FPS ?? videoCapture.Get(Emgu.CV.CvEnum.CapProp.Fps);
+            int width = videoCapture.Width;
+            int height = videoCapture.Height;
+
+            videoWriter = new VideoWriter(options.TargetFilePath, -1, targetFps, new System.Drawing.Size(width, height), true);
+
+
+            Matcher matcher = ConstructMatcherFromOptions(options);
+            predictMatcher = matcher;
+            float targetConfidence = float.Clamp(options.TargetConfidence ?? 0.0f, 0.0f, 1.0f);
+
+            Mat readBuffer = new Mat();
+
+            videoCapture.Read(readBuffer);
+
+
+            long startUtcTime = getNowUtcTime_microSecond();
+            Double previousSecond = Math.Floor((getNowUtcTime_microSecond() - startUtcTime) / (1000.0 * 1000.0));
+
+            int inc = 0;
+            while ((readBuffer.IsEmpty == false)&&(!forceExitVideoReadThread))
+            {
+                Bitmap frame = readBuffer.ToBitmap();
+
+                DetectionObjectType[] targetDetectionTypes = new DetectionObjectType[1];
+                targetDetectionTypes[0] = DetectionObjectType.sailboat;
+
+                PredictTask pt = new PredictTask(getNowUtcTime_microSecond(), frame, targetConfidence, targetDetectionTypes, inc);
+                while (!coudlUse_listPredictTask) { };          //attente lock de la liste
+                listPredictTask.ElementAt(inc % nbThreadsPredict).Add(pt);
+
+
+
+                Double nowSecond = Math.Floor((getNowUtcTime_microSecond() - startUtcTime) / (1000.0 * 1000.0));
+                if (nowSecond != previousSecond)
+                    console_writeLine("nowSecond :" + nowSecond);
+                previousSecond = nowSecond;
+
+
+                console_writeLine("inc:" + inc++);
+                //if (inc >= 60)
+                //    break;
+
+
+                waitUntil(startUtcTime, inc, timeBetweenTrame);
+                videoCapture.Read(readBuffer);
+            }
+
+            console_writeLine("Main Thread Waiting Others");
+
+            askExistPredictionYoloThread = true;
+            askExistMatcherThread = true;
+            askExitVideoWriterThread = true;
+            if(forceExitVideoReadThread)
+            {
+                forceExistPredictionYoloThread = true;
+                forceExistMatcherThread = true;
+                forceExitVideoWriterThread = true;
+            }
+
+            bool isPredictionYoloThreadFinishedAll = false;
+            for (int i = 0; i < nbThreadsPredict; i++)
+                isPredictionYoloThreadFinishedAll = isPredictionYoloThreadFinishedAll && isPredictionYoloThreadFinished.ElementAt(i);
+
+            bool isFinishedAll = !((!isPredictionYoloThreadFinishedAll) || (!isMatcherThreadFinished) || (!isVideoWriterThreadFinished));
+            while (!isFinishedAll)
+            {
+                
+
+                Thread.Sleep(100);
+
+                isPredictionYoloThreadFinishedAll = true;
+                for (int i = 0; i < nbThreadsPredict; i++)
+                    isPredictionYoloThreadFinishedAll = isPredictionYoloThreadFinishedAll && isPredictionYoloThreadFinished.ElementAt(i);
+                isFinishedAll = !((!isPredictionYoloThreadFinishedAll) || (!isMatcherThreadFinished) || (!isVideoWriterThreadFinished));
+            }
+
+            
+
+
+            matcher.Dispose();
+            videoWriter.Dispose();
+
+            testTimer.stop();
+            console_writeLine(testTimer.displayStats());
+
+            console_writeLine("Main Thread Waiting End: Goodbye");
+            isVideoReadThreadFinished = true;
+        }
+
+
 
 
 
@@ -386,13 +607,15 @@ namespace GeoLiveDectect
             public Bitmap frame;
             public float targetConfidence;
             public DetectionObjectType[] targetDetectionTypes;
+            public long index = 0;
 
-            public PredictTask(long timestamp, Bitmap frame, float targetConfidence, DetectionObjectType[] targetDetectionTypes)
+            public PredictTask(long timestamp, Bitmap frame, float targetConfidence, DetectionObjectType[] targetDetectionTypes, long index)
             {
                 this.timestamp = timestamp;
                 this.frame = frame;
                 this.targetConfidence = targetConfidence;
                 this.targetDetectionTypes = targetDetectionTypes;
+                this.index = index;
             }
         }
 
@@ -410,51 +633,64 @@ namespace GeoLiveDectect
             }
         }
 
-        public bool askExistPredictionYoloThread = false;
-        public bool isPredictionYoloThreadFinished = false;
-        List<PredictTask> listPredictTask = new List<PredictTask>();
-        List<Prediction> listPrediction = new List<Prediction>();
-        public bool coudlUse_listPredictTask = true;
-        Matcher predictMatcher;
+        static public bool askExistPredictionYoloThread = false;
+        static public bool forceExistPredictionYoloThread = false;
+        static public List<bool> isPredictionYoloThreadFinished = new List<bool>();
+        static List<List<PredictTask>> listPredictTask = new List<List<PredictTask>>();
+        static List<Prediction?> listPrediction = new List<Prediction?>();
+        static long startIndex = 0;
+        static public bool coudlUse_listPredictTask = true;
+        static Matcher predictMatcher;
 
-        public int waitDuration = 8;                //ms
+        static public int waitDuration = 8;                //ms
 
-        public void thread_PredictionYolo()
+        public static void thread_PredictionYolo(int id = 0)
         {
             askExistPredictionYoloThread = false;
-            isPredictionYoloThreadFinished = false;
 
-            DebugTimer debugT = new DebugTimer("PredicThread");
+            while (isPredictionYoloThreadFinished.Count < id + 1)
+                isPredictionYoloThreadFinished.Add(false);
 
-            while ((!askExistPredictionYoloThread) || (listPredictTask.Count() != 0))
+
+            while (listPredictTask.Count < id + 1)
+                listPredictTask.Add(new List<PredictTask>());
+
+            DebugTimer debugT = new DebugTimer("PredicThread_" + id);
+
+            while (((!askExistPredictionYoloThread) || (listPredictTask.ElementAt(id).Count() != 0))&&(!forceExistPredictionYoloThread))
             {
                 //todo revoir c# event massage ( fonction bloquante jusqu'a evenement fournit depuis l'externe == meilleur que le sleep)
 
-                if(listPredictTask.Count()!=0)
+                if (listPredictTask.ElementAt(id).Count() != 0)
                 {
                     coudlUse_listPredictTask = false;
-                    console_writeLine("NbPredict = " + listPredictTask.Count());
-                    PredictTask pt = listPredictTask.ElementAt(0);
-                    listPredictTask.RemoveAt(0);
+                    //console_writeLine("NbPredict = " + listPredictTask.Count());
+                    PredictTask pt = listPredictTask.ElementAt(id).ElementAt(0);
+                    listPredictTask.ElementAt(id).RemoveAt(0);
                     coudlUse_listPredictTask = true;
 
                     debugT.start();
                     IPrediction[] detectedObjects = predictMatcher.Run_T_Predict(pt.frame, pt.targetConfidence, pt.targetDetectionTypes);
                     debugT.stop();
-                    console_writeLine("LastPredict take " + debugT.lastDuration + " s");
+                    console_writeLine("LastPredict " + id + " take " + debugT.lastDuration + " s");
 
                     Prediction pr = new Prediction(getNowUtcTime_microSecond(), pt, detectedObjects);
                     while (!coudlUse_listMatcherTask) { };          //attente lock de la liste
-                    listPrediction.Add(pr);
+                    coudlUse_listMatcherTask = false;
+                    long curIndex = pr.predict.index - startIndex;
+                    while(listPrediction.Count() <= curIndex+1)
+                        listPrediction.Add(null);
+                    listPrediction[(int) curIndex] = pr;
+                    coudlUse_listMatcherTask = true;
 
                     Thread.Sleep(0);                                //pour laisser les autres Threads l'occasion de respirer.
-                }else{
+                } else {
                     Thread.Sleep(waitDuration);
                 }
 
-                
+
             }
-            isPredictionYoloThreadFinished = true;
+            isPredictionYoloThreadFinished[id] = true;
 
             console_writeLine(debugT.displayStats(true));
         }
@@ -480,26 +716,28 @@ namespace GeoLiveDectect
             }
         }
 
-        public bool askExistMatcherThread = false;
-        public bool isMatcherThreadFinished = false;
-        List<Match> listMatch = new List<Match>();
-        public bool coudlUse_listMatcherTask = true;
+        static public bool askExistMatcherThread = false;
+        static public bool forceExistMatcherThread = false;
+        static public bool isMatcherThreadFinished = false;
+        static List<Match> listMatch = new List<Match>();
+        static public bool coudlUse_listMatcherTask = true;
 
-        public void thread_Matcher()
+        public static void thread_Matcher()
         {
             askExistMatcherThread = false;
             isMatcherThreadFinished = false;
             DebugTimer debugT = new DebugTimer("MatchThread");
 
             //while (!askExistMatcherThread)
-            while ((!askExistMatcherThread)|| (listPrediction.Count() != 0))      //version on attend la fin du traitement pour quitter
+            while (((!askExistMatcherThread) || (listPrediction.Count() != 0))&& (!forceExistMatcherThread))      //version on attend la fin du traitement pour quitter
             {
-                if (listPrediction.Count() != 0)
+                if ((listPrediction.Count() != 0)&&(listPrediction.ElementAt(0) != null))
                 {
                     coudlUse_listMatcherTask = false;
                     console_writeLine("NbPredictions = " + listPrediction.Count());
-                    Prediction pt = listPrediction.ElementAt(0);
+                    Prediction pt = listPrediction.ElementAt(0) ?? (new Prediction());
                     listPrediction.RemoveAt(0);
+                    startIndex++;
                     coudlUse_listMatcherTask = true;
 
                     debugT.start();
@@ -513,11 +751,11 @@ namespace GeoLiveDectect
 
                     Thread.Sleep(0);                                //pour laisser les autres Threads l'occasion de respirer.
                 }
-                else{
+                else {
                     Thread.Sleep(waitDuration);
                 }
 
-                
+
             }
             isMatcherThreadFinished = true;
             console_writeLine(debugT.displayStats(true));
@@ -528,21 +766,25 @@ namespace GeoLiveDectect
         *                                                                                                   *
         ****************************************************************************************************/
 
-        public bool askExitVideoWriterThread = false;
-        public bool isVideoWriterThreadFinished = false;
+        static public bool askExitVideoWriterThread = false;
+        static public bool forceExitVideoWriterThread = false;
+        static public bool isVideoWriterThreadFinished = false;
 
-        public bool coudlUse_listMatchs = true;
+        static public bool coudlUse_listMatchs = true;
 
-        VideoWriter videoWriter;
+        static VideoWriter videoWriter;
 
-        public void thread_VideoWriter()
+        static List<Match> listReturn = new List<Match>();
+        static public bool coudlUse_listReturn = true;
+
+        public static void thread_VideoWriter()
         {
             askExitVideoWriterThread = false;
             isVideoWriterThreadFinished = false;
 
             int inc = 0;
 
-            while ((!askExitVideoWriterThread) || (listMatch.Count() != 0))
+            while (((!askExitVideoWriterThread) || (listMatch.Count() != 0))&& (!forceExitVideoWriterThread))
             {
                 if (listMatch.Count() != 0)
                 {
@@ -558,6 +800,14 @@ namespace GeoLiveDectect
                     videoWriter.Write(pt.prediction.predict.frame.ToImage<Emgu.CV.Structure.Bgr, byte>());
                     console_writeLine("image " + (inc++) + " tracks: " + pt.tracks.Count);
 
+
+                    
+                    BitmapImage bgf = BitmapToImageSource(pt.prediction.predict.frame);
+                    bgf.Freeze();       // https://stackoverflow.com/questions/3034902/how-do-you-pass-a-bitmapimage-from-a-background-thread-to-the-ui-thread-in-wpf   https://learn.microsoft.com/en-us/dotnet/api/system.windows.freezable.freeze?view=windowsdesktop-8.0&redirectedfrom=MSDN#System_Windows_Freezable_Freeze
+
+                    ActionWindow a = new ActionWindow(getNowUtcTime_microSecond(), "refreshImage", bgf);
+                    while (!MainWindow.coudlUse_listActionWindow) { };          //attente lock de la liste
+                    MainWindow.listActionWindow.Add(a);
                 }
 
                 Thread.Sleep(waitDuration);
@@ -569,10 +819,8 @@ namespace GeoLiveDectect
 
 
 
-
-
-
         
+
 
 
         /****************************************************************************************************
@@ -760,7 +1008,7 @@ namespace GeoLiveDectect
         }
 
         public static System.IO.StreamWriter? _file_txt_log = null;
-        static void console_writeLine(string text, System.IO.StreamWriter? file_txt_log = null)
+        public static void console_writeLine(string text, System.IO.StreamWriter? file_txt_log = null)
         {
             Debug.WriteLine(text);
 
@@ -772,9 +1020,24 @@ namespace GeoLiveDectect
 
 
 
+        static BitmapImage BitmapToImageSource(Bitmap bitmap)                  // https://stackoverflow.com/questions/22499407/how-to-display-a-bitmap-in-a-wpf-image
+        {
+            using (MemoryStream memory = new MemoryStream())
+            {
+                bitmap.Save(memory, System.Drawing.Imaging.ImageFormat.Bmp);
+                memory.Position = 0;
+                BitmapImage bitmapimage = new BitmapImage();
+                bitmapimage.BeginInit();
+                bitmapimage.StreamSource = memory;
+                bitmapimage.CacheOption = BitmapCacheOption.OnLoad;
+                bitmapimage.EndInit();
+
+                return bitmapimage;
+            }
+        }
 
 
     }
 
-    
+
 }

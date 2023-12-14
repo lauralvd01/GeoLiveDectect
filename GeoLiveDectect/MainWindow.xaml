@@ -6,8 +6,9 @@
         xmlns:local="clr-namespace:GeoLiveDectect"
         mc:Ignorable="d"
         Loaded="OnLoad"
-        Title="MainWindow" Height="450" Width="800">
-    <Grid>
+        Title="MainWindow" Height="500" Width="1080">
+    <Grid Margin="0,0,0,0">
+        <Image x:Name="Image0" HorizontalAlignment="Left" Margin="29,36,0,78" Width="720" Height="405" MouseDown="Image0_MouseDown"/>
 
     </Grid>
 </Window>

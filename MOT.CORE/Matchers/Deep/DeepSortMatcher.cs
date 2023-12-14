@@ -61,6 +61,8 @@ namespace MOT.CORE.Matchers.Deep
             detectedObjects = filteredDetectedObj.ToArray();
             */
 
+            //return new List<ITrack>();        //test Todo remove.
+
 
             Vector[] appearances = _appearanceExtractor.Predict(frame, detectedObjects).ToArray();
 
