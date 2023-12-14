@@ -51,7 +51,8 @@ namespace GeoLiveDectect
 
         private void Image0_MouseDown(object sender, MouseButtonEventArgs e)
         {
-            GeoLiveDetect.console_writeLine("Click on image");
+            System.Windows.Point mousePosition = e.GetPosition(Image0);
+            GeoLiveDetect.console_writeLine("######################################### Click on image at position " + mousePosition);
         }
 
 
@@ -129,7 +130,7 @@ namespace GeoLiveDectect
                         Dispatcher.BeginInvoke(new Action(() => 
                         {
                             mWindow.Image0.Source = a.frame;    // you need Mr Freeze :  https://stackoverflow.com/questions/3034902/how-do-you-pass-a-bitmapimage-from-a-background-thread-to-the-ui-thread-in-wpf   https://learn.microsoft.com/en-us/dotnet/api/system.windows.freezable.freeze?view=windowsdesktop-8.0&redirectedfrom=MSDN#System_Windows_Freezable_Freeze
-
+                            
                         }), DispatcherPriority.SystemIdle);            
                     }
                     
