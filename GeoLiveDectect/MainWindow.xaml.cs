@@ -72,17 +72,55 @@ namespace GeoLiveDectect
                     (track.CurrentBoundingBox.Top <= y) && (y <= track.CurrentBoundingBox.Bottom))
                 {
                     Tools.console_writeLine("######################################### Click on image " + inc + " at position " + mousePosition + " is in rectangle " + track.Id);
-                    
-                    System.Windows.Shapes.Rectangle rect = new System.Windows.Shapes.Rectangle();
-                    rect.Height = track.CurrentBoundingBox.Height * Image0.ActualHeight / ((System.Windows.Media.Imaging.BitmapSource)Image0.Source).PixelHeight;
-                    rect.Width = track.CurrentBoundingBox.Width * Image0.ActualWidth / ((System.Windows.Media.Imaging.BitmapSource)Image0.Source).PixelWidth;
-                    rect.Stroke = System.Windows.Media.Brushes.Red;
-                    rect.Name = "Rect_id_" + track.Id;
-                    rect.StrokeThickness = 3;
-                    canvas.Children.Add(rect);
-                    Canvas.SetTop(rect, track.CurrentBoundingBox.Top * Image0.ActualHeight / ((System.Windows.Media.Imaging.BitmapSource)Image0.Source).PixelHeight);
-                    Canvas.SetLeft(rect, track.CurrentBoundingBox.Left * Image0.ActualWidth / ((System.Windows.Media.Imaging.BitmapSource)Image0.Source).PixelWidth);
-                    Canvas.SetZIndex(rect, 2);
+
+                    bool exist = false;
+                    int index = 0;
+                    while (!exist && index < followers.Count())
+                    {
+                        System.Windows.Shapes.Rectangle cur_rect = followers.ElementAt(index);
+                        if (track.Id == int.Parse(cur_rect.Name.Split('_')[1]))
+                        {
+                            canvas.Children.Remove(cur_rect);
+                            followers.RemoveAt(index);
+                            exist = true;
+                        }
+                        index++;
+                    }
+
+                    if (!exist)
+                    {
+                        System.Windows.Shapes.Rectangle rect = new System.Windows.Shapes.Rectangle();
+                        rect.Height = track.CurrentBoundingBox.Height * Image0.ActualHeight / ((System.Windows.Media.Imaging.BitmapSource)Image0.Source).PixelHeight;
+                        rect.Width = track.CurrentBoundingBox.Width * Image0.ActualWidth / ((System.Windows.Media.Imaging.BitmapSource)Image0.Source).PixelWidth;
+                        rect.Stroke = System.Windows.Media.Brushes.Red;
+                        rect.Name = "RectId_" + track.Id;
+                        rect.StrokeThickness = 3;
+                        canvas.Children.Add(rect);
+                        Canvas.SetTop(rect, track.CurrentBoundingBox.Top * Image0.ActualHeight / ((System.Windows.Media.Imaging.BitmapSource)Image0.Source).PixelHeight);
+                        Canvas.SetLeft(rect, track.CurrentBoundingBox.Left * Image0.ActualWidth / ((System.Windows.Media.Imaging.BitmapSource)Image0.Source).PixelWidth);
+                        Canvas.SetZIndex(rect, 2);
+
+                        followers.Add(rect);
+                    }
+                }
+            }
+        }
+
+        private void UpdateFollowers()
+        {
+            foreach (System.Windows.Shapes.Rectangle rect in followers)
+            {
+                int id = int.Parse(rect.Name.Split('_')[1]);
+                foreach (ITrack track in curTracks)
+                {
+                    if (track.Id == id)
+                    {
+                        rect.Height = track.CurrentBoundingBox.Height * Image0.ActualHeight / ((System.Windows.Media.Imaging.BitmapSource)Image0.Source).PixelHeight;
+                        rect.Width = track.CurrentBoundingBox.Width * Image0.ActualWidth / ((System.Windows.Media.Imaging.BitmapSource)Image0.Source).PixelWidth;
+                        Canvas.SetTop(rect, track.CurrentBoundingBox.Top * Image0.ActualHeight / ((System.Windows.Media.Imaging.BitmapSource)Image0.Source).PixelHeight);
+                        Canvas.SetLeft(rect, track.CurrentBoundingBox.Left * Image0.ActualWidth / ((System.Windows.Media.Imaging.BitmapSource)Image0.Source).PixelWidth);
+                        continue;
+                    }
                 }
             }
         }
@@ -130,6 +168,7 @@ namespace GeoLiveDectect
         int inc = 0;
         IReadOnlyList<ITrack> curTracks;
         Canvas canvas;
+        List<System.Windows.Shapes.Rectangle> followers = new List<System.Windows.Shapes.Rectangle>();
 
 
         public void startGeoLiveDetect()
@@ -183,6 +222,7 @@ namespace GeoLiveDectect
                         {
                             mWindow.Image0.Source = a.frame;    // you need Mr Freeze :  https://stackoverflow.com/questions/3034902/how-do-you-pass-a-bitmapimage-from-a-background-thread-to-the-ui-thread-in-wpf   https://learn.microsoft.com/en-us/dotnet/api/system.windows.freezable.freeze?view=windowsdesktop-8.0&redirectedfrom=MSDN#System_Windows_Freezable_Freeze
                             mWindow.ImageCount.Text = "Image " + inc++;
+                            UpdateFollowers();
                         }), DispatcherPriority.SystemIdle);
                     }
 
