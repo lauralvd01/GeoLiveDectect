@@ -85,42 +85,65 @@ namespace GeoLiveDectect
         }
 
 
-        const int penSize = 4;
-        const float yBoundingBoxIntent = 45f;
-        const float xNumberIntent = 4f;
-        const int fontSize = 44;
-
         private void DrawTrackOnCanvas(ITrack track)
         {
+
+            int penSize = 4;
+            float yBoundingBoxIntent = (float) (45 *  Image0.ActualHeight / ((System.Windows.Media.Imaging.BitmapSource)Image0.Source).PixelHeight);
+            float xNumberIntent = (float)(4 * Image0.ActualWidth / ((System.Windows.Media.Imaging.BitmapSource)Image0.Source).PixelWidth);
+            const int fontSize = 44;
+
+
+            double trackHeight = track.CurrentBoundingBox.Height * Image0.ActualHeight / ((System.Windows.Media.Imaging.BitmapSource)Image0.Source).PixelHeight;
+            double trackWidth = track.CurrentBoundingBox.Width * Image0.ActualWidth / ((System.Windows.Media.Imaging.BitmapSource)Image0.Source).PixelWidth;
+            double trackTop = track.CurrentBoundingBox.Top * Image0.ActualHeight / ((System.Windows.Media.Imaging.BitmapSource)Image0.Source).PixelHeight;
+            double trackLeft = track.CurrentBoundingBox.Left * Image0.ActualWidth / ((System.Windows.Media.Imaging.BitmapSource)Image0.Source).PixelWidth;
+
             System.Windows.Shapes.Rectangle rect = new System.Windows.Shapes.Rectangle();
-            rect.Height = track.CurrentBoundingBox.Height * Image0.ActualHeight / ((System.Windows.Media.Imaging.BitmapSource)Image0.Source).PixelHeight;
-            rect.Width = track.CurrentBoundingBox.Width * Image0.ActualWidth / ((System.Windows.Media.Imaging.BitmapSource)Image0.Source).PixelWidth;
-            SolidColorBrush selectedColor = System.Windows.Media.Brushes.Green;
+            rect.Height = trackHeight;
+            rect.Width = trackWidth;
+            SolidColorBrush selectedColor = System.Windows.Media.Brushes.Red;
             SolidColorBrush trackColor = new SolidColorBrush(System.Windows.Media.Color.FromArgb(track.Color.A, track.Color.R, track.Color.G, track.Color.B));
             rect.Stroke = track.selected ? selectedColor : trackColor;
             rect.StrokeThickness = penSize;
             rect.Name = "Track_" + track.Id;
             canvas.Children.Add(rect);
-            Canvas.SetTop(rect, track.CurrentBoundingBox.Top * Image0.ActualHeight / ((System.Windows.Media.Imaging.BitmapSource)Image0.Source).PixelHeight);
-            Canvas.SetLeft(rect, track.CurrentBoundingBox.Left * Image0.ActualWidth / ((System.Windows.Media.Imaging.BitmapSource)Image0.Source).PixelWidth);
+            Canvas.SetTop(rect, trackTop);
+            Canvas.SetLeft(rect, trackLeft);
             Canvas.SetZIndex(rect, 2);
 
+            System.Windows.Shapes.Rectangle idRect = new System.Windows.Shapes.Rectangle();
+            idRect.Height = yBoundingBoxIntent - (penSize / 2);
+            idRect.Width = trackWidth + penSize;
+            idRect.Stroke = track.selected ? selectedColor : trackColor;
+            idRect.StrokeThickness = penSize;
+            idRect.Fill = track.selected ? selectedColor : trackColor;
+            idRect.Name = "Track_" + track.Id;
+            canvas.Children.Add(idRect);
+            Canvas.SetTop(idRect, trackTop - yBoundingBoxIntent);
+            Canvas.SetLeft(idRect, trackLeft - (penSize / 2));
+            Canvas.SetZIndex(idRect, 3);
 
+            (float x, float y) = ((float)trackLeft - xNumberIntent, (float)trackTop - yBoundingBoxIntent);
 
+            TextBlock idText = new TextBlock();
+            idText.Text = "Track_" + track.Id;
+            //idText.FontSize = fontSize;
+            //idText.FontStyle = 
+            idText.Foreground = System.Windows.Media.Brushes.Black;
+            idText.Background = System.Windows.Media.Brushes.White;
+            canvas.Children.Add (idText);
+            Canvas.SetTop(idRect, y);
+            Canvas.SetLeft(idRect, x);
+            Canvas.SetZIndex(idRect, 4);
 
-                /*
-                
-                graphics.FillRectangle(new System.Drawing.SolidBrush(track.Color),
-                    new System.Drawing.RectangleF(track.CurrentBoundingBox.X - (penSize / 2), track.CurrentBoundingBox.Y - yBoundingBoxIntent,
-                        track.CurrentBoundingBox.Width + penSize, yBoundingBoxIntent - (penSize / 2)));
+            /*
 
-                (float x, float y) = (track.CurrentBoundingBox.X - xNumberIntent, track.CurrentBoundingBox.Y - yBoundingBoxIntent);
+            graphics.DrawString($"{track.Id}",
+                new Font("Consolas", fontSize, GraphicsUnit.Pixel), new System.Drawing.SolidBrush(System.Drawing.Color.FromArgb((0xFF << 24) | 0xDDDDDD)),
+                new System.Drawing.PointF(x, y));
 
-                graphics.DrawString($"{track.Id}",
-                    new Font("Consolas", fontSize, GraphicsUnit.Pixel), new System.Drawing.SolidBrush(System.Drawing.Color.FromArgb((0xFF << 24) | 0xDDDDDD)),
-                    new System.Drawing.PointF(x, y));
-                 
-                 */
+             */
         }
 
         private void DrawTracksOnCanvas()
