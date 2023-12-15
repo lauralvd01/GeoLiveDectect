@@ -6,9 +6,85 @@
         xmlns:local="clr-namespace:GeoLiveDectect"
         mc:Ignorable="d"
         Loaded="OnLoad"
-        Title="MainWindow" Height="500" Width="1080">
-    <Grid Margin="0,0,0,0">
-        <Image x:Name="Image0" HorizontalAlignment="Left" Margin="29,36,0,78" Width="720" Height="405" MouseDown="Image0_MouseDown"/>
+        Title="MainWindow" Height="700" Width="1280">
+    <Grid Margin="0,0,0,-16">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="932*"/>
+            <ColumnDefinition Width="450
+                              *"/>
+        </Grid.ColumnDefinitions>
+        <GroupBox x:Name="groupBoxLeftImg" Header="Image">
+            <Grid DockPanel.Dock="Left" >
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+                <TextBlock x:Name="ImageCount" FontWeight="Bold" FontSize="18" TextWrapping="Wrap" Panel.ZIndex="2" Margin="29,10,0,0" Height="30" HorizontalAlignment="Left" VerticalAlignment="Top" Width="329">Image COUNT</TextBlock>
+                <Image x:Name="Image0" HorizontalAlignment="Left" Margin="29,39,0,46" Width="720" MouseDown="Image0_MouseDown" MouseMove="Image0_MouseMove" Panel.ZIndex="1" Height="405" />
+            </Grid>
+        </GroupBox>
+        <GroupBox x:Name="groupBoxRightProperties" Header="Decklink" Grid.Column="1" >
+            <Grid DockPanel.Dock="Right" Width="360" >
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+                <GroupBox x:Name="groupBoxProperties" Header="Properties" >
+                    <Grid HorizontalAlignment="Left" Margin="5" Width="340">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Label x:Name="labelDevice" Content="Input Device:" Margin="3"/>
+                        <ComboBox x:Name="comboBoxDevice" Grid.Column="1" Margin="3" SelectionChanged="comboBoxDevice_SelectionChanged"/>
+                        <Label x:Name="labelConnection" Content="Input Connection:" Grid.Row="1" Margin="3"/>
+                        <ComboBox x:Name="comboBoxConnection" Grid.Row ="1" Grid.Column="1" Margin="3" SelectionChanged="comboBoxConnection_SelectionChanged"/>
+                        <Label x:Name="labelFormat" Content="Video Format:" Grid.Row="2" Margin="3"/>
+                        <ComboBox x:Name="comboBoxVideoFormat" Grid.Row ="2" Grid.Column="1" Margin="3" SelectionChanged="comboBoxVideoFormat_SelectionChanged"/>
+                        <Label x:Name="labelAutoDetect" Content="Auto-Detect Format:" Grid.Row="3" Margin="3" Visibility="Collapsed"/>
+                        <CheckBox x:Name="checkBoxAutoDetect" Grid.Row="3" Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="3" Checked="checkBoxAutoDetect_CheckedChanged" Unchecked="checkBoxAutoDetect_CheckedChanged" Visibility="Collapsed" IsThreeState="False"/>
+                        <Label x:Name="label3DPreview" Content="3D Preview Format:" Grid.Row="4" Margin="3" Visibility="Collapsed"/>
+                        <ComboBox x:Name="comboBox3DPreviewFormat" Grid.Row ="4" Grid.Column="1" Margin="3" Visibility="Collapsed"/>
+                    </Grid>
+                </GroupBox>
+                <GroupBox x:Name="groupBoxTimecode" Header="Timecode" Grid.Row="1">
+                    <DataGrid Name="dataGridTimecode" ItemsSource="{Binding TimecodeData}" AutoGenerateColumns="False" GridLinesVisibility="None" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" HeadersVisibility="Column" Background="Transparent" RowBackground="Transparent" CanUserAddRows="False">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Format" Binding="{Binding Format}" Width="125" />
+                            <DataGridTextColumn Header="Value" Binding="{Binding Value}" Width="125" />
+                            <DataGridTextColumn Header="User Bits" Binding="{Binding UserBits}" Width="*" />
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </GroupBox>
+                <GroupBox x:Name="groupBoxVANC" Header="VANC" Grid.Row="2">
+                    <DataGrid Name="dataGridVANC" ItemsSource="{Binding VANCPacketData}" AutoGenerateColumns="False" GridLinesVisibility="None" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" HeadersVisibility="Column" Background="Transparent" RowBackground="Transparent" CanUserAddRows="False">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Line" Binding="{Binding Line}" Width="40" />
+                            <DataGridTextColumn Header="DID" Binding="{Binding DID}" Width="40" />
+                            <DataGridTextColumn Header="SDID" Binding="{Binding SDID}" Width="40" />
+                            <DataGridTextColumn Header="Data" Binding="{Binding Data}" Width="Auto" MinWidth="226" />
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </GroupBox>
+                <GroupBox x:Name="groupBoxMetadata" Header="Static Metadata" Grid.Row="3">
+                    <DataGrid Name="dataGridMetadata" ItemsSource="{Binding MetadataData}" AutoGenerateColumns="False" GridLinesVisibility="None" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" HeadersVisibility="Column" Background="Transparent" RowBackground="Transparent" CanUserAddRows="False">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Item" Binding="{Binding Item}" Width="250" />
+                            <DataGridTextColumn Header="Value" Binding="{Binding Value}" Width="*" />
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </GroupBox>
+            </Grid>
+        </GroupBox>
 
     </Grid>
 </Window>

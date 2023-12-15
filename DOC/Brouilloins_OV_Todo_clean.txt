@@ -1,4 +1,27 @@
 
+
+*****
+
+-Mat readBuffer -> GetData()
+-Bitmap frame = readBuffer.ToBitmap();
+-videoCapture => Systeme.Drawing.Bitmap
+
+-IDeckLinkVideoFrame? frame = null; -> GetBytes()
+
+-matcher need Bitmap
+
+-DrawTrack() : 
+	-Graphics graphics = Graphics.FromImage(frame);
+
+-MainWindows.Image0.Source = BitmapImage
+	-BitmapImage bgf = Tools.BitmapToImageSource(pt.prediction.predict.frame);
+
+*****
+
+
+
+
+
 MulConfidence = ObjConfidence * ClsConfidence
 	ClsConfidence
 	

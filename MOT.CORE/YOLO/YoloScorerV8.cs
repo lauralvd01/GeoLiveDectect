@@ -3,6 +3,7 @@ using Compunet.YoloV8.Data;
 using Microsoft.ML.OnnxRuntime;
 using Microsoft.ML.OnnxRuntime.Tensors;
 using MOT.CORE.Utils;
+using MOT.CORE.Utils.Pool;
 using MOT.CORE.YOLO.Models;
 using SixLabors.ImageSharp.Formats.Jpeg;
 using SixLabors.ImageSharp.PixelFormats;
@@ -43,44 +44,12 @@ namespace MOT.CORE.YOLO
         }
 
 
-        /*
-        public static Image ToImageSharpImage(System.Drawing.Bitmap bitmap)
-        {
-            using (var memoryStream = new MemoryStream())
-            {
-                bitmap.Save(memoryStream, System.Drawing.Imaging.ImageFormat.Jpeg);
-
-                memoryStream.Seek(0, SeekOrigin.Begin);
-
-                return Image.Load(memoryStream, new JpegDecoder());
-            }
-        }
-        */
-
-
-        /*
-        public static byte[] ImageToByte(Image img)         //https://stackoverflow.com/questions/7350679/convert-a-bitmap-into-a-byte-array
-        {
-            ImageConverter converter = new ImageConverter();
-            return (byte[])converter.ConvertTo(img, typeof(byte[]));
-        }
-        */
-
-        public static byte[] ImageToByte(Image img)
-        {
-            using (var stream = new MemoryStream())
-            {
-                //img.Save(stream, System.Drawing.Imaging.ImageFormat.Png);         // non usede , because rgb24 (no alpha needed)
-                //img.Save(stream, System.Drawing.Imaging.ImageFormat.Jpeg);
-                img.Save(stream, System.Drawing.Imaging.ImageFormat.Bmp);
-                return stream.ToArray();
-            }
-        }
+        
 
         static public YoloV8 predictor_V8 = null;
         public IReadOnlyList<IPrediction> Predict(Bitmap image, float targetConfidence, params DetectionObjectType[] targetDetectionTypes)
         {
-            
+
 
 
 
@@ -95,7 +64,7 @@ namespace MOT.CORE.YOLO
             //IDetectionResult result = predictor_V8.Detect(ImageSelector<Rgb24>:ImageSelector(stream));
             //IDetectionResult result = predictor_V8.Detect(new ImageSelector<Rgb24>(stream));
 
-            byte[] byteArray = ImageToByte(image);
+            byte[] byteArray = Tools.ImageToByte(image);
             IDetectionResult result = predictor_V8.Detect(new ImageSelector(byteArray));
 
 

@@ -40,7 +40,7 @@ namespace GeoLiveDectect
             if (isStarted)
                 return;
 
-            startUtcTime = getNowUtcTime_microSecond();
+            startUtcTime = Tools.getNowUtcTime_microSecond();
             isStarted = true;
 
             //for hiddle
@@ -68,7 +68,7 @@ namespace GeoLiveDectect
             if (!isStarted)
                 return;
 
-            stopUtcTime = getNowUtcTime_microSecond();
+            stopUtcTime = Tools.getNowUtcTime_microSecond();
             isStarted = false;
 
             Double duration = (stopUtcTime - startUtcTime) / (1000.0 * 1000.0);
@@ -94,16 +94,5 @@ namespace GeoLiveDectect
         }
 
 
-
-
-
-
-        /****************************************************************************************************
-        *                                                                                                   *
-        ****************************************************************************************************/
-        static long getNowUtcTime_microSecond()                     // https://stackoverflow.com/questions/17632584/how-to-get-the-unix-timestamp-in-c-sharp
-        {
-            return (long)((DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1)).Ticks / TimeSpan.TicksPerMillisecond) * 1000.0);      //in microSecond
-        }
     }
 }

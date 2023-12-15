@@ -49,11 +49,46 @@ namespace GeoLiveDectect
         }
 
 
+        private void Image0_MouseMove(object sender, MouseEventArgs e)              // https://stackoverflow.com/questions/21550982/how-to-get-the-mousemove-event-when-the-mouse-actually-moves-over-an-element
+        {
+            System.Windows.Point mousePosition = e.GetPosition(Image0);
+            ImageCount.Text = "pos: " + mousePosition;         //debug todo remove
+        }
+
         private void Image0_MouseDown(object sender, MouseButtonEventArgs e)
         {
             System.Windows.Point mousePosition = e.GetPosition(Image0);
-            GeoLiveDetect.console_writeLine("######################################### Click on image at position " + mousePosition);
+
+
+            //Image0.ActualHeight  Image0.ActualWidth
+            //Image0.PointFromScreen();
+            float x = (float)mousePosition.X * ((System.Windows.Media.Imaging.BitmapSource)Image0.Source).PixelWidth / (float)Image0.ActualWidth;
+            float y = (float)mousePosition.Y * ((System.Windows.Media.Imaging.BitmapSource)Image0.Source).PixelHeight / (float)Image0.ActualHeight;
+
+            foreach (ITrack track in curTracks)
+            {
+                if ((track.CurrentBoundingBox.Left <= x) && (x <= track.CurrentBoundingBox.Right) &&
+                    (track.CurrentBoundingBox.Top <= y) && (y <= track.CurrentBoundingBox.Bottom))
+                {
+                    Tools.console_writeLine("######################################### Click on image " + inc + " at position " + mousePosition + " is in rectangle " + track.Id);
+                }
+            }
         }
+
+        /*
+        Prediction.detectedObjects => IPrediction[]
+        IPrediction.Rectangle.Top .Left . Right .Bottom .Width .Height => int
+        
+        IReadOnlyList<ITrack>
+        ITrack.Id
+        ITrack.CurrentBoundingBox.Top .Left . Right .Bottom .Width .Height => float
+
+        Point mousePosition.X .Y => double
+        
+        mousePosition
+        Bottom Left : 28;367
+         */
+
 
 
 
@@ -66,29 +101,34 @@ namespace GeoLiveDectect
             public long timestamp;
             public String action;
             public BitmapImage frame;
+            public IReadOnlyList<ITrack> tracks;
 
-            public ActionWindow(long timestamp, String action, BitmapImage frame)
+            public ActionWindow(long timestamp, String action, BitmapImage frame, IReadOnlyList<ITrack> tracks)
             {
                 this.timestamp = timestamp;
                 this.action = action;
                 this.frame = frame;
+                this.tracks = tracks;
             }
         }
 
         static public List<ActionWindow> listActionWindow = new List<ActionWindow>();
         static public bool coudlUse_listActionWindow = true;
         static public bool forceExistListenerThread = false;
+        int inc = 0;
+        IReadOnlyList<ITrack> curTracks;
 
-        public void startGeoLiveDetect() 
+
+        public void startGeoLiveDetect()
         {
-            
+
             try
             {
                 Thread thread = new Thread(new ThreadStart(threadGeoLiveDetect));
                 thread.Start();
             }
-            catch (Exception e) 
-            { 
+            catch (Exception e)
+            {
                 //Debug.writeLine(e.ToString()); 
             }
 
@@ -107,17 +147,16 @@ namespace GeoLiveDectect
         }
         public void threadGeoLiveDetect()
         {
-            //mGeoliveDetect.init(mWindow);
-            mGeoliveDetect.init(null);
+            mGeoliveDetect.init(mWindow);
         }
 
         public void threadListener()
         {
-            while(!forceExistListenerThread)
+            while (!forceExistListenerThread)
             {
 
 
-                if(listActionWindow.Count != 0)
+                if (listActionWindow.Count != 0)
                 {
                     coudlUse_listActionWindow = false;
                     ActionWindow a = listActionWindow[0];
@@ -126,21 +165,33 @@ namespace GeoLiveDectect
 
                     if (a.action.Equals("refreshImage"))
                     {
-                        
-                        Dispatcher.BeginInvoke(new Action(() => 
+                        curTracks = a.tracks;
+                        Dispatcher.BeginInvoke(new Action(() =>
                         {
                             mWindow.Image0.Source = a.frame;    // you need Mr Freeze :  https://stackoverflow.com/questions/3034902/how-do-you-pass-a-bitmapimage-from-a-background-thread-to-the-ui-thread-in-wpf   https://learn.microsoft.com/en-us/dotnet/api/system.windows.freezable.freeze?view=windowsdesktop-8.0&redirectedfrom=MSDN#System_Windows_Freezable_Freeze
-                            
-                        }), DispatcherPriority.SystemIdle);            
+                            mWindow.ImageCount.Text = "Image " + inc++;
+                        }), DispatcherPriority.SystemIdle);
                     }
-                    
+
                 }
 
             }
         }
+
+
+
+        //Decklink interface
+        private void comboBoxDevice_SelectionChanged(object sender, SelectionChangedEventArgs e) { mGeoliveDetect.notify("comboBoxDevice_SelectionChanged", sender, e); }
+
+        private void comboBoxConnection_SelectionChanged(object sender, SelectionChangedEventArgs e) { mGeoliveDetect.notify("comboBoxConnection_SelectionChanged", sender, e); }
+
+        private void comboBoxVideoFormat_SelectionChanged(object sender, RoutedEventArgs e) { mGeoliveDetect.notify("comboBoxVideoFormat_SelectionChanged", sender, e); }
+
+        private void checkBoxAutoDetect_CheckedChanged(object sender, RoutedEventArgs e) { mGeoliveDetect.notify("checkBoxAutoDetect_CheckedChanged", sender, e); }
+
+        private void comboBox3DPreviewFormat_SelectionChanged(object sender, RoutedEventArgs e) { mGeoliveDetect.notify("comboBox3DPreviewFormat_SelectionChanged", sender, e); }
     }
 }
-
 
 
 /*

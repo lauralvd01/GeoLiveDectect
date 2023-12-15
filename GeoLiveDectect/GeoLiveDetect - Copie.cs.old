@@ -33,8 +33,6 @@ using System.Security.Cryptography.X509Certificates;
 using System.Windows.Media.Imaging;
 using System.Windows.Media;
 using static GeoLiveDectect.MainWindow;
-using System.Security.Policy;
-using GeoLiveDectect.Decklink;
 
 
 
@@ -47,7 +45,7 @@ using GeoLiveDectect.Decklink;
 namespace GeoLiveDectect
 {
 
-    public class GeoLiveDetect
+    internal class GeoLiveDetect
     {
         static MainWindow? mWindow = null;
 
@@ -55,47 +53,19 @@ namespace GeoLiveDectect
         {
             mWindow = window;
 
-            Tools.initLogs("GeoLiveDetect");
+            initLogs();
 
             //test_1b();
             //test3();
-            //test5();
-
-            test6();
+            test5();
         }
-
-        public void notifyNewFrame(DecklinkCapture.Frame f)
-        {
-            //todo 
-        }
-
-
-
-
 
 
         static public bool forceExitVideoReadThread = false;
         static public bool isVideoReadThreadFinished = false;
 
-        /****************************************************************************************************
-        *                                                                                                   *
-        ****************************************************************************************************/
-
-        DecklinkCapture dkc = null;
-        public void test6()         //test make working Decklink capture.
-        {
-            dkc = new DecklinkCapture(mWindow, this);
-
-            isVideoReadThreadFinished = true;
-        }
-        public void notify(String action, object sender, SelectionChangedEventArgs e) { if (dkc != null) dkc.notify(action, sender, e); }
-        public void notify(String action, object sender, RoutedEventArgs e) { if (dkc != null) dkc.notify(action, sender, e); }
 
 
-
-        /****************************************************************************************************
-        *                                                                                                   *
-        ****************************************************************************************************/
         public async void test()
         {
             DebugTimer testTimer = new DebugTimer("Test", true);
@@ -115,7 +85,7 @@ namespace GeoLiveDectect
             ploted.Save("./pose_demo.jpg");
 
             testTimer.stop();
-            Tools.console_writeLine(testTimer.displayStats());
+            console_writeLine(testTimer.displayStats());
             isVideoReadThreadFinished = true;
         }
 
@@ -147,13 +117,13 @@ namespace GeoLiveDectect
                 result = predictor.Detect(aa);
                 debugT.stop();
 
-                Tools.console_writeLine("image " + (inc++) + " LastDuration: " + debugT.lastDuration);
+                console_writeLine("image " + (inc++) + " LastDuration: " + debugT.lastDuration);
             }
 
-            Tools.console_writeLine(debugT.displayStats());
+            console_writeLine(debugT.displayStats());
 
             testTimer.stop();
-            Tools.console_writeLine(testTimer.displayStats());
+            console_writeLine(testTimer.displayStats());
             isVideoReadThreadFinished = true;
         }
 
@@ -170,11 +140,11 @@ namespace GeoLiveDectect
                 Thread thread = new Thread(new ThreadStart(threadTest2));
                 thread.Start();
             }
-            catch (Exception e) { Tools.console_writeLine(e.ToString()); }
+            catch (Exception e) { console_writeLine(e.ToString()); }
         }
         public void threadTest2()
         {
-            Tools.console_writeLine("Ca marche. Au revoir");
+            console_writeLine("Ca marche. Au revoir");
         }
 
 
@@ -235,20 +205,20 @@ namespace GeoLiveDectect
                 debugT.start();
                 IPrediction[] detectedObjects = matcher.Run_T_Predict(frame, targetConfidence, DetectionObjectType.sailboat);
                 debugT.stop();
-                Tools.console_writeLine("LastPredict take " + debugT.lastDuration + " s");
+                console_writeLine("LastPredict take " + debugT.lastDuration + " s");
 
                 debugT_b.start();
                 IReadOnlyList<ITrack> tracks = matcher.Run_T_Match(detectedObjects, frame);
                 debugT_b.stop();
-                Tools.console_writeLine("LastMatch take " + debugT.lastDuration + " s");
+                console_writeLine("LastMatch take " + debugT.lastDuration + " s");
 
 
 
                 DrawTracks(frame, tracks);
 
                 videoWriter.Write(frame.ToImage<Emgu.CV.Structure.Bgr, byte>());
-                Tools.console_writeLine("image " + (inc++) + " tracks: " + tracks.Count);
-                Tools.console_writeLine("LastDuration: " + debugT.lastDuration);
+                console_writeLine("image " + (inc++) + " tracks: " + tracks.Count);
+                console_writeLine("LastDuration: " + debugT.lastDuration);
 
                 videoCapture.Read(readBuffer);
 
@@ -256,14 +226,14 @@ namespace GeoLiveDectect
                     break;
             }
 
-            Tools.console_writeLine(debugT.displayStats());
-            Tools.console_writeLine(debugT_b.displayStats());
+            console_writeLine(debugT.displayStats());
+            console_writeLine(debugT_b.displayStats());
             matcher.Dispose();
             videoWriter.Dispose();
 
 
             testTimer.stop();
-            Tools.console_writeLine(testTimer.displayStats());
+            console_writeLine(testTimer.displayStats());
             isVideoReadThreadFinished = true;
         }
 
@@ -330,26 +300,6 @@ namespace GeoLiveDectect
                 [FieldOffset(10)]
                 public short headerChecksum;
             }
-
-
-            //int long float double (string a verifier) => des type de base, donc copié
-            //Int Long Float Double String => reference. Attention a ne pas modifier une valeurs que l'on croyais etre copiée.
-            //      Double aa = new Double(124);
-            //      double aa = 124.3;
-            //      Double aa = 124.3;          //ca marche car il comprend que c'est un double, qu'il peut mettre en Double.
-            
-
-            // en javascript : 
-            // si tu as une variable avec un type de base, c'est une copie ( let aa = 12.4 => Number, let aa = "toto" => string )
-            // si c'est un object ( let aa = {} ), c'est une reference.
-            //      let aa = { name: "toto", id: 42 }
-            //      function xxx(let bb) { bb.name = "titi"; }  
-            //      xxx(aa); => là ca change aa
-            //
-            //  ex : j'ai un serie de fonctions, voir de la recursivité, qui doit remplir le meme tableau, 
-            //      je fais let aa = { list: [] }, et je passe aa en argumnt de mes fonctions.
-            //
-
             */
 
 
@@ -361,7 +311,7 @@ namespace GeoLiveDectect
             }
             catch (Exception e)
             {
-                Tools.console_writeLine(e.ToString());
+                console_writeLine(e.ToString());
                 return;
             }
 
@@ -372,7 +322,7 @@ namespace GeoLiveDectect
             }
             catch (Exception e)
             {
-                Tools.console_writeLine(e.ToString());
+                console_writeLine(e.ToString());
                 return;
             }
 
@@ -383,7 +333,7 @@ namespace GeoLiveDectect
             }
             catch (Exception e)
             {
-                Tools.console_writeLine(e.ToString());
+                console_writeLine(e.ToString());
                 return;
             }
 
@@ -407,8 +357,8 @@ namespace GeoLiveDectect
             videoCapture.Read(readBuffer);
 
 
-            long startUtcTime = Tools.getNowUtcTime_microSecond();
-            Double previousSecond = Math.Floor((Tools.getNowUtcTime_microSecond() - startUtcTime) / (1000.0 * 1000.0));
+            long startUtcTime = getNowUtcTime_microSecond();
+            Double previousSecond = Math.Floor((getNowUtcTime_microSecond() - startUtcTime) / (1000.0 * 1000.0));
 
             int inc = 0;
             while ((readBuffer.IsEmpty == false)&& (!forceExitVideoReadThread))
@@ -418,28 +368,28 @@ namespace GeoLiveDectect
                 DetectionObjectType[] targetDetectionTypes = new DetectionObjectType[1];
                 targetDetectionTypes[0] = DetectionObjectType.sailboat;
 
-                PredictTask pt = new PredictTask(Tools.getNowUtcTime_microSecond(), frame, targetConfidence, targetDetectionTypes,inc);
+                PredictTask pt = new PredictTask(getNowUtcTime_microSecond(), frame, targetConfidence, targetDetectionTypes,inc);
                 while (!coudlUse_listPredictTask) { };          //attente lock de la liste
                 listPredictTask.ElementAt(0).Add(pt);
 
 
 
-                Double nowSecond = Math.Floor((Tools.getNowUtcTime_microSecond() - startUtcTime) / (1000.0 * 1000.0));
+                Double nowSecond = Math.Floor((getNowUtcTime_microSecond() - startUtcTime) / (1000.0 * 1000.0));
                 if (nowSecond != previousSecond)
-                    Tools.console_writeLine("nowSecond :" + nowSecond);
+                    console_writeLine("nowSecond :" + nowSecond);
                 previousSecond = nowSecond;
 
 
-                Tools.console_writeLine("inc:" + inc++);
+                console_writeLine("inc:" + inc++);
                 if (inc >= 60)
                     break;
 
 
-                Tools.waitUntil(startUtcTime, inc, timeBetweenTrame);
+                waitUntil(startUtcTime, inc, timeBetweenTrame);
                 videoCapture.Read(readBuffer);
             }
 
-            Tools.console_writeLine("Main Thread Waiting Others");
+            console_writeLine("Main Thread Waiting Others");
 
             askExistPredictionYoloThread = true;
             askExistMatcherThread = true;
@@ -458,9 +408,9 @@ namespace GeoLiveDectect
             videoWriter.Dispose();
 
             testTimer.stop();
-            Tools.console_writeLine(testTimer.displayStats());
+            console_writeLine(testTimer.displayStats());
 
-            Tools.console_writeLine("Main Thread Waiting End: Goodbye");
+            console_writeLine("Main Thread Waiting End: Goodbye");
             isVideoReadThreadFinished = true;
         }
 
@@ -515,7 +465,7 @@ namespace GeoLiveDectect
                 }
                 catch (Exception e)
                 {
-                    Tools.console_writeLine("Error on Thread " + i + " :" + e.ToString());
+                    console_writeLine("Error on Thread " + i + " :" + e.ToString());
                     return;
                 }
             }
@@ -528,7 +478,7 @@ namespace GeoLiveDectect
             }
             catch (Exception e)
             {
-                Tools.console_writeLine(e.ToString());
+                console_writeLine(e.ToString());
                 return;
             }
 
@@ -540,7 +490,7 @@ namespace GeoLiveDectect
             }
             catch (Exception e)
             {
-                Tools.console_writeLine(e.ToString());
+                console_writeLine(e.ToString());
                 return;
             }
 
@@ -564,8 +514,8 @@ namespace GeoLiveDectect
             videoCapture.Read(readBuffer);
 
 
-            long startUtcTime = Tools.getNowUtcTime_microSecond();
-            Double previousSecond = Math.Floor((Tools.getNowUtcTime_microSecond() - startUtcTime) / (1000.0 * 1000.0));
+            long startUtcTime = getNowUtcTime_microSecond();
+            Double previousSecond = Math.Floor((getNowUtcTime_microSecond() - startUtcTime) / (1000.0 * 1000.0));
 
             int inc = 0;
             while ((readBuffer.IsEmpty == false)&&(!forceExitVideoReadThread))
@@ -575,28 +525,28 @@ namespace GeoLiveDectect
                 DetectionObjectType[] targetDetectionTypes = new DetectionObjectType[1];
                 targetDetectionTypes[0] = DetectionObjectType.sailboat;
 
-                PredictTask pt = new PredictTask(Tools.getNowUtcTime_microSecond(), frame, targetConfidence, targetDetectionTypes, inc);
+                PredictTask pt = new PredictTask(getNowUtcTime_microSecond(), frame, targetConfidence, targetDetectionTypes, inc);
                 while (!coudlUse_listPredictTask) { };          //attente lock de la liste
                 listPredictTask.ElementAt(inc % nbThreadsPredict).Add(pt);
 
 
 
-                Double nowSecond = Math.Floor((Tools.getNowUtcTime_microSecond() - startUtcTime) / (1000.0 * 1000.0));
+                Double nowSecond = Math.Floor((getNowUtcTime_microSecond() - startUtcTime) / (1000.0 * 1000.0));
                 if (nowSecond != previousSecond)
-                    Tools.console_writeLine("nowSecond :" + nowSecond);
+                    console_writeLine("nowSecond :" + nowSecond);
                 previousSecond = nowSecond;
 
 
-                Tools.console_writeLine("inc:" + inc++);
+                console_writeLine("inc:" + inc++);
                 if (inc >= 60)
                     break;
 
 
-                Tools.waitUntil(startUtcTime, inc, timeBetweenTrame);
+                waitUntil(startUtcTime, inc, timeBetweenTrame);
                 videoCapture.Read(readBuffer);
             }
 
-            Tools.console_writeLine("Main Thread Waiting Others");
+            console_writeLine("Main Thread Waiting Others");
 
             askExistPredictionYoloThread = true;
 
@@ -631,9 +581,9 @@ namespace GeoLiveDectect
             videoWriter.Dispose();
 
             testTimer.stop();
-            Tools.console_writeLine(testTimer.displayStats());
+            console_writeLine(testTimer.displayStats());
 
-            Tools.console_writeLine("Main Thread Waiting End: Goodbye");
+            console_writeLine("Main Thread Waiting End: Goodbye");
             isVideoReadThreadFinished = true;
         }
 
@@ -713,7 +663,7 @@ namespace GeoLiveDectect
                 if (listPredictTask.ElementAt(id).Count() != 0)
                 {
                     coudlUse_listPredictTask = false;
-                    //Tools.console_writeLine("NbPredict = " + listPredictTask.Count());
+                    //console_writeLine("NbPredict = " + listPredictTask.Count());
                     PredictTask pt = listPredictTask.ElementAt(id).ElementAt(0);
                     listPredictTask.ElementAt(id).RemoveAt(0);
                     coudlUse_listPredictTask = true;
@@ -721,9 +671,9 @@ namespace GeoLiveDectect
                     debugT.start();
                     IPrediction[] detectedObjects = predictMatcher.Run_T_Predict(pt.frame, pt.targetConfidence, pt.targetDetectionTypes);
                     debugT.stop();
-                    Tools.console_writeLine("LastPredict " + id + " take " + debugT.lastDuration + " s");
+                    console_writeLine("LastPredict " + id + " take " + debugT.lastDuration + " s");
 
-                    Prediction pr = new Prediction(Tools.getNowUtcTime_microSecond(), pt, detectedObjects);
+                    Prediction pr = new Prediction(getNowUtcTime_microSecond(), pt, detectedObjects);
                     while (!coudlUse_listMatcherTask) { };          //attente lock de la liste
                     coudlUse_listMatcherTask = false;
                     long curIndex = pr.predict.index - startIndex;
@@ -742,7 +692,7 @@ namespace GeoLiveDectect
             isPredictionYoloThreadFinished[id] = true;
             askExistMatcherThread = true;
 
-            Tools.console_writeLine(debugT.displayStats(true));
+            console_writeLine(debugT.displayStats(true));
         }
 
 
@@ -784,7 +734,7 @@ namespace GeoLiveDectect
                 if ((listPrediction.Count() != 0)&&(listPrediction.ElementAt(0) != null))
                 {
                     coudlUse_listMatcherTask = false;
-                    Tools.console_writeLine("NbPredictions = " + listPrediction.Count());
+                    console_writeLine("NbPredictions = " + listPrediction.Count());
                     Prediction pt = listPrediction.ElementAt(0) ?? (new Prediction());
                     listPrediction.RemoveAt(0);
                     startIndex++;
@@ -793,9 +743,9 @@ namespace GeoLiveDectect
                     debugT.start();
                     IReadOnlyList<ITrack> tracks = predictMatcher.Run_T_Match(pt.detectedObjects, pt.predict.frame);
                     debugT.stop();
-                    Tools.console_writeLine("LastMatch take " + debugT.lastDuration + " s");
+                    console_writeLine("LastMatch take " + debugT.lastDuration + " s");
 
-                    Match pr = new Match(Tools.getNowUtcTime_microSecond(), pt, tracks);
+                    Match pr = new Match(getNowUtcTime_microSecond(), pt, tracks);
                     while (!coudlUse_listMatchs) { };          //attente lock de la liste
                     listMatch.Add(pr);
 
@@ -809,7 +759,7 @@ namespace GeoLiveDectect
             }
             isMatcherThreadFinished = true;
             askExitVideoWriterThread = true;
-            Tools.console_writeLine(debugT.displayStats(true));
+            console_writeLine(debugT.displayStats(true));
         }
 
 
@@ -840,7 +790,7 @@ namespace GeoLiveDectect
                 if (listMatch.Count() != 0)
                 {
                     coudlUse_listMatchs = false;
-                    Tools.console_writeLine("NbMatchs = " + listMatch.Count());
+                    console_writeLine("NbMatchs = " + listMatch.Count());
                     Match pt = listMatch.ElementAt(0);
                     listMatch.RemoveAt(0);
                     coudlUse_listMatchs = true;
@@ -849,14 +799,14 @@ namespace GeoLiveDectect
                     DrawTracks(pt.prediction.predict.frame, pt.tracks);
 
                     videoWriter.Write(pt.prediction.predict.frame.ToImage<Emgu.CV.Structure.Bgr, byte>());
-                    Tools.console_writeLine("image " + (inc++) + " tracks: " + pt.tracks.Count);
+                    console_writeLine("image " + (inc++) + " tracks: " + pt.tracks.Count);
 
 
                     
-                    BitmapImage bgf = Tools.BitmapToImageSource(pt.prediction.predict.frame);
+                    BitmapImage bgf = BitmapToImageSource(pt.prediction.predict.frame);
                     bgf.Freeze();       // https://stackoverflow.com/questions/3034902/how-do-you-pass-a-bitmapimage-from-a-background-thread-to-the-ui-thread-in-wpf   https://learn.microsoft.com/en-us/dotnet/api/system.windows.freezable.freeze?view=windowsdesktop-8.0&redirectedfrom=MSDN#System_Windows_Freezable_Freeze
 
-                    ActionWindow a = new ActionWindow(Tools.getNowUtcTime_microSecond(), "refreshImage", bgf,pt.tracks);
+                    ActionWindow a = new ActionWindow(getNowUtcTime_microSecond(), "refreshImage", bgf,pt.tracks);
                     while (!MainWindow.coudlUse_listActionWindow) { };          //attente lock de la liste
                     MainWindow.listActionWindow.Add(a);
                 }
@@ -978,6 +928,114 @@ namespace GeoLiveDectect
         }
 
 
+
+        /****************************************************************************************************
+        /********************************************* Tools ************************************************
+        ****************************************************************************************************/
+
+        public static void waitUntil(long startUtcTime, int inc, int timeBetweenTrame)
+        {
+            bool useSleep = false;
+
+            if (timeBetweenTrame != 0)
+            {
+                long endTimeSleep = startUtcTime / 1000 + inc * timeBetweenTrame;
+
+                long diff = endTimeSleep - (getNowUtcTime_microSecond() / 1000);
+                if (diff > 0)
+                {
+                    if (useSleep)
+                    {
+                        Thread.Sleep((int)diff);                             //in ms => bad on Windows
+                    }
+                    else
+                    {
+                        while (getNowUtcTime_microSecond() / 1000 < endTimeSleep)
+                            Thread.Sleep(0);                            //https://blogs.msmvps.com/peterritchie/2007/04/26/thread-sleep-is-a-sign-of-a-poorly-designed-program/
+                                                                        // if not working think about : https://docs.microsoft.com/en-us/dotnet/api/system.timers.timer?redirectedfrom=MSDN&view=netcore-3.1
+                    }
+                }
+
+                if (diff >= 0)
+                    Console.WriteLine("sleep delay +" + diff.ToString() + " ms");
+            }
+
+        }
+
+
+
+        /****************************************************************************************************
+        *                                                                                                   *
+        ****************************************************************************************************/
+        static long getNowUtcTime_microSecond()                     // https://stackoverflow.com/questions/17632584/how-to-get-the-unix-timestamp-in-c-sharp
+        {
+            return (long)((DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1)).Ticks / TimeSpan.TicksPerMillisecond) * 1000.0);      //in microSecond
+        }
+
+
+
+        public void initLogs()
+        {
+            CultureInfo culture = (CultureInfo)CultureInfo.CurrentCulture.Clone();
+            culture.NumberFormat.NumberDecimalSeparator = ".";
+            //culture.DateTimeFormat.DateSeparator = "/";
+            //culture.DateTimeFormat.ShortDatePattern = "dd/MM/yyyy";
+            Thread.CurrentThread.CurrentCulture = culture;
+            Thread.CurrentThread.CurrentUICulture = culture;
+
+
+            string logFolder = "./logs";
+            if (!Directory.Exists(logFolder))
+            {
+                try
+                {
+                    Directory.CreateDirectory(logFolder);
+                }
+                catch (Exception e)
+                {
+                    console_writeLine(e.ToString());
+                    logFolder = ".";
+                }
+            }
+            string baseFilename = logFolder + "/GeoLiveDetect";
+            //baseFilename += "_"+ DateTime.UtcNow.ToString("yyyyMMddTHHmmss");       // version pour avoir un fichier de log par execution. string iso8601String = DateTime.UtcNow.ToString("yyyyMMddTHH:mm:ssZ");
+
+            try
+            {
+                _file_txt_log = new System.IO.StreamWriter(baseFilename + ".log");
+                _file_txt_log.AutoFlush = true;                                                  //file saved on each write(), instead of close()
+            }
+            catch (Exception e) { console_writeLine(e.ToString()); }
+        }
+
+        public static System.IO.StreamWriter? _file_txt_log = null;
+        public static void console_writeLine(string text, System.IO.StreamWriter? file_txt_log = null)
+        {
+            Debug.WriteLine(text);
+
+            if (file_txt_log != null)
+                file_txt_log.WriteLine(text);
+            else if(_file_txt_log != null)
+                _file_txt_log.WriteLine(text);
+        }
+
+
+
+        static BitmapImage BitmapToImageSource(Bitmap bitmap)                  // https://stackoverflow.com/questions/22499407/how-to-display-a-bitmap-in-a-wpf-image
+        {
+            using (MemoryStream memory = new MemoryStream())
+            {
+                bitmap.Save(memory, System.Drawing.Imaging.ImageFormat.Bmp);
+                memory.Position = 0;
+                BitmapImage bitmapimage = new BitmapImage();
+                bitmapimage.BeginInit();
+                bitmapimage.StreamSource = memory;
+                bitmapimage.CacheOption = BitmapCacheOption.OnLoad;
+                bitmapimage.EndInit();
+
+                return bitmapimage;
+            }
+        }
 
 
     }
