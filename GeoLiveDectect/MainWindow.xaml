@@ -19,8 +19,10 @@
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="*" />
                 </Grid.RowDefinitions>
-                <TextBlock x:Name="ImageCount" FontWeight="Bold" FontSize="18" TextWrapping="Wrap" Panel.ZIndex="2" Margin="29,10,0,0" Height="30" HorizontalAlignment="Left" VerticalAlignment="Top" Width="329">Image COUNT</TextBlock>
-                <Image x:Name="Image0" HorizontalAlignment="Left" Margin="29,39,0,46" Width="720" MouseDown="Image0_MouseDown" MouseMove="Image0_MouseMove" Panel.ZIndex="1" Height="405" />
+                <TextBlock x:Name="ImageCount" FontWeight="Bold" FontSize="18" TextWrapping="Wrap" Panel.ZIndex="3" Margin="29,10,0,0" Height="30" HorizontalAlignment="Left" VerticalAlignment="Top" Width="329">Image COUNT</TextBlock>
+                <Canvas x:Name="Canvas0" Width="720" Height="405" HorizontalAlignment="Left" Panel.ZIndex="1" Margin="29,39,0,46" Background="Transparent">
+                    <Image x:Name="Image0" HorizontalAlignment="Left" Width="720" MouseDown="Image0_MouseDown" MouseMove="Image0_MouseMove" Panel.ZIndex="1" Height="405" />
+                </Canvas>
             </Grid>
         </GroupBox>
         <GroupBox x:Name="groupBoxRightProperties" Header="Decklink" Grid.Column="1" >

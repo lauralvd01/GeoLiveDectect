@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 
+/*
 namespace GeoLiveDectect
 {
     public class DecklinkSimulator : DecklinkCapture
@@ -99,5 +100,6 @@ namespace GeoLiveDectect
         public override void checkBoxAutoDetect_CheckedChanged(object sender, RoutedEventArgs e) { }
         public override void comboBox3DPreviewFormat_SelectionChanged(object sender, RoutedEventArgs e) { }
 
-    }
 }
+}
+        */

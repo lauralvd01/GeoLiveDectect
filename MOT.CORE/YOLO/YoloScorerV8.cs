@@ -43,8 +43,17 @@ namespace MOT.CORE.YOLO
                 predictor_V8 = new YoloV8("Assets/Models/Yolo/yolo640v8.onnx");   // https://github.com/dme-compunet/YOLOv8
         }
 
+        public byte[] ImageToByte(Image img)
+        {
+            using (var stream = new MemoryStream())
+            {
+                //img.Save(stream, System.Drawing.Imaging.ImageFormat.Png);         // non usede , because rgb24 (no alpha needed)
+                //img.Save(stream, System.Drawing.Imaging.ImageFormat.Jpeg);
+                img.Save(stream, System.Drawing.Imaging.ImageFormat.Bmp);
+                return stream.ToArray();
+            }
+        }
 
-        
 
         static public YoloV8 predictor_V8 = null;
         public IReadOnlyList<IPrediction> Predict(Bitmap image, float targetConfidence, params DetectionObjectType[] targetDetectionTypes)
@@ -64,7 +73,7 @@ namespace MOT.CORE.YOLO
             //IDetectionResult result = predictor_V8.Detect(ImageSelector<Rgb24>:ImageSelector(stream));
             //IDetectionResult result = predictor_V8.Detect(new ImageSelector<Rgb24>(stream));
 
-            byte[] byteArray = Tools.ImageToByte(image);
+            byte[] byteArray = ImageToByte(image);
             IDetectionResult result = predictor_V8.Detect(new ImageSelector(byteArray));
 
 

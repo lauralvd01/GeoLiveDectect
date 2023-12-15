@@ -59,9 +59,9 @@ namespace GeoLiveDectect
 
             //test_1b();
             //test3();
-            //test5();
+            test5();
 
-            test6();
+            //test6();
         }
 
         public void notifyNewFrame(DecklinkCapture.Frame f)
@@ -588,8 +588,8 @@ namespace GeoLiveDectect
 
 
                 Tools.console_writeLine("inc:" + inc++);
-                if (inc >= 60)
-                    break;
+                //if (inc >= 60)
+                //    break;
 
 
                 Tools.waitUntil(startUtcTime, inc, timeBetweenTrame);

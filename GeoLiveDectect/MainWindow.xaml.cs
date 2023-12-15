@@ -31,6 +31,7 @@ namespace GeoLiveDectect
 
 
             mWindow = this;
+            canvas = mWindow.Canvas0;
             mGeoliveDetect = new GeoLiveDetect();
         }
 
@@ -71,6 +72,17 @@ namespace GeoLiveDectect
                     (track.CurrentBoundingBox.Top <= y) && (y <= track.CurrentBoundingBox.Bottom))
                 {
                     Tools.console_writeLine("######################################### Click on image " + inc + " at position " + mousePosition + " is in rectangle " + track.Id);
+                    
+                    System.Windows.Shapes.Rectangle rect = new System.Windows.Shapes.Rectangle();
+                    rect.Height = track.CurrentBoundingBox.Height * Image0.ActualHeight / ((System.Windows.Media.Imaging.BitmapSource)Image0.Source).PixelHeight;
+                    rect.Width = track.CurrentBoundingBox.Width * Image0.ActualWidth / ((System.Windows.Media.Imaging.BitmapSource)Image0.Source).PixelWidth;
+                    rect.Stroke = System.Windows.Media.Brushes.Red;
+                    rect.Name = "Rect_id_" + track.Id;
+                    rect.StrokeThickness = 3;
+                    canvas.Children.Add(rect);
+                    Canvas.SetTop(rect, track.CurrentBoundingBox.Top * Image0.ActualHeight / ((System.Windows.Media.Imaging.BitmapSource)Image0.Source).PixelHeight);
+                    Canvas.SetLeft(rect, track.CurrentBoundingBox.Left * Image0.ActualWidth / ((System.Windows.Media.Imaging.BitmapSource)Image0.Source).PixelWidth);
+                    Canvas.SetZIndex(rect, 2);
                 }
             }
         }
@@ -117,6 +129,7 @@ namespace GeoLiveDectect
         static public bool forceExistListenerThread = false;
         int inc = 0;
         IReadOnlyList<ITrack> curTracks;
+        Canvas canvas;
 
 
         public void startGeoLiveDetect()
