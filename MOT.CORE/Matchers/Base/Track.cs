@@ -18,9 +18,11 @@ namespace MOT.CORE.Matchers.Abstract
             _history = new List<RectangleF>() { firstUnpredicted };
             CurrentBoundingBox = firstUnpredicted;
             Color = Color.FromArgb((int)(_random.Next(int.MinValue, int.MaxValue) << (int)(id & 0xFFFFFF00) | (0x8 << 28)));
+            selected = false;
         }
 
         public int Id { get; set; }
+        public bool selected { get; set; }
         public Color Color { get; set; }
         public RectangleF CurrentBoundingBox { get; private set; }
         public DetectionObjectType DetectionObjectType { get; private set; }

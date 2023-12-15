@@ -7,6 +7,7 @@ namespace MOT.CORE.Matchers.Abstract
     public interface ITrack
     {
         public int Id { get; set; }
+        public bool selected { get; set; }
         public Color Color { get; }
         public IReadOnlyList<RectangleF> History { get; }
         public RectangleF CurrentBoundingBox { get; }

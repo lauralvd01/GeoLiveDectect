@@ -24,7 +24,7 @@ namespace MOT.CORE.Matchers.Abstract
                 WrappedTrack.Id = value;
             }
         }
-
+        public bool selected { get; set; }
         public Color Color => WrappedTrack.Color;
         public RectangleF CurrentBoundingBox => WrappedTrack.CurrentBoundingBox;
         public DetectionObjectType DetectionObjectType => WrappedTrack.DetectionObjectType;
