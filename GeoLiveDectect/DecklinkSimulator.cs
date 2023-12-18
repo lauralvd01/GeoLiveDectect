@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 
-/*
+
 namespace GeoLiveDectect
 {
     public class DecklinkSimulator : DecklinkCapture
@@ -21,12 +21,13 @@ namespace GeoLiveDectect
 
         private VideoCapture? videoCapture = null;
 
-        public DecklinkSimulator(MainWindow wind, GeoLiveDetect geoliveDetect)
+        public DecklinkSimulator(MainWindow wind, GeoLiveDetect geoliveDetect) : base(wind, geoliveDetect)
         {
-            mWindow = wind;
-            mGeoliveDetect = geoliveDetect;
+          
+        }
 
-
+        public override void init()
+        {
             m_deckLinkMainThread = new Thread(() => DeckLinkMainThread());
             m_deckLinkMainThread.Start();
         }
@@ -100,6 +101,6 @@ namespace GeoLiveDectect
         public override void checkBoxAutoDetect_CheckedChanged(object sender, RoutedEventArgs e) { }
         public override void comboBox3DPreviewFormat_SelectionChanged(object sender, RoutedEventArgs e) { }
 
+    }
 }
-}
-        */
+        

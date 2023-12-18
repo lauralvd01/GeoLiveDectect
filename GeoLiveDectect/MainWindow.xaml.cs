@@ -66,6 +66,7 @@ namespace GeoLiveDectect
             float x = (float)mousePosition.X * ((System.Windows.Media.Imaging.BitmapSource)Image0.Source).PixelWidth / (float)Image0.ActualWidth;
             float y = (float)mousePosition.Y * ((System.Windows.Media.Imaging.BitmapSource)Image0.Source).PixelHeight / (float)Image0.ActualHeight;
 
+
             foreach (ITrack track in curTracks)
             {
                 if ((track.CurrentBoundingBox.Left <= x) && (x <= track.CurrentBoundingBox.Right) &&
@@ -73,15 +74,10 @@ namespace GeoLiveDectect
                 {
                     Tools.console_writeLine("######################################### Click on image " + inc + " at position " + mousePosition + " is in rectangle " + track.Id);
 
-                    if (track.selected)
-                    {
-                        track.selected = false;
-                        DrawTrackOnCanvas(track);
-                    }
-                    else 
-                        track.selected = true;
+                    track.selected = !track.selected;
                 }
             }
+            
         }
 
 
@@ -148,6 +144,9 @@ namespace GeoLiveDectect
 
         private void DrawTracksOnCanvas()
         {
+            if (curTracks == null)
+                return;
+
             canvas.Children.RemoveRange(1,canvas.Children.Count);
             foreach (ITrack track in curTracks)
             {
@@ -254,9 +253,35 @@ namespace GeoLiveDectect
                             mWindow.ImageCount.Text = "Image " + inc++;
                             DrawTracksOnCanvas();
                         }), DispatcherPriority.SystemIdle);
+
+
+
+
+                        // envoi au GeoRender des tracks selectionnées.
+                        if (curTracks != null)
+                        {
+                            /*
+                            #define JSON_GR_SETTRACKERS 		2309	// informations des Trackers (venatn de GeoLiveDetect)
+                            { utcTime: 165435434.564, tracks:  [ { id: 12, bb: {l: 100, r: 200, t: 300, b: 400} }, { id: 12, del: true }... ] }            // from top left corner origin, del = delete
+                            
+                            //todo ajouter clear dedans
+                            */
+
+                            String str = "{ \"utcTime\": " + a.timestamp + ", \"tracks\": [";
+                            bool isFirst = true;
+                            foreach (ITrack track in curTracks)
+                            {
+                                str += ((!isFirst) ? "," : "") + "{ \"id\": " + track.Id + ", \"bb\":{ \"l\": " + track.CurrentBoundingBox.Left + ", \"r\":" + track.CurrentBoundingBox.Right + ", \"t\":" + track.CurrentBoundingBox.Top + ", \"b\":" + track.CurrentBoundingBox.Bottom + "}}";
+                                isFirst = false;
+                            }
+                            str += "]}";
+
+                            mGeoliveDetect.GeoSocket_notifyNewMessage(2309, str);           //JSON_GR_SETTRACKERS 		2309	// informations des Trackers (venatn de GeoLiveDetect)
+                        }
                     }
 
                 }
+
 
             }
         }

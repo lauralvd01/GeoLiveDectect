@@ -11,6 +11,8 @@ using System.Threading.Tasks;
 using System.Windows.Media.Imaging;
 using SixLabors.ImageSharp.Formats.Jpeg;
 using SixLabors.ImageSharp.PixelFormats;
+using System.Reflection;
+
 
 
 namespace GeoLiveDectect
@@ -166,6 +168,66 @@ namespace GeoLiveDectect
                 img.Save(stream, System.Drawing.Imaging.ImageFormat.Bmp);
                 return stream.ToArray();
             }
+        }
+
+
+        /*
+        public string CurrentVersion
+        {
+            get
+            {
+                return ApplicationDeployment.IsNetworkDeployed ? ApplicationDeployment.CurrentDeployment.CurrentVersion.ToString() : Assembly.GetExecutingAssembly().GetName().Version.ToString();
+            }
+        }
+
+        private static string GetProcessorId()
+        {
+            var mgt = new ManagementClass("Win32_Processor");
+            var procs = mgt.GetInstances();
+            foreach (var item in procs) return item.Properties["Name"].Value.ToString();
+            return "Unknown";
+        }
+
+        private static String GetRamSize()
+        {
+            var mgt = new ManagementClass("Win32_ComputerSystem");
+            var procs = mgt.GetInstances();
+            foreach (var item in procs) return Convert.ToString(Math.Round(Convert.ToDouble(item.Properties["TotalPhysicalMemory"].Value) / 1073741824, 0)) + " GB";
+            return "Unknown";
+        }
+
+        private static String GetGraphicsCard()
+        {
+            var searcher = new ManagementObjectSearcher("SELECT * FROM Win32_DisplayConfiguration");
+            foreach (var mo in searcher.Get())
+            {
+                foreach (var property in mo.Properties)
+                {
+                    if (property.Name == "Description")
+                    {
+                        return property.Value.ToString();
+                    }
+                }
+            }
+            return "Unknown";
+        }
+        */
+
+        /****************************************************************************************************/
+        static string ByteArrayToString(Byte[] ba)                                  // https://stackoverflow.com/questions/311165/how-do-you-convert-a-byte-array-to-a-hexadecimal-string-and-vice-versa
+        {
+            StringBuilder hex = new StringBuilder(ba.Length * 2);
+            foreach (Byte b in ba)
+                hex.AppendFormat("{0:x2}", b);
+            return hex.ToString();
+        }
+        static Byte[] StringToByteArray(String hex)
+        {
+            int NumberChars = hex.Length;
+            Byte[] bytes = new Byte[NumberChars / 2];
+            for (int i = 0; i < NumberChars; i += 2)
+                bytes[i / 2] = Convert.ToByte(hex.Substring(i, 2), 16);
+            return bytes;
         }
     }
 }

@@ -51,7 +51,6 @@ namespace GeoLiveDectect
                     BitmapData bmpData = frameBmp.LockBits(new Rectangle(0, 0, frameBmp.Width, frameBmp.Height), ImageLockMode.WriteOnly, frameBmp.PixelFormat);    // Create a BitmapData and lock all pixels to be written
                     Marshal.Copy(frameBytes, 0, bmpData.Scan0, frameBytes.Length);  // Copy the data from the byte array into BitmapData.Scan0
                     frameBmp.UnlockBits(bmpData);        // Unlock the pixels
-
                 }
             }
 
@@ -157,8 +156,9 @@ namespace GeoLiveDectect
             mGeoliveDetect = geoliveDetect;
 
             m_applicationCloseWaitHandle = new EventWaitHandle(false, EventResetMode.AutoReset);
-
-
+        }
+        public virtual void init()
+        {
             // Bind 3D preview formats to combo box
             mWindow.Dispatcher.BeginInvoke(new Action(() =>
             {
@@ -168,7 +168,7 @@ namespace GeoLiveDectect
                 mWindow.comboBox3DPreviewFormat.SelectedValue = kDefault3DPreviewFormat;
                 mWindow.comboBox3DPreviewFormat.SelectionChanged += comboBox3DPreviewFormat_SelectionChanged;
             }), DispatcherPriority.SystemIdle);
-            
+
 
             m_deckLinkMainThread = new Thread(() => DeckLinkMainThread());
             m_deckLinkMainThread.SetApartmentState(ApartmentState.MTA);
