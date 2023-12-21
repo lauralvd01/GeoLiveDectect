@@ -37,4 +37,4 @@ Setup the installation in order to install developpement desktops of
     - Target SE version is __7.0__
 - In __Project dependancies__ (Project tab), check all other projects
 
-7. Regenerate the solution to update all dependencies
+7. Generate the solution to update all dependencies
