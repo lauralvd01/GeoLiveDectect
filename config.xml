@@ -2,9 +2,22 @@
 <Settings>
   <GeoSocketClient ip="127.0.0.1" port="9041" />
   <WebSocketServer port="9031" timeout="59" />
+  
   <!-- VideoSource soit "Decklink" soit un chemin vers un fichier video (.mp4 par exemple) -->
   <!--VideoSource>Decklink</VideoSource-->
   <VideoSource>Assets/Input/vg_1.mp4</VideoSource>
+  
+  <DetectorModel>Assets/Models/Yolo/yolo640v8.onnx</DetectorModel>
+  <!-- version = soit "OSNet" soit "FastReid" -->
+  <AppearanceModel version="OSNet" path="Assets/Models/Reid/osnet_x1_0_msmt17.onnx"/>
+  <NbPredictThread>4</NbPredictThread>
+  
+  <TargetConfidence>1.0</TargetConfidence>
+  
+  
+  <!--DetectionMode> soit "AllFrames" soit "OneThreadOneFrame" soit "MultiThreadRealTime" </DetectionMode-->
+  <DetectionMode>OneThreadOneFrame</DetectionMode>
+  
   <Logs>
     <Log id="-1" enable="true" logAnswer="true" coldDownTime="0" />
     <Log id="2302" enable="true" logAnswer="false" coldDownTime="5000" />

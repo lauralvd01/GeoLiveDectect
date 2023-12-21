@@ -46,43 +46,80 @@ using BridgeWebSocketGeoSocketConfigurator;
 using System.Net;
 using Newtonsoft.Json;
 using System.Diagnostics.Eventing.Reader;
+using MOT.CORE.Matchers.Trackers;
+using MOT.CORE.Utils.Pool;
+using System.Drawing.Imaging;
+using System.Windows.Media.Media3D;
+using System.Windows.Xps;
+using Emgu.CV.XFeatures2D;
+using Emgu.CV.Ocl;
 
 
 // - Todo : 2 gros soucis
-//  - todo configs a faire.
-//  -rajouter de n'envoyer que les selected tracks au GeoRender.
-//  -rajouter le clear des tracks a envoyer au GeoRender //a mettre en commentaire
-//  -construire un Json assez proche du json envoyé au GeoRender avec les tracks (limite le meme id) puis envoyer ca a WebSocket_notifyNewMessage(msgid, message);
-//  -sur reception d'un message json selectedTracks, simuler l'equivalent du click sur rectangle.=> renvoyer le flux sur GeoRender.
+//      V- todo configs a faire.
+//      V-rajouter de n'envoyer que les selected tracks au GeoRender. // Connexion to GeoRender failed => à revoir pour vérifier que y a bien que les selectedTracks
+//      V-Pause Gouter
+//      V-envoyer un "init" pour virer les anciens trackers dans le GeoRender
+//      V-envoyer un del: true au trackers deselectionné. => pb timing construction du selectedTracks.
+//      -peut etre reduire le nombre de frames sans qu'un track id ne soit present a l'ecran.
+//      V-rajouter le clear des tracks a envoyer au GeoRender //a mettre en commentaire (ici les tracks invalidés par le systeme de matching )
+//
+//  -regler pb connexion websocket avec l'interface UCI
+//      => Alchemist utilise normalement le .Net FrameWork 4.0.0 (c'est le message), sauf que l'on est en 4.8, et que la version Vs2022 ne prend plus en compte la 4.0.0  https://learn.microsoft.com/fr-fr/dotnet/framework/install/guide-for-developers
+//      -donc refaire le serveur WebSocket c# ...
+//  C-construire un Json assez proche du json envoyé au GeoRender avec les tracks (limite le meme id) puis envoyer ca a WebSocket_notifyNewMessage(msgid, message);
+//  C-a envoyer a l'interface WebSocket_notifyNewMessage(211, buf);            //S3_PREVIEW_CONTINUE     buf = (int)width (int) height + tableau pixels rgba (32bits)
+//
+//  C-sur reception d'un message json selectedTracks, simuler l'equivalent du click sur rectangle.=> renvoyer le flux sur GeoRender. json = { selected: [1,4, ...], unselected: [2, 3, 5, ..]  }
 
-// - il faut laisser passer les frames (on n'est pas en temps reeel , pas assez de perf pour traiter toutes les images => on doit faire une image sur X, mais .... comment trouver X, est ce qu'il est variable, mais bon comme ca depend du deepsort)
-//  -a envoyer a l'interface WebSocket_notifyNewMessage(211, buf);            //S3_PREVIEW_CONTINUE     buf = (int)width (int) height + tableau pixels rgba (32bits)
+//  C- il faut laisser passer les frames (on n'est pas en temps reeel , pas assez de perf pour traiter toutes les images => on doit faire une image sur X, mais .... comment trouver X, est ce qu'il est variable, mais bon comme ca depend du deepsort)
+//      V-en option, pouvoir faire du AllFrames, mais sur une courte période, car on n'est pas temps réel sur les operations a faire (ne peut pas etre a la frequence des images)
+//      -Mode RealTime MultiThread a faire.
+//      -bouton pour record sur demande.
+
+
+
+//  V-conversion de l'image de la Decklink (mauvaise hypothese 24bit/sans alpha)
+//      C-tout passer en 32bits au depart ? sachant que l'on fournir du 32 bits dans la preview aussi, mais apres les calcauls de detection , ce n'est pas top de l'avoir en 32bits je crois ...
+//  -optimisations:
+//      V-Fuite mémoire == accumlation des images quelque part / peut etre les copy buffer + references. => avec un mode qui ne prend pas toutes les iamges , c'est stable.
+//      -et 96% du processeur pas bien (voir ou c'est => voir utilisation evenement  au lieu des Thread Sleep
+//      V- => verifier test4 ou 5 => sur 5 (multiThread) c'est pareil. par contre, le 3 (MonoThread) on monte jusqu'a 65% du Cpu, et 800Mo (mais sur 60 images) de Ram. => la copie entre les Thread (peut etre le Freeze) genere des fuites mémoires.
+//      -pourquoi le deepSort est si long (~150ms  target ideal: 40ms, min: 80ms)
+//
+//
+// 3 modes :    - DetectionMode -
+//      - AllFrames : mode de debug - on traite chacune des frames, avec plusieurs thread. Déjà implémenté
+//      - OneThreadOneFrame : mode de debug - on traite chacune des frames avec 1 seul thread (donc tout comme si on était en continuité), et surtout on n'actualise le buffer avec une nouvelle image que quand on a fini de traiter entièrement la frame précédente
+//      - MultiThreadRealTime : mode temps réel - on traite une image sur X, X étant à déterminer en fonction du matching (2 modes d'analyse : temps que les calculs prennent en tout / temps que prend le matching qui doit traiter 1 image par 1)
+
+
+
+
+
+
 /*
-    size_t previewDatasSize = sizeof(int32)*2 + mPreviewWidth * mPreviewHeight * pEvent->getDepthDatas() / 8;
 
-	byte* datas = (byte*)malloc( previewDatasSize );
-	byte* datas_tmp = datas;
-        				
-	int32 width = mPreviewWidth;
-	int32 height = mPreviewHeight;
 
-	for(size_t i=0;i<4;i++)
-		datas_tmp[i] = (byte)(width >> i * 8);
-	datas_tmp += sizeof(int32);
+public void startTreadxxx()
+{
+    Thread th = new Thread("treadxxx")
+    th.start();
+}
 
-	for(size_t i=0;i<4;i++)
-		datas_tmp[i] = (byte)(height >> i * 8);
-	datas_tmp += sizeof(int32);
+
+public void treadxxx()
+{
+    while ((dwret = ::WaitForSingleObject mThread, INFINITE)) != WAIT_OBJECT_0)             //en c++ bloquant => tu envois un evenement pour debloquer.
+	{
+    }
+}
+
+
+
+
+
 */
-
-//  -conversion de l'image de la Decklink (mauvaise hypothese 24bit/sans alpha)
-//  -Fuite mémoire == accumlation des images quelque part / peut etre les copy buffer + references.
-//      -verifier test4 ou 5
-//  -96% du processeur pas bien (voir ou c'est , et voir utilisation evenement  au lieu des Thread Sleep)
-//      -verifier test4 ou 5
-
-
-
 
 namespace GeoLiveDectect
 {
@@ -105,12 +142,14 @@ namespace GeoLiveDectect
         private string _engineFolder = string.Empty; //File config.exe - node Render/PATH
         */
 
+
+
         //WebSocketServer
         private WebSocketServer _wsServer;
         private int _wsPort = 9031;
         private int _wsTimeout = 59;                                //en minutes.
         protected static ConcurrentDictionary<User, string> OnlineUsers = new ConcurrentDictionary<User, string>();
-        private String _videoSourece = "Decklink";
+        public String _videoSource = "Decklink";
 
         //GeoSocket
         private CGeoSockNet _renderSocket;
@@ -119,6 +158,14 @@ namespace GeoLiveDectect
         private int _gcnPort = 9041;
 
         /////// configs
+
+        private String _detectorFilePath;
+        private AppearanceExtractorVersion _appearanceExtractorVersion;
+        private String _appearanceModelPathElement;
+        public int _NbPredictThread;
+        public Double? _TargetConfidence;
+
+        public static DetectionMode _detectionMode = DetectionMode.AllFrames;
 
         public bool mLogMessageEnable = true;                   // master priority for turn off log on demand without rewreitte config
         public class LogsConfig
@@ -132,7 +179,12 @@ namespace GeoLiveDectect
         }
         private static List<LogsConfig> mLogsConfigs = new List<LogsConfig>();
 
-
+        public enum DetectionMode : byte
+        {
+            AllFrames = 0,
+            OneThreadOneFrame,
+            MultiThreadRealTime
+        }
 
 
 
@@ -153,16 +205,14 @@ namespace GeoLiveDectect
             }
             LoadConfigFile("config.xml");
             StartServers();
-
+            startDectections();
             startVideoSource();
 
-            startDectections();
+            
 
             //test_1b();
             //test3();
             //test5();
-
-            //test6();
         }
 
         public void restartServer()
@@ -174,8 +224,8 @@ namespace GeoLiveDectect
 
         public void Dipose()
         {
-            stopDectections();
             stopVideoSource();
+            stopDectections();
             StopServers();
         }
 
@@ -213,6 +263,11 @@ namespace GeoLiveDectect
                     new XElement("GeoSocketClient", new XAttribute("ip", _gcnIp), new XAttribute("port", _gcnPort)),
                     new XElement("WebSocketServer", new XAttribute("port", _wsPort), new XAttribute("timeout", _wsTimeout)),
                     new XElement("VideoSource", "Decklink"),
+                    new XElement("DetectorModel", "Assets/Models/Yolo/yolo640v8.onnx"),
+                    new XElement("AppearanceModel", new XAttribute("version", "OSNet"), new XAttribute("path", "Assets/Models/Reid/osnet_x1_0_msmt17.onnx")),
+                    new XElement("NbPredictThread", "1"),
+                    new XElement("TargetConfidence", ""),
+                    new XElement("DetectionMode", "AllFrames"),
                     new XElement("Logs",
                         new XElement("Log",
                             new XAttribute("id", "-1"),
@@ -236,6 +291,8 @@ namespace GeoLiveDectect
             var xDoc = XDocument.Parse(xmlText);
 
 
+           
+
             var wsServerElement = xDoc.Descendants("WebSocketServer").First();
             _wsPort = int.Parse(wsServerElement.Attribute("port").Value);
             _wsTimeout = int.Parse(wsServerElement.Attribute("timeout").Value);
@@ -245,7 +302,24 @@ namespace GeoLiveDectect
             _gcnPort = int.Parse(gcServerElement.Attribute("port").Value);
 
             var gcVideoSourceElement = xDoc.Descendants("VideoSource").First();
-            _videoSourece = gcVideoSourceElement.Value;
+            _videoSource = gcVideoSourceElement.Value;
+
+            var dpDetectorModelElement = xDoc.Descendants("DetectorModel").First();
+            _detectorFilePath = dpDetectorModelElement.Value;
+
+            var dpAppearanceModelElement = xDoc.Descendants("AppearanceModel").First();
+            _appearanceExtractorVersion = String.Equals(dpAppearanceModelElement.Attribute("version").Value, "OSNet") ? AppearanceExtractorVersion.OSNet : AppearanceExtractorVersion.FastReid ;
+            _appearanceModelPathElement = dpAppearanceModelElement.Attribute("path").Value;
+
+            var dpNbPredictThreadElement = xDoc.Descendants("NbPredictThread").First();
+            _NbPredictThread = int.Parse(dpNbPredictThreadElement.Value);
+
+            var dpTargetConfidenceElement = xDoc.Descendants("TargetConfidence").First();
+            _TargetConfidence = String.Equals(dpTargetConfidenceElement.Value,"") ? null : Double.Parse(dpTargetConfidenceElement.Value);
+
+            var dpDetectionModeElement = xDoc.Descendants("DetectionMode").First();
+            _detectionMode = String.Equals(dpDetectionModeElement.Value, "AllFrames") ? DetectionMode.AllFrames : ( String.Equals(dpDetectionModeElement.Value, "OneThreadOneFrame") ? DetectionMode.OneThreadOneFrame : DetectionMode.MultiThreadRealTime);
+
 
             var gcLogCfgs = xDoc.Descendants("Logs").First();
             foreach (XElement gcLogCfg in gcLogCfgs.Nodes())
@@ -340,7 +414,7 @@ namespace GeoLiveDectect
             Start_GeoSocket_connection();
 
             logInformations(@"Start WebSocket connection ...");
-            Start_WebSocket_connection();
+            //Start_WebSocket_connection();         //todo remettre quand alchemist corrigée
 
             logInformations(@"Start Serveurs Done !!!");
         }
@@ -622,6 +696,7 @@ namespace GeoLiveDectect
             string trash; // Concurrent dictionaries make things weird
             OnlineUsers.TryRemove(user, out trash);
         }
+
         private void OnWebSocketReceive(UserContext context)
         {
             List<ArraySegment<byte>> datasList = context.DataFrame.AsRaw();
@@ -712,8 +787,57 @@ namespace GeoLiveDectect
                         }
                         */
 
-                        GeoSocket_notifyNewMessage(msgid, message);
+                        //GeoSocket_notifyNewMessage(msgid, message);
 
+
+                        /*
+            
+                        //---- reduire les tabulations, pour garder le code interressant plus visible (donc pas un km a droite, vs les cas particuliers.)
+
+                        //ce que l'on fait des fois
+                        if (aa != null)
+                        {
+                            if (aa.length != 0)                 //mauvais ex car on aurait pus le mettre dans le if precedente, mais c'est pour l'idée d'enchainnement de if que l'on ne peut pas faire d'un coups
+                            {
+
+                                for()
+                                {
+                                    if (aa[i]!=null)
+                                    {
+
+                                    }else{
+
+                                    }
+                                }
+                            }else{
+                                error = "error 2"
+                            }
+                        }else{
+                            error = "error1"
+                        }
+
+                        //////////////
+
+                        if (aa == null)
+                            return console.error("error1");
+
+                        if (aa.length = 0)
+                            return console.error("error2");
+
+
+                        for()
+                        {
+                            if ()
+                                continue;
+
+                            mqlsdkqmd
+                        }
+                        */
+
+
+
+                        // TODO traiter les messages :
+                        // selection/deselection d'un ou plusieurs tracks depuis l'interface.
 
                     }
                     else
@@ -724,7 +848,7 @@ namespace GeoLiveDectect
                         for (int i = 0; i < sv.Length; i++)
                             bytes[i] = Byte.Parse(sv[i]);
 
-                        GeoSocket_Send(msgid, bytes, bytes.Length);
+                        //GeoSocket_Send(msgid, bytes, bytes.Length);
                     }
 
                 }
@@ -737,6 +861,9 @@ namespace GeoLiveDectect
             else
             {                                      // json message
 
+                //  -sur reception d'un message json selectedTracks, simuler l'equivalent du click sur rectangle.=> renvoyer le flux sur GeoRender.
+                //  json = { selected: [1,4, ...], unselected: [2, 3, 5, ..]  }
+
                 try
                 {
                     dynamic jDoc = JsonConvert.DeserializeObject(messageReceived);
@@ -744,6 +871,40 @@ namespace GeoLiveDectect
                     //short msgid = short.Parse(jDoc.id);
                     short msgid = jDoc.id;
                     String message = JsonConvert.SerializeObject(jDoc.message);
+
+                    String[] selected = message.Split(",")[0].Split('[')[1].Split(']')[0].Split(',');
+                    String[] unselected = message.Split(",")[1].Split('[')[1].Split(']')[0].Split(',');
+
+                    long timestamp = Tools.getNowUtcTime_microSecond();
+                    String geoStr = "{ \"utcTime\": " + timestamp + ", \"tracks\": [";
+                    bool isFirst = true;
+                    foreach (String selectedTrack in selected)
+                    {
+                        foreach (ITrack track in MainWindow.curTracks)
+                        {
+                            if (track.Id == int.Parse(selectedTrack))
+                            {
+                                track.selected = !track.selected;
+                                str += ((!isFirst) ? "," : "") + "{ \"id\": " + track.Id + ", \"bb\":{ \"l\": " + track.CurrentBoundingBox.Left + ", \"r\":" + track.CurrentBoundingBox.Right + ", \"t\":" + track.CurrentBoundingBox.Top + ", \"b\":" + track.CurrentBoundingBox.Bottom + "}}";
+                                isFirst = false;
+                            }
+                        }
+                    }
+                    foreach (String unselectedTrack in unselected)
+                    {
+                        foreach (ITrack track in MainWindow.curTracks)
+                        {
+                            if (track.Id == int.Parse(unselectedTrack))
+                            {
+                                track.selected = !track.selected;
+                                str += ((!isFirst) ? "," : "") + "{ \"id\": " + track.Id + ", \"del\": true }";
+                                isFirst = false;
+                            }
+                        }
+                    }
+                    str += "]}";
+
+                    GeoSocket_notifyNewMessage(2309, str);
 
                     conditionnalLog(msgid, message, false);
 
@@ -763,16 +924,22 @@ namespace GeoLiveDectect
             //Tools.console_writeLine(String.Format("Data sent to: {0}\r\n\t{1}", context.ClientAddress, ""));
         }
 
-        private void WebSocket_notifyNewMessage(short msgid, String message)
+        public void WebSocket_notifyNewMessage(short msgid, String message)
         {
+            if (OnlineUsers.Count() == 0)
+                return;
+
             String xmldoc_str = "<Params><Message id=\"" + msgid + "\" type=\"txt\" >" + message + "</Message></Params>";
 
             foreach (var onlineUser in OnlineUsers.Select(k => k.Key.Context))
                 onlineUser.Send(xmldoc_str);
         }
 
-        private void WebSocket_notifyNewMessage(short msgid, byte[] buf)
+        public void WebSocket_notifyNewMessage(short msgid, byte[] buf)
         {
+            if (OnlineUsers.Count() == 0)
+                return;
+
             byte[] msgidBytes = BitConverter.GetBytes(msgid);
 
             byte[] buf_tmp = new byte[buf.Length + 2];
@@ -797,7 +964,7 @@ namespace GeoLiveDectect
         ////////////////////////////////////// VideoSource
 
 
-        DecklinkCapture dkc = null;
+        static public DecklinkCapture dkc = null;
         static public bool forceExitVideoReadThread = false;
         static public bool isVideoReadThreadFinished = false;
 
@@ -806,14 +973,15 @@ namespace GeoLiveDectect
             forceExitVideoReadThread = false;
             isVideoReadThreadFinished = false;
 
-            if(_videoSourece == "Decklink")
+            if(_videoSource == "Decklink")
             {
                 dkc = new DecklinkCapture(mWindow, this);
             }else{
                 dkc = new DecklinkSimulator(mWindow, this);
-                (dkc as DecklinkSimulator).setVideoFilename(_videoSourece);
+                (dkc as DecklinkSimulator).setVideoFilename(_videoSource);
             }
             dkc.init();
+            
 
             isVideoReadThreadFinished = true;
         }
@@ -824,7 +992,8 @@ namespace GeoLiveDectect
 
             while(!isVideoReadThreadFinished) { Thread.Sleep(0); }                   //waiting the end.
 
-            dkc.Dispose();
+            if(dkc!=null)
+                dkc.Dispose();
             dkc = null;
         }
 
@@ -856,17 +1025,18 @@ namespace GeoLiveDectect
 
         ////////////////////////////////////// Detections
 
-        public String _DetectorFilePath = "Assets/Models/Yolo/yolo640v8.onnx";                                      //todo config
-        public AppearanceExtractorVersion _AppearanceExtractorVersion = AppearanceExtractorVersion.OSNet;           //todo config
-        public String _AppearanceExtractorFilePath = "Assets/Models/Reid/osnet_x1_0_msmt17.onnx";                   //todo config
-        public int _NbPredictThread = 1;
-        public Double? _TargetConfidence = null;                                              //todo config    `TargetConfidence=` en config === `_TargetConfidence=null`
+        //public String _DetectorFilePath = "Assets/Models/Yolo/yolo640v8.onnx";                                      => config
+        //public AppearanceExtractorVersion _AppearanceExtractorVersion = AppearanceExtractorVersion.OSNet;           => config
+        //public String _AppearanceExtractorFilePath = "Assets/Models/Reid/osnet_x1_0_msmt17.onnx";                   => config
+        //public int _NbPredictThread = 1;                                                                            => config
+        //public Double? _TargetConfidence = null;                                                                    => config    `TargetConfidence=''` en config === `_TargetConfidence=null`
 
         public float _targetConfidence = 1.0f;                                              //todo meilleur valeurs par defaut.
         public DetectionObjectType[] _targetDetectionTypes = new DetectionObjectType[0];
         public List<Thread> listThreads = new List<Thread>();
         Matcher matcher = null;
-
+        public long predictionInc = 0;
+        
 
         public void startDectections()
         {
@@ -883,14 +1053,19 @@ namespace GeoLiveDectect
             CommandLineOptions options = new CommandLineOptions();
             //options.SourceFilePath = "Assets/Input/vg_1.mp4";
             //options.TargetFilePath = "Assets/Output/vg_1.mp4";                          //todo futur quand on aura un record
-            options.DetectorFilePath = _DetectorFilePath;                               // "Assets/Models/Yolo/yolo640v8.onnx";
+            options.DetectorFilePath = _detectorFilePath;                               // Default "Assets/Models/Yolo/yolo640v8.onnx";
             options.MatcherType = 0;                                                    //todo futur en config
             options.YoloVersion = YoloVersion.Yolo640v8;                                //todo futur en config quand on aura resolu les pb de detection dans les autres modes.
-            options.AppearanceExtractorVersion = _AppearanceExtractorVersion;      
-            options.AppearanceExtractorFilePath = _AppearanceExtractorFilePath;
+            options.AppearanceExtractorVersion = _appearanceExtractorVersion;      
+            options.AppearanceExtractorFilePath = _appearanceModelPathElement;
+
+
             
+            if (_detectionMode == DetectionMode.OneThreadOneFrame)          // OneThreadOneFrame : mode de debug - on traite chacune des frames avec 1 seul thread (donc tout comme si on était en continuité), et surtout on n'actualise le buffer avec une nouvelle image que quand on a fini de traiter entièrement la frame précédente
+                _NbPredictThread = 1;
 
 
+            sendInitTrackersToGeoRender();
 
 
 
@@ -922,6 +1097,18 @@ namespace GeoLiveDectect
                 return;
             }
 
+            try
+            {
+                Thread thread = new Thread(new ThreadStart(thread_RecordWriter));
+                thread.Start();
+                listThreads.Add(thread);
+            }
+            catch (Exception e)
+            {
+                Tools.console_writeLine(e.ToString());
+                return;
+            }
+
 
             try
             {
@@ -936,18 +1123,28 @@ namespace GeoLiveDectect
 
             _targetDetectionTypes = new DetectionObjectType[1];
             _targetDetectionTypes[0] = DetectionObjectType.sailboat;                         //todo futur config
+
+
+        }
+
+        public void sendInitTrackersToGeoRender()                       //to clean old Trackers
+        {
+            String str = "{ \"utcTime\": " + Tools.getNowUtcTime_microSecond() + ", \"clearTracks\": true }";
+            GeoSocket_notifyNewMessage(2309, str);           //JSON_GR_SETTRACKERS 		2309	// informations des Trackers (venatn de GeoLiveDetect)
+            WebSocket_notifyNewMessage(2309, str);           //de meme sur l'interface.
         }
 
         public void stopDectections()
         {
             forceExistPredictionYoloThread = true;
             forceExistMatcherThread = true;
+            forceExitRecordWriterThread = true;
 
             bool isPredictionYoloThreadFinishedAll = false;
             for (int i = 0; i < _NbPredictThread; i++)
                 isPredictionYoloThreadFinishedAll = isPredictionYoloThreadFinishedAll && isPredictionYoloThreadFinished.ElementAt(i);
 
-            bool isFinishedAll = !((!isPredictionYoloThreadFinishedAll) || (!isMatcherThreadFinished));
+            bool isFinishedAll = !((!isPredictionYoloThreadFinishedAll) || (!isMatcherThreadFinished) || (!isRecordWriterThreadFinished));
             while (!isFinishedAll)
             {
                 Thread.Sleep(100);
@@ -955,11 +1152,14 @@ namespace GeoLiveDectect
                 isPredictionYoloThreadFinishedAll = true;
                 for (int i = 0; i < _NbPredictThread; i++)
                     isPredictionYoloThreadFinishedAll = isPredictionYoloThreadFinishedAll && isPredictionYoloThreadFinished.ElementAt(i);
-                isFinishedAll = !((!isPredictionYoloThreadFinishedAll) || (!isMatcherThreadFinished));
+                isFinishedAll = !((!isPredictionYoloThreadFinishedAll) || (!isMatcherThreadFinished) || (!isRecordWriterThreadFinished));
             }
 
             if(matcher!=null)
                 matcher.Dispose();
+
+            if (recordWriter != null)
+                recordWriter.Dispose();
 
             foreach (Thread th in listThreads)
                 th.Join();
@@ -977,31 +1177,27 @@ namespace GeoLiveDectect
                 _targetDetectionTypes[0] = DetectionObjectType.sailboat;                         //Default
             }
 
-            PredictTask pt = new PredictTask(Tools.getNowUtcTime_microSecond(), f, _targetConfidence, _targetDetectionTypes, f.index);
-            while (!coudlUse_listPredictTask) { Thread.Sleep(0); };          //attente lock de la liste
-            listPredictTask.ElementAt(((int)f.index) % _NbPredictThread).Add(pt);
+
+            // 3 modes :    - DetectionMode -
+            //      - AllFrames : mode de debug - on traite chacune des frames, avec plusieurs thread. Déjà implémenté
+            //      - OneThreadOneFrame : mode de debug - on traite chacune des frames avec 1 seul thread (donc tout comme si on était en continuité), et surtout on n'actualise le buffer avec une nouvelle image que quand on a fini de traiter entièrement la frame précédente
+            //      - MultiThreadRealTime : mode temps réel - on traite une image sur X, X étant à déterminer en fonction du matching (2 modes d'analyse : temps que les calculs prennent en tout / temps que prend le matching qui doit traiter 1 image par 1)
+
+            if ((_detectionMode == DetectionMode.AllFrames) ||
+                ((_detectionMode == DetectionMode.OneThreadOneFrame)&&(listPredictTask.ElementAt(0).Count()==0))
+                )           //todo cas du MultiThreadRealTime
+            {
+
+                if(_detectionMode == DetectionMode.OneThreadOneFrame)
+                    f.index = predictionInc++;
+
+                PredictTask pt = new PredictTask(Tools.getNowUtcTime_microSecond(), f, _targetConfidence, _targetDetectionTypes, f.index);
+                while (!coudlUse_listPredictTask) { Thread.Sleep(0); };          //attente lock de la liste
+                listPredictTask.ElementAt(((int)f.index) % _NbPredictThread).Add(pt);
+            }           //else on ignore l'image.
+
+
         }
-
-
-
-
-        //todo rajouter un record sur demande.TargetFilePath = "Assets/Output/vg_1.mp4";        avec utilisation du VideoWriter
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -1051,6 +1247,7 @@ namespace GeoLiveDectect
         static Matcher predictMatcher;
 
         static public int waitDuration = 8;                //ms
+        static public long matchInc = 0;
 
         public static void thread_PredictionYolo(int id = 0)
         {
@@ -1080,16 +1277,29 @@ namespace GeoLiveDectect
                     debugT.start();
                     IPrediction[] detectedObjects = (predictMatcher!=null) ? predictMatcher.Run_T_Predict(pt.frame.frameBmp, pt.targetConfidence, pt.targetDetectionTypes) : new IPrediction[0];
                     debugT.stop();
-                    Tools.console_writeLine("LastPredict " + id + " take " + debugT.lastDuration + " s");
+                    Tools.console_writeLine("LastPredict " + id + " take " + debugT.lastDuration + " s  nbDetect: "+ detectedObjects.Count());
 
-                    Prediction pr = new Prediction(Tools.getNowUtcTime_microSecond(), pt, detectedObjects);
-                    while (!coudlUse_listMatcherTask) { Thread.Sleep(1); };          //attente lock de la liste      (ici cas plusieurs Thread d'ou le secure en plus)
-                    coudlUse_listMatcherTask = false;
-                    int curIndex = (int)(pr.predict.index - startIndex);
-                    while(listPrediction.Count() <= curIndex)
-                        listPrediction.Add(null);
-                    listPrediction[curIndex] = pr;
-                    coudlUse_listMatcherTask = true;
+
+                    //      - OneThreadOneFrame : mode de debug - on traite chacune des frames avec 1 seul thread (donc tout comme si on était en continuité), et surtout on n'actualise le buffer avec une nouvelle image que quand on a fini de traiter entièrement la frame précédente
+                    //      - MultiThreadRealTime : mode temps réel - on traite une image sur X, X étant à déterminer en fonction du matching (2 modes d'analyse : temps que les calculs prennent en tout / temps que prend le matching qui doit traiter 1 image par 1)
+
+                    if ((_detectionMode == DetectionMode.AllFrames) ||
+                        ((_detectionMode == DetectionMode.OneThreadOneFrame) && (listPrediction.Count() == 0))
+                        )               //todo cas MultiThreadRealTime
+                    {
+                        if (_detectionMode == DetectionMode.OneThreadOneFrame)
+                            pt.frame.index = pt.index = matchInc++;
+
+
+                        Prediction pr = new Prediction(Tools.getNowUtcTime_microSecond(), pt, detectedObjects);
+                        while (!coudlUse_listMatcherTask) { Thread.Sleep(1); };          //attente lock de la liste      (ici cas plusieurs Thread d'ou le secure en plus)
+                        coudlUse_listMatcherTask = false;
+                        int curIndex = (int)(pr.predict.index - startIndex);
+                        while (listPrediction.Count() <= curIndex)
+                            listPrediction.Add(null);
+                        listPrediction[curIndex] = pr;
+                        coudlUse_listMatcherTask = true;
+                    }
 
                     Thread.Sleep(0);                                //pour laisser les autres Threads l'occasion de respirer.
                 } else {
@@ -1116,12 +1326,14 @@ namespace GeoLiveDectect
             public long timestamp;
             public Prediction prediction;
             public IReadOnlyList<ITrack> tracks;
+            public Bitmap? bmp = null;
 
-            public Match(long timestamp, Prediction prediction, IReadOnlyList<ITrack> tracks)
+            public Match(long timestamp, Prediction prediction, IReadOnlyList<ITrack> tracks, Bitmap? bmp = null)
             {
                 this.timestamp = timestamp;
                 this.prediction = prediction;
                 this.tracks = tracks;
+                this.bmp = bmp;
             }
         }
 
@@ -1152,24 +1364,32 @@ namespace GeoLiveDectect
 
                     debugT.start();
                     IReadOnlyList<ITrack> tracks = (predictMatcher != null) ? predictMatcher.Run_T_Match(pt.detectedObjects, pt.predict.frame.frameBmp) : new List<ITrack>();
+                    List<PoolObject<KalmanTracker<DeepSortTrack>>> lastRemoved = (predictMatcher != null) ? (predictMatcher as DeepSortMatcher).lastRemoved : new List<PoolObject<KalmanTracker<DeepSortTrack>>>();
                     debugT.stop();
-                    Tools.console_writeLine("LastMatch take " + debugT.lastDuration + " s");
+                    Tools.console_writeLine("LastMatch take " + debugT.lastDuration + " s nbTracks: "+ tracks.Count());
+
 
                     Match pr = new Match(Tools.getNowUtcTime_microSecond(), pt, tracks);
 
-                    if (videoWriter != null)
+                    if (isRecording)
                     {
+                        //copie avant de Freezer (utiliseation de frameBmp sur l'interface)
+                        pr.bmp = new Bitmap(pr.prediction.predict.frame.frameBmp.Width, pr.prediction.predict.frame.frameBmp.Height, System.Drawing.Imaging.PixelFormat.Format32bppRgb);                 // https://stackoverflow.com/questions/2016406/converting-bitmap-pixelformats-in-c-sharp
+                        using (Graphics gr = Graphics.FromImage(pr.bmp))
+                        {
+                            gr.DrawImage(pr.prediction.predict.frame.frameBmp, new System.Drawing.Rectangle(0, 0, pr.prediction.predict.frame.frameBmp.Width, pr.prediction.predict.frame.frameBmp.Height));
+                        }
+
                         while (!coudlUse_listMatchs) { Thread.Sleep(0); };          //attente lock de la liste
                         listMatch.Add(pr);
-
-                    }else{
-                        BitmapImage bgf = Tools.BitmapToImageSource(pr.prediction.predict.frame.frameBmp);
-                        bgf.Freeze();       // https://stackoverflow.com/questions/3034902/how-do-you-pass-a-bitmapimage-from-a-background-thread-to-the-ui-thread-in-wpf   https://learn.microsoft.com/en-us/dotnet/api/system.windows.freezable.freeze?view=windowsdesktop-8.0&redirectedfrom=MSDN#System_Windows_Freezable_Freeze
-
-                        ActionWindow a = new ActionWindow(Tools.getNowUtcTime_microSecond(), "refreshImage", bgf, pr.tracks);
-                        while (!MainWindow.coudlUse_listActionWindow) { Thread.Sleep(0); };          //attente lock de la liste
-                        MainWindow.listActionWindow.Add(a);
                     }
+
+                    BitmapImage bgf = Tools.BitmapToImageSource(pr.prediction.predict.frame.frameBmp);
+                    bgf.Freeze();       // https://stackoverflow.com/questions/3034902/how-do-you-pass-a-bitmapimage-from-a-background-thread-to-the-ui-thread-in-wpf   https://learn.microsoft.com/en-us/dotnet/api/system.windows.freezable.freeze?view=windowsdesktop-8.0&redirectedfrom=MSDN#System_Windows_Freezable_Freeze
+
+                    ActionWindow a = new ActionWindow(Tools.getNowUtcTime_microSecond(), "refreshImage", pr.prediction.predict.frame.frameBytes, bgf, pr.tracks, lastRemoved);
+                    while (!MainWindow.coudlUse_listActionWindow) { Thread.Sleep(0); };          //attente lock de la liste
+                    MainWindow.listActionWindow.Add(a);
 
                     Thread.Sleep(0);                                //pour laisser les autres Threads l'occasion de respirer.
                 }
@@ -1180,9 +1400,106 @@ namespace GeoLiveDectect
 
             }
             isMatcherThreadFinished = true;
-            askExitVideoWriterThread = true;
+            askExitRecordWriterThread = true;
             Tools.console_writeLine(debugT.displayStats(true));
         }
+
+
+        /****************************************************************************************************
+        *                                Thread_RecordWriter                                                *
+        ****************************************************************************************************/
+
+        static public bool askExitRecordWriterThread = false;
+        static public bool forceExitRecordWriterThread = false;
+        static public bool isRecordWriterThreadFinished = false;
+
+        static public bool coudlUse_listMatchs = true;
+        static public bool isRecording = false;
+        static public VideoWriter recordWriter = null;
+        static public bool coudlUse_recordWriter = true;
+
+
+        static public void startRecord()
+        {
+            isRecording = true;
+        }
+
+        static public void stopRecord()
+        {
+            isRecording = false;
+
+            if(recordWriter!=null)
+            {
+                while(!coudlUse_recordWriter) { Thread.Sleep(1); };
+                recordWriter.Dispose();
+                recordWriter = null;
+            }
+        }
+
+        public static void thread_RecordWriter()
+        {
+            isRecordWriterThreadFinished = false;
+            askExitRecordWriterThread = false;
+            isRecordWriterThreadFinished = false;
+
+            int inc = 0;
+
+            while (((!askExitRecordWriterThread) || (listMatch.Count() != 0)) && (!forceExitRecordWriterThread))
+            {
+                if (!isRecording)
+                    listMatch.Clear();
+
+                if (listMatch.Count() == 0)
+                {
+                    Thread.Sleep(waitDuration);
+                    continue;
+                }
+
+                coudlUse_listMatchs = false;
+                Tools.console_writeLine("NbToRecord = " + listMatch.Count());
+                Match pt = listMatch.ElementAt(0);
+                listMatch.RemoveAt(0);
+                coudlUse_listMatchs = true;
+
+
+                
+                int width = pt.prediction.predict.frame.width;
+                int height = pt.prediction.predict.frame.height;
+                System.Drawing.Imaging.PixelFormat pf = pt.prediction.predict.frame.pf;
+                byte[] frameBytes = pt.prediction.predict.frame.frameBytes;
+
+                
+                DrawTracks(pt.bmp, pt.tracks);
+
+
+                if (recordWriter == null)
+                {
+                    String targetFilePath = "Assets/Output/record_" + DateTime.UtcNow.ToString("yyyyMMddTHHmmss") + ".mp4";
+                    double targetFps = 5.0; // mGeoliveDetect._videoSource == "Decklink" ? dkc.numFrame / 1 : 1 / (dkc as DecklinkSimulator).timeBetweenTrame ;
+
+                    recordWriter = new VideoWriter(targetFilePath, -1, targetFps, new System.Drawing.Size(width, height), true);
+                }
+
+                if (recordWriter != null)
+                {
+                    coudlUse_recordWriter = false;
+                    recordWriter.Write(pt.bmp.ToImage<Emgu.CV.Structure.Bgr, byte>());
+                    Tools.console_writeLine("RECORD image " + (inc++) + " tracks: " + pt.tracks.Count);
+                    coudlUse_recordWriter = true;
+                } 
+                
+                Thread.Sleep(0);
+            }
+            if (recordWriter != null)
+            {
+                recordWriter.Dispose();
+                recordWriter = null;
+            }
+            isRecordWriterThreadFinished = true;
+        }
+
+
+
 
 
         /****************************************************************************************************
@@ -1193,12 +1510,12 @@ namespace GeoLiveDectect
         static public bool forceExitVideoWriterThread = false;
         static public bool isVideoWriterThreadFinished = false;
 
-        static public bool coudlUse_listMatchs = true;
+        //static public bool coudlUse_listMatchs = true;
 
-        static VideoWriter? videoWriter = null;
+        static public VideoWriter? videoWriter = null;
 
         static List<Match> listReturn = new List<Match>();
-        static public bool coudlUse_listReturn = true;
+        static public bool coudlUse_listRetur = true;
 
         public static void thread_VideoWriter()
         {
@@ -1231,7 +1548,8 @@ namespace GeoLiveDectect
                     BitmapImage bgf = Tools.BitmapToImageSource(pt.prediction.predict.frame.frameBmp);
                     bgf.Freeze();       // https://stackoverflow.com/questions/3034902/how-do-you-pass-a-bitmapimage-from-a-background-thread-to-the-ui-thread-in-wpf   https://learn.microsoft.com/en-us/dotnet/api/system.windows.freezable.freeze?view=windowsdesktop-8.0&redirectedfrom=MSDN#System_Windows_Freezable_Freeze
 
-                    ActionWindow a = new ActionWindow(Tools.getNowUtcTime_microSecond(), "refreshImage", bgf,pt.tracks);
+
+                    ActionWindow a = new ActionWindow(Tools.getNowUtcTime_microSecond(), "refreshImage", pt.prediction.predict.frame.frameBytes, bgf,pt.tracks, new List<PoolObject<KalmanTracker<DeepSortTrack>>>());
                     while (!MainWindow.coudlUse_listActionWindow) { Thread.Sleep(0); };          //attente lock de la liste
                     MainWindow.listActionWindow.Add(a);
                 }
@@ -1326,6 +1644,7 @@ namespace GeoLiveDectect
 
         private static void DrawTracks(Bitmap frame, IReadOnlyList<ITrack> tracks)
         {
+            int bb = 2;
             Graphics graphics = Graphics.FromImage(frame);
 
             foreach (ITrack track in tracks)
@@ -1335,10 +1654,11 @@ namespace GeoLiveDectect
                 const float xNumberIntent = 4f;
                 const int fontSize = 44;
 
-                graphics.DrawRectangles(new System.Drawing.Pen(track.Color, penSize),
+                System.Drawing.Color color = (track.selected) ? System.Drawing.Color.Red : track.Color;
+                graphics.DrawRectangles(new System.Drawing.Pen(color, penSize),
                     new[] { track.CurrentBoundingBox });
 
-                graphics.FillRectangle(new System.Drawing.SolidBrush(track.Color),
+                graphics.FillRectangle(new System.Drawing.SolidBrush(color),
                     new System.Drawing.RectangleF(track.CurrentBoundingBox.X - (penSize / 2), track.CurrentBoundingBox.Y - yBoundingBoxIntent,
                         track.CurrentBoundingBox.Width + penSize, yBoundingBoxIntent - (penSize / 2)));
 
@@ -1569,7 +1889,7 @@ namespace GeoLiveDectect
 
 
 
-            //Todo a copers quelque part.
+            //Todo a copier quelque part.
             // 10/12/2023 11h02h03.213
             // 2023/12/10 11:02:03.213
             // Monday the 10 decembre 2023 11`02'03"213
@@ -1615,6 +1935,31 @@ namespace GeoLiveDectect
             //  ex : j'ai un serie de fonctions, voir de la recursivité, qui doit remplir le meme tableau, 
             //      je fais let aa = { list: [] }, et je passe aa en argumnt de mes fonctions.
             //
+
+
+
+
+
+             // "<mqksdmlksq   name=\"xxx\" path=\"c:\\`\\lqkjsdlkqjd\\qksjdq\\\" >  ..."
+            // '<mqksdmlksq   name="xxx" >  ...'          //seulement en javascript
+            //
+            let html = '\n\
+<qmlskdmqldk>\n\
+             \n\
+</qmlskdmqldk>\n\
+            ';
+
+            let name = "toto";
+            let html = `                                      //seulement en javascript
+<qmlskdmqldk name="${name}" >
+    <mlksdf/>
+</ qmlskdmqldk >
+                `;
+
+
+
+            int aa = 0;             //soit 0 soit 1 et que ca change a chaque fois (presque un boolean)
+            aa = 1 - aa;
 
             */
 

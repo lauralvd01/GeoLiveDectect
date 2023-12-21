@@ -1,14 +1,24 @@
-﻿using MOT.CORE.Matchers.Abstract;
+﻿using Emgu.CV;
+using Emgu.CV.Face;
+using Google.Protobuf.WellKnownTypes;
+using MOT.CORE.Matchers.Abstract;
+using MOT.CORE.Matchers.Deep;
+using MOT.CORE.Matchers.Trackers;
+using MOT.CORE.Utils.Pool;
+using System;
 using System.Drawing;
 using System.IO;
 using System.Text;
 using System.Windows;
+using System.Windows.Automation.Peers;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
+using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using System.Windows.Media.Media3D;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Windows.Threading;
@@ -42,10 +52,13 @@ namespace GeoLiveDectect
 
         protected override void OnClosed(EventArgs e)
         {
+            stopRecord();
+
             base.OnClosed(e);
 
             GeoLiveDetect.forceExitVideoReadThread = true;
             forceExistListenerThread = true;
+            mGeoliveDetect.Dipose();
             Application.Current.Shutdown();
         }
 
@@ -67,6 +80,8 @@ namespace GeoLiveDectect
             float y = (float)mousePosition.Y * ((System.Windows.Media.Imaging.BitmapSource)Image0.Source).PixelHeight / (float)Image0.ActualHeight;
 
 
+            List<ITrack> listUnselected = new List<ITrack>();
+
             foreach (ITrack track in curTracks)
             {
                 if ((track.CurrentBoundingBox.Left <= x) && (x <= track.CurrentBoundingBox.Right) &&
@@ -75,7 +90,25 @@ namespace GeoLiveDectect
                     Tools.console_writeLine("######################################### Click on image " + inc + " at position " + mousePosition + " is in rectangle " + track.Id);
 
                     track.selected = !track.selected;
+                    if(!track.selected)
+                        listUnselected.Add(track);
                 }
+            }
+
+
+            //Send message to GeoRender to cancel unselected
+            if(listUnselected.Count()!=0)
+            {
+                String str = "{ \"utcTime\": " + Tools.getNowUtcTime_microSecond() + ", \"tracks\": [";
+                bool isFirst = true;
+                foreach (ITrack track in listUnselected)
+                {
+                    str += ((!isFirst) ? "," : "") + "{ \"id\": " + track.Id + ", \"del\": true }";
+                    isFirst = false;
+                }
+                str += "]}";
+
+                mGeoliveDetect.GeoSocket_notifyNewMessage(2309, str);           //JSON_GR_SETTRACKERS 		2309	// informations des Trackers (venant de GeoLiveDetect)
             }
             
         }
@@ -86,8 +119,8 @@ namespace GeoLiveDectect
 
             int penSize = 4;
             float yBoundingBoxIntent = (float) (45 *  Image0.ActualHeight / ((System.Windows.Media.Imaging.BitmapSource)Image0.Source).PixelHeight);
-            float xNumberIntent = (float)(4 * Image0.ActualWidth / ((System.Windows.Media.Imaging.BitmapSource)Image0.Source).PixelWidth);
-            const int fontSize = 44;
+            float xNumberIntent = (float) (4 * Image0.ActualWidth / ((System.Windows.Media.Imaging.BitmapSource)Image0.Source).PixelWidth);
+            int fontSize = (int) (9 * ((System.Windows.Media.Imaging.BitmapSource)Image0.Source).PixelWidth / ((System.Windows.Media.Imaging.BitmapSource)Image0.Source).PixelHeight );
 
 
             double trackHeight = track.CurrentBoundingBox.Height * Image0.ActualHeight / ((System.Windows.Media.Imaging.BitmapSource)Image0.Source).PixelHeight;
@@ -103,72 +136,55 @@ namespace GeoLiveDectect
             rect.Stroke = track.selected ? selectedColor : trackColor;
             rect.StrokeThickness = penSize;
             rect.Name = "Track_" + track.Id;
-            canvas.Children.Add(rect);
             Canvas.SetTop(rect, trackTop);
             Canvas.SetLeft(rect, trackLeft);
             Canvas.SetZIndex(rect, 2);
-
-            System.Windows.Shapes.Rectangle idRect = new System.Windows.Shapes.Rectangle();
-            idRect.Height = yBoundingBoxIntent - (penSize / 2);
-            idRect.Width = trackWidth + penSize;
-            idRect.Stroke = track.selected ? selectedColor : trackColor;
-            idRect.StrokeThickness = penSize;
-            idRect.Fill = track.selected ? selectedColor : trackColor;
-            idRect.Name = "Track_" + track.Id;
-            canvas.Children.Add(idRect);
-            Canvas.SetTop(idRect, trackTop - yBoundingBoxIntent);
-            Canvas.SetLeft(idRect, trackLeft - (penSize / 2));
-            Canvas.SetZIndex(idRect, 3);
+            canvas.Children.Add(rect);
 
             (float x, float y) = ((float)trackLeft - xNumberIntent, (float)trackTop - yBoundingBoxIntent);
 
             TextBlock idText = new TextBlock();
             idText.Text = "Track_" + track.Id;
-            //idText.FontSize = fontSize;
-            //idText.FontStyle = 
+            idText.FontSize = fontSize;
+            idText.FontFamily = new System.Windows.Media.FontFamily("Consolas");
+            idText.FontWeight = FontWeight.FromOpenTypeWeight(1);
             idText.Foreground = System.Windows.Media.Brushes.Black;
-            idText.Background = System.Windows.Media.Brushes.White;
+            idText.Background = track.selected ? selectedColor : trackColor;
+            Canvas.SetTop(idText, y);
+            Canvas.SetLeft(idText, x);
+            Canvas.SetZIndex(idText, 3);
             canvas.Children.Add (idText);
-            Canvas.SetTop(idRect, y);
-            Canvas.SetLeft(idRect, x);
-            Canvas.SetZIndex(idRect, 4);
 
-            /*
-
-            graphics.DrawString($"{track.Id}",
-                new Font("Consolas", fontSize, GraphicsUnit.Pixel), new System.Drawing.SolidBrush(System.Drawing.Color.FromArgb((0xFF << 24) | 0xDDDDDD)),
-                new System.Drawing.PointF(x, y));
-
-             */
         }
 
         private void DrawTracksOnCanvas()
         {
+            selectedTracks = new List<ITrack>();
             if (curTracks == null)
                 return;
 
             canvas.Children.RemoveRange(1,canvas.Children.Count);
             foreach (ITrack track in curTracks)
             {
+                if (track.selected)
+                    selectedTracks.Add(track);
                 DrawTrackOnCanvas(track);
             }
         }
 
-        /*
-        Prediction.detectedObjects => IPrediction[]
-        IPrediction.Rectangle.Top .Left . Right .Bottom .Width .Height => int
+        public void toogleRecord(object sender, RoutedEventArgs e) { toogleRecord(); }      //appelé par l'interface.
+
+        public void toogleRecord()
+        {
+            isRecording = !isRecording;
+
+            if (isRecording)
+                GeoLiveDetect.startRecord();
+            else
+                GeoLiveDetect.stopRecord();
+        }
+
         
-        IReadOnlyList<ITrack>
-        ITrack.Id
-        ITrack.CurrentBoundingBox.Top .Left . Right .Bottom .Width .Height => float
-
-        Point mousePosition.X .Y => double
-        
-        mousePosition
-        Bottom Left : 28;367
-         */
-
-
 
 
         /****************************************************************************************************
@@ -179,15 +195,19 @@ namespace GeoLiveDectect
         {
             public long timestamp;
             public String action;
+            public byte[] frameBytes;                               // gardé pour l'ervois a l'interface web (galere de recup depuis le Bitmap)
             public BitmapImage frame;
             public IReadOnlyList<ITrack> tracks;
+            public List<PoolObject<KalmanTracker<DeepSortTrack>>> lastRemoved;
 
-            public ActionWindow(long timestamp, String action, BitmapImage frame, IReadOnlyList<ITrack> tracks)
+            public ActionWindow(long timestamp, String action, byte[] frameBytes, BitmapImage frame, IReadOnlyList<ITrack> tracks, List<PoolObject<KalmanTracker<DeepSortTrack>>> lastRemoved)
             {
                 this.timestamp = timestamp;
                 this.action = action;
+                this.frameBytes = frameBytes;
                 this.frame = frame;
                 this.tracks = tracks;
+                this.lastRemoved = lastRemoved;
             }
         }
 
@@ -195,9 +215,9 @@ namespace GeoLiveDectect
         static public bool coudlUse_listActionWindow = true;
         static public bool forceExistListenerThread = false;
         int inc = 0;
-        IReadOnlyList<ITrack> curTracks;
+        static public IReadOnlyList<ITrack> curTracks;
+        static public List<ITrack> selectedTracks;
         Canvas canvas;
-        List<System.Windows.Shapes.Rectangle> followers = new List<System.Windows.Shapes.Rectangle>();
 
 
         public void startGeoLiveDetect()
@@ -257,16 +277,44 @@ namespace GeoLiveDectect
 
 
 
-                        // envoi au GeoRender des tracks selectionnées.
-                        if (curTracks != null)
+                        // envoi au GeoRender des tracks selectionnés.
+                        if ((selectedTracks != null)&&( (selectedTracks.Count()!=0)|| ((a.lastRemoved!=null)&&(a.lastRemoved.Count()!=0)) ))
                         {
                             /*
                             #define JSON_GR_SETTRACKERS 		2309	// informations des Trackers (venatn de GeoLiveDetect)
                             { utcTime: 165435434.564, tracks:  [ { id: 12, bb: {l: 100, r: 200, t: 300, b: 400} }, { id: 12, del: true }... ] }            // from top left corner origin, del = delete
-                            
-                            //todo ajouter clear dedans
                             */
 
+                            String str = "{ \"utcTime\": " + a.timestamp + ", \"tracks\": [";
+                            bool isFirst = true;
+                            foreach (ITrack track in selectedTracks)
+                            {
+                                if (!track.selected)                    // le temps de deselectionner un track, il est quand emme envoyé au GeoRender, car la construction de selectedTracks est fait en parrallele, et donc pas rafraichit avec la desselection (du coups le GeoREnder recoit des données apres la deselection, ce qui reconstruit les elements.)
+                                    continue;
+
+                                str += ((!isFirst) ? "," : "") + "{ \"id\": " + track.Id + ", \"bb\":{ \"l\": " + track.CurrentBoundingBox.Left + ", \"r\":" + track.CurrentBoundingBox.Right + ", \"t\":" + track.CurrentBoundingBox.Top + ", \"b\":" + track.CurrentBoundingBox.Bottom + "}}";
+                                isFirst = false;
+                            }
+                            if (a.lastRemoved != null)
+                            {
+                                foreach (PoolObject<KalmanTracker<DeepSortTrack>> klmTrack in a.lastRemoved)
+                                {
+                                    ITrack track = klmTrack.Object.Track;
+                                    str += ((!isFirst) ? "," : "") + "{ \"id\": " + track.Id + ", \"del\": true }";
+                                    isFirst = false;
+                                }
+                            }
+                            str += "]}";
+
+                            mGeoliveDetect.GeoSocket_notifyNewMessage(2309, str);           //JSON_GR_SETTRACKERS 		2309	// informations des Trackers (venatn de GeoLiveDetect)
+                        }
+
+
+
+
+                        // envoi a l'interface Web l'image + les Tracks.
+                        if ((curTracks != null) && ((curTracks.Count() != 0) || ((a.lastRemoved != null) && (a.lastRemoved.Count() != 0))))
+                        {
                             String str = "{ \"utcTime\": " + a.timestamp + ", \"tracks\": [";
                             bool isFirst = true;
                             foreach (ITrack track in curTracks)
@@ -274,9 +322,38 @@ namespace GeoLiveDectect
                                 str += ((!isFirst) ? "," : "") + "{ \"id\": " + track.Id + ", \"bb\":{ \"l\": " + track.CurrentBoundingBox.Left + ", \"r\":" + track.CurrentBoundingBox.Right + ", \"t\":" + track.CurrentBoundingBox.Top + ", \"b\":" + track.CurrentBoundingBox.Bottom + "}}";
                                 isFirst = false;
                             }
+                            if (a.lastRemoved != null)
+                            {
+                                foreach (PoolObject<KalmanTracker<DeepSortTrack>> klmTrack in a.lastRemoved)
+                                {
+                                    ITrack track = klmTrack.Object.Track;
+                                    str += ((!isFirst) ? "," : "") + "{ \"id\": " + track.Id + ", \"del\": true }";
+                                    isFirst = false;
+                                }
+                            }
                             str += "]}";
 
-                            mGeoliveDetect.GeoSocket_notifyNewMessage(2309, str);           //JSON_GR_SETTRACKERS 		2309	// informations des Trackers (venatn de GeoLiveDetect)
+                            mGeoliveDetect.WebSocket_notifyNewMessage(2309, str);           //JSON_GR_SETTRACKERS 		2309	// informations des Trackers (venatn de GeoLiveDetect)
+
+
+
+                            //same for sending image:
+                            if ((a.frameBytes.Length != 0) && (a.frame != null))
+                            {
+                                byte[] imgBuff = a.frameBytes;
+                                int width = (int)a.frame.Width;
+                                int height = (int)a.frame.Height;
+                                byte[] buf = new byte[imgBuff.Length + 2 * 4];
+
+                                for (int i = 0; i < 4; i++)
+                                    buf[i] = (byte)(width >> i * 8);
+                                for (int i = 0; i < 4; i++)
+                                    buf[i + 4] = (byte)(height >> i * 8);
+
+                                imgBuff.CopyTo(buf, 2*4);
+
+                                mGeoliveDetect.WebSocket_notifyNewMessage(211, buf);         // 211 == S3_PREVIEW_CONTINUE     buf = (int)width (int) height + tableau pixels rgba (32bits)     //Todo tester
+                            }
                         }
                     }
 
@@ -299,6 +376,8 @@ namespace GeoLiveDectect
 
         private void comboBox3DPreviewFormat_SelectionChanged(object sender, RoutedEventArgs e) { mGeoliveDetect.notify("comboBox3DPreviewFormat_SelectionChanged", sender, e); }
     }
+
+
 }
 
 

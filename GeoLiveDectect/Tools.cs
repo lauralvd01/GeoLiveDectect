@@ -163,8 +163,6 @@ namespace GeoLiveDectect
         {
             using (var stream = new MemoryStream())
             {
-                //img.Save(stream, System.Drawing.Imaging.ImageFormat.Png);         // non usede , because rgb24 (no alpha needed)
-                //img.Save(stream, System.Drawing.Imaging.ImageFormat.Jpeg);
                 img.Save(stream, System.Drawing.Imaging.ImageFormat.Bmp);
                 return stream.ToArray();
             }

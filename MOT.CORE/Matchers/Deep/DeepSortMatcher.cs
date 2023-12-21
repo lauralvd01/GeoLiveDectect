@@ -21,6 +21,8 @@ namespace MOT.CORE.Matchers.Deep
         private readonly IAppearanceExtractor _appearanceExtractor;
 
         private List<PoolObject<KalmanTracker<DeepSortTrack>>> _trackers = new List<PoolObject<KalmanTracker<DeepSortTrack>>>();
+        public List<PoolObject<KalmanTracker<DeepSortTrack>>> lastRemoved = new List<PoolObject<KalmanTracker<DeepSortTrack>>>();
+        
 
         public DeepSortMatcher(IPredictor predictor, IAppearanceExtractor appearanceExtractor,
             float appearanceWeight = 0.775f, float threshold = 0.5f, int maxMisses = 50,
@@ -79,7 +81,8 @@ namespace MOT.CORE.Matchers.Deep
                 AddNewTrack(detectedObjects, appearances, unmatched[i]);
 
             List<ITrack> tracks = ConfirmTracks<KalmanTracker<DeepSortTrack>, DeepSortTrack>(_trackers);
-            RemoveOutdatedTracks<KalmanTracker<DeepSortTrack>, DeepSortTrack>(ref _trackers);
+            lastRemoved = RemoveOutdatedTracks<KalmanTracker<DeepSortTrack>, DeepSortTrack>(ref _trackers);
+
 
             return tracks;
         }
@@ -107,6 +110,7 @@ namespace MOT.CORE.Matchers.Deep
         }
 
 
+        //public override IReadOnlyList<ITrack> Run_T_Match(IPrediction[] detectedObjects, Bitmap frame, List<PoolObject<KalmanTracker<DeepSortTrack>>> _toRemove = null)               // Run() versions pour Threads
         public override IReadOnlyList<ITrack> Run_T_Match(IPrediction[] detectedObjects, Bitmap frame)               // Run() versions pour Threads
         {
             Vector[] appearances = _appearanceExtractor.Predict(frame, detectedObjects).ToArray();
@@ -124,7 +128,7 @@ namespace MOT.CORE.Matchers.Deep
                 AddNewTrack(detectedObjects, appearances, unmatched[i]);
 
             List<ITrack> tracks = ConfirmTracks<KalmanTracker<DeepSortTrack>, DeepSortTrack>(_trackers);
-            RemoveOutdatedTracks<KalmanTracker<DeepSortTrack>, DeepSortTrack>(ref _trackers);
+            lastRemoved = RemoveOutdatedTracks<KalmanTracker<DeepSortTrack>, DeepSortTrack>(ref _trackers);
 
             return tracks;
         }

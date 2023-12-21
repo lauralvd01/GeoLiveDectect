@@ -1,4 +1,6 @@
-﻿using MOT.CORE.Utils.Pool;
+﻿using MOT.CORE.Matchers.Deep;
+using MOT.CORE.Matchers.Trackers;
+using MOT.CORE.Utils.Pool;
 using MOT.CORE.YOLO;
 using System;
 using System.Collections.Generic;
@@ -12,6 +14,7 @@ namespace MOT.CORE.Matchers.Abstract
     {
         private int _startTrackerIndex = 1;
 
+
         public Matcher(int maxMisses = 50, int minStreak = 2)
         {
             MaxMisses = maxMisses;
@@ -20,6 +23,7 @@ namespace MOT.CORE.Matchers.Abstract
 
         public int MaxMisses { get; protected init; }
         public int MinStreak { get; protected init; }
+
 
         public virtual IReadOnlyList<ITrack> Run(Bitmap frame, float targetConfidence, params DetectionObjectType[] detectionObjectTypes)
         {
@@ -31,6 +35,8 @@ namespace MOT.CORE.Matchers.Abstract
         {
             return new IPrediction[0];
         }
+
+        //public virtual IReadOnlyList<ITrack> Run_T_Match(IPrediction[] detectedObjects, Bitmap frame, List<PoolObject<KalmanTracker<DeepSortTrack>>> _toRemove = null)
         public virtual IReadOnlyList<ITrack> Run_T_Match(IPrediction[] detectedObjects, Bitmap frame)
         {
             return new List<ITrack>();
@@ -48,7 +54,7 @@ namespace MOT.CORE.Matchers.Abstract
             return confirmedTracks;
         }
 
-        protected virtual void RemoveOutdatedTracks<TTracker, TTrack>(ref List<PoolObject<TTracker>> trackers) where TTracker : ITracker<TTrack> where TTrack : ITrack
+        protected virtual List<PoolObject<TTracker>> RemoveOutdatedTracks<TTracker, TTrack>(ref List<PoolObject<TTracker>> trackers) where TTracker : ITracker<TTrack> where TTrack : ITrack
         {
             var toRemove = new List<PoolObject<TTracker>>();
 
@@ -63,6 +69,10 @@ namespace MOT.CORE.Matchers.Abstract
 
             if (toRemove.Count != 0)
                 trackers = trackers.Except(toRemove).ToList();
+
+            List<PoolObject<TTracker>> listLastRemoved = toRemove;
+
+            return toRemove;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
