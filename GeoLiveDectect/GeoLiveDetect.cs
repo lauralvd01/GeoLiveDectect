@@ -964,7 +964,7 @@ namespace GeoLiveDectect
         ////////////////////////////////////// VideoSource
 
 
-        static public DecklinkCapture dkc = null;
+        static public DecklinkCaptureBase dkc = null;
         static public bool forceExitVideoReadThread = false;
         static public bool isVideoReadThreadFinished = false;
 
@@ -975,6 +975,7 @@ namespace GeoLiveDectect
 
             if(_videoSource == "Decklink")
             {
+                Tools.console_writeLine("Info: to working with \"Decklinkk\" mode, you have to have a Decklink plugged, and Driver installed with  Blackmagic_Desktop_Video_Windows_12.7.1");
                 dkc = new DecklinkCapture(mWindow, this);
             }else{
                 dkc = new DecklinkSimulator(mWindow, this);

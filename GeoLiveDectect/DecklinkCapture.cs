@@ -25,87 +25,9 @@ using static GeoLiveDectect.DecklinkCapture;
 
 namespace GeoLiveDectect
 {
-    public class DecklinkCapture
+    public class DecklinkCapture : DecklinkCaptureBase
     {
-        public struct Frame
-        {
-            public long timestamp;
-            public long index;
-            public int width = 0;
-            public int height = 0;
-            public PixelFormat pf;
-            public byte[] frameBytes;                               // gardé pour l'ervois a l'interface web (galere de recup depuis le Bitmap)
-            public Bitmap? frameBmp;
-
-
-            public Frame(long timestamp, IDeckLinkVideoFrame? frameDkl, long index)
-            {
-                this.timestamp = timestamp;
-                this.index = index;
-                frameBytes = new byte[0];
-                frameBmp = null;
-
-                if (frameDkl != null)
-                {
-                    int width = frameDkl.GetWidth();
-                    int height = frameDkl.GetHeight();
-                    int rowBytes = frameDkl.GetRowBytes();
-                    //_BMDPixelFormat pf = frameDkl.GetPixelFormat();         //=>  format 10 bits : bmdFormat10BitYUV
-
-                    IDeckLinkVideoFrame bgra32Frame = m_frameConverter.ConvertFrame(frameDkl);      // format xxx -> ARGB (32bits)
-
-
-                    IntPtr bgra32FrameBytes;                        // https://forum.blackmagicdesign.com/viewtopic.php?f=12&t=108533
-                    bgra32Frame.GetBytes(out bgra32FrameBytes);
-
-                    int frameSize = bgra32Frame.GetRowBytes() * height;
-                    frameBytes = new byte[frameSize];
-                    Marshal.Copy(bgra32FrameBytes, frameBytes, 0, frameSize);
-
-                    frameBmp = new Bitmap(width, height, System.Drawing.Imaging.PixelFormat.Format32bppRgb);  // https://stackoverflow.com/questions/21555394/how-to-create-bitmap-from-byte-array 
-                    BitmapData bmpData = frameBmp.LockBits(new Rectangle(0, 0, frameBmp.Width, frameBmp.Height), ImageLockMode.WriteOnly, frameBmp.PixelFormat);    // Create a BitmapData and lock all pixels to be written
-                    Marshal.Copy(frameBytes, 0, bmpData.Scan0, frameBytes.Length);  // Copy the data from the byte array into BitmapData.Scan0
-                    frameBmp.UnlockBits(bmpData);        // Unlock the pixels
-
-                    width = frameBmp.Width;
-                    height = frameBmp.Height;
-                    pf = frameBmp.PixelFormat;
-                }
-            }
-
-
-            public Frame(long timestamp, Bitmap? frameBmp, long index)
-            {
-                this.timestamp = timestamp;
-                this.index = index;
-
-                if (frameBmp.PixelFormat != System.Drawing.Imaging.PixelFormat.Format32bppRgb)
-                {
-                    this.frameBmp = new Bitmap(frameBmp.Width, frameBmp.Height, System.Drawing.Imaging.PixelFormat.Format32bppRgb);                 // https://stackoverflow.com/questions/2016406/converting-bitmap-pixelformats-in-c-sharp
-                    using (Graphics gr = Graphics.FromImage(this.frameBmp))
-                    {
-                        gr.DrawImage(frameBmp, new Rectangle(0, 0, this.frameBmp.Width, this.frameBmp.Height));
-                    }
-                }else{
-                    this.frameBmp = frameBmp;
-                }
-
-                width = this.frameBmp.Width;
-                height = this.frameBmp.Height;
-                pf = this.frameBmp.PixelFormat;
-
-                byte[] aa = Tools.ImageToByte(this.frameBmp);
-                frameBytes = new byte[aa.Length];
-                aa.CopyTo(frameBytes, 0);
-            }
-        }
-
-
-
-
-        public static MainWindow? mWindow = null;
-        public GeoLiveDetect mGeoliveDetect;
-        public long numFrame = 0;
+        
         static public Bgra32FrameConverter m_frameConverter = new Bgra32FrameConverter();               // from Sdk StillsCSharp example
 
         const _BMD3DPreviewFormat kDefault3DPreviewFormat = _BMD3DPreviewFormat.bmd3DPreviewFormatTopBottom;
@@ -187,14 +109,14 @@ namespace GeoLiveDectect
         }
 
 
-        public DecklinkCapture(MainWindow wind, GeoLiveDetect geoliveDetect)
+        public DecklinkCapture(MainWindow wind, GeoLiveDetect geoliveDetect) : base(wind, geoliveDetect)
         {
             mWindow = wind;
             mGeoliveDetect = geoliveDetect;
 
             m_applicationCloseWaitHandle = new EventWaitHandle(false, EventResetMode.AutoReset);
         }
-        public virtual void init()
+        public override void init()
         {
             // Bind 3D preview formats to combo box
             mWindow.Dispatcher.BeginInvoke(new Action(() =>
@@ -212,7 +134,7 @@ namespace GeoLiveDectect
             m_deckLinkMainThread.Start();
         }
 
-        public virtual void Dispose()
+        public override void Dispose()
         {
             m_applicationCloseWaitHandle.Set();
             m_deckLinkMainThread.Join();
@@ -261,7 +183,37 @@ namespace GeoLiveDectect
 
         public void RenderD3DImage(object sender, EventArgs e)
         {
-            Frame f = new Frame(Tools.getNowUtcTime_microSecond(), (e as EventArgs_IDeckLinkVideoFrame).frame, numFrame++);
+            IDeckLinkVideoFrame? frameDkl = (e as EventArgs_IDeckLinkVideoFrame).frame; ;
+            Bitmap? frameBmp = null;
+            if (frameDkl != null)
+            {
+                int width = frameDkl.GetWidth();
+                int height = frameDkl.GetHeight();
+                int rowBytes = frameDkl.GetRowBytes();
+                //_BMDPixelFormat pf = frameDkl.GetPixelFormat();         //=>  format 10 bits : bmdFormat10BitYUV
+
+                IDeckLinkVideoFrame bgra32Frame = m_frameConverter.ConvertFrame(frameDkl);      // format xxx -> ARGB (32bits)
+
+
+                IntPtr bgra32FrameBytes;                        // https://forum.blackmagicdesign.com/viewtopic.php?f=12&t=108533
+                bgra32Frame.GetBytes(out bgra32FrameBytes);
+
+                int frameSize = bgra32Frame.GetRowBytes() * height;
+                byte[] frameBytes = new byte[frameSize];
+                Marshal.Copy(bgra32FrameBytes, frameBytes, 0, frameSize);
+
+                frameBmp = new Bitmap(width, height, System.Drawing.Imaging.PixelFormat.Format32bppRgb);  // https://stackoverflow.com/questions/21555394/how-to-create-bitmap-from-byte-array 
+                BitmapData bmpData = frameBmp.LockBits(new Rectangle(0, 0, frameBmp.Width, frameBmp.Height), ImageLockMode.WriteOnly, frameBmp.PixelFormat);    // Create a BitmapData and lock all pixels to be written
+                Marshal.Copy(frameBytes, 0, bmpData.Scan0, frameBytes.Length);  // Copy the data from the byte array into BitmapData.Scan0
+                frameBmp.UnlockBits(bmpData);        // Unlock the pixels
+
+                //width = frameBmp.Width;
+                //height = frameBmp.Height;
+                //pf = frameBmp.PixelFormat;
+            }
+
+
+            Frame f = new Frame(Tools.getNowUtcTime_microSecond(), frameBmp, numFrame++);
             mGeoliveDetect.notifyNewFrame(f);
 
             /*
@@ -541,7 +493,7 @@ namespace GeoLiveDectect
             m_deckLinkDeviceDiscovery.DeviceRemoved -= RemoveDevice;
         }
 
-        private void startCapture()
+        public override void startCapture()
         {
             if (m_selectedDevice == null)
                 return;
@@ -563,7 +515,7 @@ namespace GeoLiveDectect
             }
         }
 
-        private void restartCapture()
+        public override void restartCapture()
         {
             if (m_selectedDevice == null)
                 return;
@@ -600,14 +552,14 @@ namespace GeoLiveDectect
 
 
 
-        public void notify(String action, object sender, SelectionChangedEventArgs e)
+        public override void notify(String action, object sender, SelectionChangedEventArgs e)
         {
             if (action.Equals("comboBoxDevice_SelectionChanged"))
                 comboBoxDevice_SelectionChanged(sender, e);
             else if (action.Equals("comboBoxConnection_SelectionChanged"))
                 comboBoxConnection_SelectionChanged(sender, e);
         }
-        public void notify(String action, object sender, RoutedEventArgs e)
+        public override void notify(String action, object sender, RoutedEventArgs e)
         {
             if (action.Equals("comboBoxVideoFormat_SelectionChanged"))
                 comboBoxVideoFormat_SelectionChanged(sender, e);

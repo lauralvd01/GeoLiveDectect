@@ -13,13 +13,15 @@ using System.Windows.Controls;
 
 namespace GeoLiveDectect
 {
-    public class DecklinkSimulator : DecklinkCapture
+    public class DecklinkSimulator : DecklinkCaptureBase
     {
         public String videoFilename = "";
         public Double timeBetweenTrame = 40.0;
         public bool askExit = false;
 
         private VideoCapture? videoCapture = null;
+        public Thread m_deckLinkMainThread;
+
 
         public DecklinkSimulator(MainWindow wind, GeoLiveDetect geoliveDetect) : base(wind, geoliveDetect)
         {
@@ -60,7 +62,7 @@ namespace GeoLiveDectect
         }
 
 
-        public override void DeckLinkMainThread()
+        public void DeckLinkMainThread()
         {
             Mat readBuffer = new Mat();
             long startUtcTime = Tools.getNowUtcTime_microSecond();
@@ -91,15 +93,6 @@ namespace GeoLiveDectect
                 Tools.waitUntil(startUtcTime, inc++, timeBetweenTrame);
             }
         }
-
-
-
-
-        public override void comboBoxDevice_SelectionChanged(object sender, SelectionChangedEventArgs e) { }
-        public override void comboBoxConnection_SelectionChanged(object sender, SelectionChangedEventArgs e) { }
-        public override void comboBoxVideoFormat_SelectionChanged(object sender, RoutedEventArgs e) { }
-        public override void checkBoxAutoDetect_CheckedChanged(object sender, RoutedEventArgs e) { }
-        public override void comboBox3DPreviewFormat_SelectionChanged(object sender, RoutedEventArgs e) { }
 
     }
 }
