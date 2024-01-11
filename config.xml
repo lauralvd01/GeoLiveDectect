@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Settings>
   <GeoSocketClient ip="127.0.0.1" port="9041" />
-  <WebSocketServer port="9031" timeout="59" />
+  <WebSocketServer port="9031" timeout="59" previewColdDown="1000" />
   
   <!-- VideoSource soit "Decklink" soit un chemin vers un fichier video (.mp4 par exemple) -->
   <!--VideoSource>Decklink</VideoSource-->

@@ -32,6 +32,7 @@ namespace GeoLiveDectect
             public PixelFormat pf;
             public byte[] frameBytes;                               // gardé pour l'ervois a l'interface web (galere de recup depuis le Bitmap)
             public Bitmap? frameBmp;
+            public byte[] preview_frameBytes;
 
             /*
             public Frame(long timestamp, IDeckLinkVideoFrame? frameDkl, long index)
@@ -95,6 +96,12 @@ namespace GeoLiveDectect
                 byte[] aa = Tools.ImageToByte(this.frameBmp);
                 frameBytes = new byte[aa.Length];
                 aa.CopyTo(frameBytes, 0);
+
+                //preview = half of bitmap
+                Bitmap halfResized = new Bitmap(this.frameBmp, new System.Drawing.Size( width / 2, height / 2));
+                byte[] ab = Tools.ImageToByte(halfResized);
+                preview_frameBytes = new byte[ab.Length];
+                ab.CopyTo(preview_frameBytes, 0);
             }
         }
 

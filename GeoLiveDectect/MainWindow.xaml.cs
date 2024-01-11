@@ -196,15 +196,17 @@ namespace GeoLiveDectect
             public long timestamp;
             public String action;
             public byte[] frameBytes;                               // gardé pour l'ervois a l'interface web (galere de recup depuis le Bitmap)
+            public byte[] preview_frameBytes;
             public BitmapImage frame;
             public IReadOnlyList<ITrack> tracks;
             public List<PoolObject<KalmanTracker<DeepSortTrack>>> lastRemoved;
 
-            public ActionWindow(long timestamp, String action, byte[] frameBytes, BitmapImage frame, IReadOnlyList<ITrack> tracks, List<PoolObject<KalmanTracker<DeepSortTrack>>> lastRemoved)
+            public ActionWindow(long timestamp, String action, byte[] frameBytes, byte[] preview_frameBytes, BitmapImage frame, IReadOnlyList<ITrack> tracks, List<PoolObject<KalmanTracker<DeepSortTrack>>> lastRemoved)
             {
                 this.timestamp = timestamp;
                 this.action = action;
                 this.frameBytes = frameBytes;
+                this.preview_frameBytes = preview_frameBytes;
                 this.frame = frame;
                 this.tracks = tracks;
                 this.lastRemoved = lastRemoved;
@@ -218,7 +220,7 @@ namespace GeoLiveDectect
         static public IReadOnlyList<ITrack> curTracks;
         static public List<ITrack> selectedTracks;
         Canvas canvas;
-
+        private long previousPreviewTime = 0;
 
         public void startGeoLiveDetect()
         {
@@ -338,27 +340,34 @@ namespace GeoLiveDectect
 
 
                             //same for sending image:
-                            if ((a.frameBytes.Length != 0) && (a.frame != null))
+                            if ((a.preview_frameBytes.Length != 0) && (a.frame != null))
                             {
-                                byte[] imgBuff = a.frameBytes;
-                                int width = (int)a.frame.PixelWidth;
-                                int height = (int)a.frame.PixelHeight;
-                                int pixelsSize = width * height * 4;
-                                byte[] buf = new byte[2 * 4 + pixelsSize];
+                                long nowTime = Tools.getNowUtcTime_microSecond();
 
-                                for (int i = 0; i < 4; i++)
-                                    buf[i] = (byte)(width >> i * 8);
-                                for (int i = 0; i < 4; i++)
-                                    buf[i + 4] = (byte)(height >> i * 8);
+                                if ((mGeoliveDetect._ws_previewColdDown < 0.0) || ((nowTime - previousPreviewTime) / 1000.0 > mGeoliveDetect._ws_previewColdDown))       //en ms coldown to sed preview.
+                                {
+                                    byte[] imgBuff = a.preview_frameBytes;
+                                    int width = (int)a.frame.PixelWidth / 2;
+                                    int height = (int)a.frame.PixelHeight / 2;
+                                    int pixelsSize = width * height * 4;
+                                    byte[] buf = new byte[2 * 4 + pixelsSize];
 
-                                //imgBuff.CopyTo(buf, 2*4);                         //saddely the 54 first octets are not pixel in imgBuff
-                                //Array.Copy(imgBuff, 54, buf, 2 * 4, pixelsSize);          //saddely rows seam to be inversed
+                                    for (int i = 0; i < 4; i++)
+                                        buf[i] = (byte)(width >> i * 8);
+                                    for (int i = 0; i < 4; i++)
+                                        buf[i + 4] = (byte)(height >> i * 8);
 
-                                for(int i=0;i<height; i++)
-                                    Array.Copy(imgBuff, 54 + ( (height - 1 - i) * width * 4), buf, 2 * 4 + (i * width * 4), width * 4);
+                                    //imgBuff.CopyTo(buf, 2*4);                         //saddely the 54 first octets are not pixel in imgBuff
+                                    //Array.Copy(imgBuff, 54, buf, 2 * 4, pixelsSize);          //saddely rows seam to be inversed
 
-                                mGeoliveDetect.WebSocket_notifyNewMessage(211, buf);         // 211 == S3_PREVIEW_CONTINUE     buf = (int)width (int) height + tableau pixels rgba (32bits)     //Todo tester
+                                    for (int i = 0; i < height; i++)
+                                        Array.Copy(imgBuff, 54 + ((height - 1 - i) * width * 4), buf, 2 * 4 + (i * width * 4), width * 4);
+
+                                    mGeoliveDetect.WebSocket_notifyNewMessage(211, buf);         // 211 == S3_PREVIEW_CONTINUE     buf = (int)width (int) height + tableau pixels rgba (32bits)     //Todo tester
+                                    previousPreviewTime = nowTime;
+                                }
                             }
+                            
                         }
                     }
 

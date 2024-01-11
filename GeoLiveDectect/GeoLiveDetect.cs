@@ -149,6 +149,7 @@ namespace GeoLiveDectect
         private WebSocketServer _wsServer;
         private int _wsPort = 9031;
         private int _wsTimeout = 59;                                //en minutes.
+        public int _ws_previewColdDown = -1;                        // en ms
         protected static ConcurrentDictionary<User, string> OnlineUsers = new ConcurrentDictionary<User, string>();
         public String _videoSource = "Decklink";
 
@@ -299,6 +300,8 @@ namespace GeoLiveDectect
             var wsServerElement = xDoc.Descendants("WebSocketServer").First();
             _wsPort = int.Parse(wsServerElement.Attribute("port").Value);
             _wsTimeout = int.Parse(wsServerElement.Attribute("timeout").Value);
+            _ws_previewColdDown = int.Parse(wsServerElement.Attribute("previewColdDown").Value);
+            
 
             var gcServerElement = xDoc.Descendants("GeoSocketClient").First();
             _gcnIp = gcServerElement.Attribute("ip").Value;
@@ -1429,7 +1432,7 @@ namespace GeoLiveDectect
                     BitmapImage bgf = Tools.BitmapToImageSource(pr.prediction.predict.frame.frameBmp);
                     bgf.Freeze();       // https://stackoverflow.com/questions/3034902/how-do-you-pass-a-bitmapimage-from-a-background-thread-to-the-ui-thread-in-wpf   https://learn.microsoft.com/en-us/dotnet/api/system.windows.freezable.freeze?view=windowsdesktop-8.0&redirectedfrom=MSDN#System_Windows_Freezable_Freeze
 
-                    ActionWindow a = new ActionWindow(Tools.getNowUtcTime_microSecond(), "refreshImage", pr.prediction.predict.frame.frameBytes, bgf, pr.tracks, lastRemoved);
+                    ActionWindow a = new ActionWindow(Tools.getNowUtcTime_microSecond(), "refreshImage", pr.prediction.predict.frame.frameBytes, pr.prediction.predict.frame.preview_frameBytes, bgf, pr.tracks, lastRemoved);
                     while (!MainWindow.coudlUse_listActionWindow) { Thread.Sleep(0); };          //attente lock de la liste
                     MainWindow.listActionWindow.Add(a);
 
@@ -1591,7 +1594,7 @@ namespace GeoLiveDectect
                     bgf.Freeze();       // https://stackoverflow.com/questions/3034902/how-do-you-pass-a-bitmapimage-from-a-background-thread-to-the-ui-thread-in-wpf   https://learn.microsoft.com/en-us/dotnet/api/system.windows.freezable.freeze?view=windowsdesktop-8.0&redirectedfrom=MSDN#System_Windows_Freezable_Freeze
 
 
-                    ActionWindow a = new ActionWindow(Tools.getNowUtcTime_microSecond(), "refreshImage", pt.prediction.predict.frame.frameBytes, bgf,pt.tracks, new List<PoolObject<KalmanTracker<DeepSortTrack>>>());
+                    ActionWindow a = new ActionWindow(Tools.getNowUtcTime_microSecond(), "refreshImage", pt.prediction.predict.frame.frameBytes, pt.prediction.predict.frame.preview_frameBytes, bgf,pt.tracks, new List<PoolObject<KalmanTracker<DeepSortTrack>>>());
                     while (!MainWindow.coudlUse_listActionWindow) { Thread.Sleep(0); };          //attente lock de la liste
                     MainWindow.listActionWindow.Add(a);
                 }
