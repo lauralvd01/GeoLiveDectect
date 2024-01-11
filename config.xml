@@ -15,8 +15,8 @@
   <TargetConfidence>1.0</TargetConfidence>
   
   
-  <!--DetectionMode> soit "AllFrames" soit "OneThreadOneFrame" soit "MultiThreadRealTime" </DetectionMode-->
-  <DetectionMode>OneThreadOneFrame</DetectionMode>
+  <!--DetectionMode> soit "AllFrames" soit "AllFrames_NotRealTime" soit "OneThreadOneFrame" soit "MultiThreadRealTime" </DetectionMode-->
+  <DetectionMode>MultiThreadRealTime</DetectionMode>
   
   <Logs>
     <Log id="-1" enable="true" logAnswer="true" coldDownTime="0" />

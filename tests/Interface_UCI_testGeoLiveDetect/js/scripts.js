@@ -796,7 +796,7 @@ function processGeoLiveDetect_rects(json)
 		let rect = rects[i];
 		if(!ckv(rect.bb))
 			continue;
-			str += '<div class="rect" data_id="'+ rect.id +'" style="left: '+ (rect.bb.l/19.20)+'%; right: '+ ((1920 - rect.bb.r)/19.20)+'%; top: '+ (rect.bb.t/10.80)+'%; bottom: '+ ((1080 - rect.bb.b)/10.80)+'%; "><div class="rectId">'+ rect.id +'</div></div>';
+			str += '<div class="rect '+ (((ckv(rect.selected))&&(rect.selected)) ? 'selected' : '') +'" data_id="'+ rect.id +'" style="left: '+ (rect.bb.l/19.20)+'%; right: '+ ((1920 - rect.bb.r)/19.20)+'%; top: '+ (rect.bb.t/10.80)+'%; bottom: '+ ((1080 - rect.bb.b)/10.80)+'%; "><div class="rectId">'+ rect.id +'</div></div>';
 	}
 	div.append(str);
 
@@ -816,7 +816,7 @@ function processGeoLiveDetect_rects(json)
 
 function sendSelectedRectsToGeoDetectLive()
 {
-	let datas = { selected: [], unselected: []};
+	let datas = { id: JSON_GR_SETTRACKERS, message: { selected: [], unselected: []}};
 
 	let listRectDiv = $(".preview .rects_container .rect");	
 	for(let i=0;i<listRectDiv.length;i++)
@@ -830,8 +830,20 @@ function sendSelectedRectsToGeoDetectLive()
 			datas.unselected.push(id);
 	}
 
-	sendRenderMessage(JSON_GR_SETTRACKERS, JSON.toString(datas));	
+	if (ckv(RENDER_SOCKET) && RENDER_SOCKET.readyState == 1)
+	{
+		console.log("send Render message (id: "+ datas.id +") : "+ datas.message);	
+		try
+		{
+			RENDER_SOCKET.send( JSON.toString(datas) );	
+		}catch(error){
+			console.error("Error sending message id: "+   datas.id);	
+		}
+	}else{
+		console.error("Error missing RENDER_SOCKET ");	
+	}
 }
+
 
 
 

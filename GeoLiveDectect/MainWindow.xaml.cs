@@ -319,7 +319,7 @@ namespace GeoLiveDectect
                             bool isFirst = true;
                             foreach (ITrack track in curTracks)
                             {
-                                str += ((!isFirst) ? "," : "") + "{ \"id\": " + track.Id + ", \"bb\":{ \"l\": " + track.CurrentBoundingBox.Left + ", \"r\":" + track.CurrentBoundingBox.Right + ", \"t\":" + track.CurrentBoundingBox.Top + ", \"b\":" + track.CurrentBoundingBox.Bottom + "}}";
+                                str += ((!isFirst) ? "," : "") + "{ \"id\": " + track.Id + ", \"selected\": "+ ((track.selected) ? "true" : "false") + ", \"bb\":{ \"l\": " + track.CurrentBoundingBox.Left + ", \"r\":" + track.CurrentBoundingBox.Right + ", \"t\":" + track.CurrentBoundingBox.Top + ", \"b\":" + track.CurrentBoundingBox.Bottom + "}}";
                                 isFirst = false;
                             }
                             if (a.lastRemoved != null)

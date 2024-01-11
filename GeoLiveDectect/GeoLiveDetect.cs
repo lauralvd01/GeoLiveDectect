@@ -182,6 +182,7 @@ namespace GeoLiveDectect
         public enum DetectionMode : byte
         {
             AllFrames = 0,
+            AllFrames_NotRealTime,
             OneThreadOneFrame,
             MultiThreadRealTime
         }
@@ -318,7 +319,10 @@ namespace GeoLiveDectect
             _TargetConfidence = String.Equals(dpTargetConfidenceElement.Value,"") ? null : Double.Parse(dpTargetConfidenceElement.Value);
 
             var dpDetectionModeElement = xDoc.Descendants("DetectionMode").First();
-            _detectionMode = String.Equals(dpDetectionModeElement.Value, "AllFrames") ? DetectionMode.AllFrames : ( String.Equals(dpDetectionModeElement.Value, "OneThreadOneFrame") ? DetectionMode.OneThreadOneFrame : DetectionMode.MultiThreadRealTime);
+            _detectionMode = DetectionMode.MultiThreadRealTime;
+            if (String.Equals(dpDetectionModeElement.Value, "AllFrames")) _detectionMode = DetectionMode.AllFrames;
+            if (String.Equals(dpDetectionModeElement.Value, "AllFrames_NotRealTime")) _detectionMode = DetectionMode.AllFrames_NotRealTime;
+            if (String.Equals(dpDetectionModeElement.Value, "OneThreadOneFrame")) _detectionMode = DetectionMode.OneThreadOneFrame;
 
 
             var gcLogCfgs = xDoc.Descendants("Logs").First();
@@ -717,6 +721,10 @@ namespace GeoLiveDectect
 
 
 
+
+
+
+
             if (str.ElementAt(0).Equals('<'))            // Xml message
             {
                 try
@@ -1062,7 +1070,7 @@ namespace GeoLiveDectect
 
 
             
-            if (_detectionMode == DetectionMode.OneThreadOneFrame)          // OneThreadOneFrame : mode de debug - on traite chacune des frames avec 1 seul thread (donc tout comme si on était en continuité), et surtout on n'actualise le buffer avec une nouvelle image que quand on a fini de traiter entièrement la frame précédente
+            if ((_detectionMode == DetectionMode.OneThreadOneFrame) || (_detectionMode == DetectionMode.AllFrames_NotRealTime))         // OneThreadOneFrame : mode de debug - on traite chacune des frames avec 1 seul thread (donc tout comme si on était en continuité), et surtout on n'actualise le buffer avec une nouvelle image que quand on a fini de traiter entièrement la frame précédente
                 _NbPredictThread = 1;
 
 
@@ -1169,6 +1177,7 @@ namespace GeoLiveDectect
         }
 
 
+        long previousNewFrameTime = 0;
 
         public void notifyNewFrame(DecklinkCapture.Frame f)
         {
@@ -1179,17 +1188,43 @@ namespace GeoLiveDectect
             }
 
 
-            // 3 modes :    - DetectionMode -
-            //      - AllFrames : mode de debug - on traite chacune des frames, avec plusieurs thread. Déjà implémenté
+            // 4 modes :    - DetectionMode -
+            //      - AllFrames : mode de debug (pas temps reel => pb accumulation dans le ram) - on traite chacune des frames, avec plusieurs thread. Déjà implémenté
+            //      - AllFrames_NotRealTime : mode de debug - on traite chacune des frames avec le lecteur d'image qui attent.(pour les pc qui rame et qui n'ont pas de decklink)
             //      - OneThreadOneFrame : mode de debug - on traite chacune des frames avec 1 seul thread (donc tout comme si on était en continuité), et surtout on n'actualise le buffer avec une nouvelle image que quand on a fini de traiter entièrement la frame précédente
             //      - MultiThreadRealTime : mode temps réel - on traite une image sur X, X étant à déterminer en fonction du matching (2 modes d'analyse : temps que les calculs prennent en tout / temps que prend le matching qui doit traiter 1 image par 1)
 
-            if ((_detectionMode == DetectionMode.AllFrames) ||
+            if ((_detectionMode == DetectionMode.AllFrames_NotRealTime))                                    //on bloque l'arrivée d'image  (on les fait sou mais , mais pas en temps Reel)
+            {
+                while ((!coudlUse_listPredictTask) || (listPredictTask.ElementAt(0).Count() != 0)) { Thread.Sleep(8); };
+            }
+
+
+            long nowTime = Tools.getNowUtcTime_microSecond();
+            if ((_detectionMode == DetectionMode.MultiThreadRealTime) && (previousNewFrameTime!=0))          //permet de synchroniser les nouvelles images a considerer par rapport a ce que peut faire la prediction et le matching
+            {
+                double maxLastDuration = -1.0;
+                if (predictLastDuration > 0.1)
+                    maxLastDuration = predictLastDuration;
+                if ((matchLastDuration > 0.1) && (matchLastDuration > maxLastDuration))
+                    maxLastDuration = matchLastDuration;
+
+                double aa = (nowTime - previousNewFrameTime) / (1000.0 * 1000.0);
+
+                if ((maxLastDuration > 0.0) && ( (nowTime - previousNewFrameTime) / (1000.0 * 1000.0) < maxLastDuration ))      //colddown
+                    return;                         //don't want the image this time.
+            }
+            previousNewFrameTime = nowTime;
+
+            //matchLastDuration  //predictLastDuration
+
+            if ((_detectionMode == DetectionMode.AllFrames) || (_detectionMode == DetectionMode.AllFrames_NotRealTime) ||
+                (_detectionMode == DetectionMode.MultiThreadRealTime) ||
                 ((_detectionMode == DetectionMode.OneThreadOneFrame)&&(listPredictTask.ElementAt(0).Count()==0))
                 )           //todo cas du MultiThreadRealTime
             {
 
-                if(_detectionMode == DetectionMode.OneThreadOneFrame)
+                if ((_detectionMode == DetectionMode.OneThreadOneFrame) || (_detectionMode == DetectionMode.MultiThreadRealTime))
                     f.index = predictionInc++;
 
                 PredictTask pt = new PredictTask(Tools.getNowUtcTime_microSecond(), f, _targetConfidence, _targetDetectionTypes, f.index);
@@ -1246,6 +1281,8 @@ namespace GeoLiveDectect
         static long startIndex = 0;
         static public bool coudlUse_listPredictTask = true;
         static Matcher predictMatcher;
+        static double predictLastDuration = -1.0;
+
 
         static public int waitDuration = 8;                //ms
         static public long matchInc = 0;
@@ -1279,16 +1316,23 @@ namespace GeoLiveDectect
                     IPrediction[] detectedObjects = (predictMatcher!=null) ? predictMatcher.Run_T_Predict(pt.frame.frameBmp, pt.targetConfidence, pt.targetDetectionTypes) : new IPrediction[0];
                     debugT.stop();
                     Tools.console_writeLine("LastPredict " + id + " take " + debugT.lastDuration + " s  nbDetect: "+ detectedObjects.Count());
-
+                    predictLastDuration = debugT.lastDuration;
 
                     //      - OneThreadOneFrame : mode de debug - on traite chacune des frames avec 1 seul thread (donc tout comme si on était en continuité), et surtout on n'actualise le buffer avec une nouvelle image que quand on a fini de traiter entièrement la frame précédente
                     //      - MultiThreadRealTime : mode temps réel - on traite une image sur X, X étant à déterminer en fonction du matching (2 modes d'analyse : temps que les calculs prennent en tout / temps que prend le matching qui doit traiter 1 image par 1)
 
-                    if ((_detectionMode == DetectionMode.AllFrames) ||
+                    if ((_detectionMode == DetectionMode.AllFrames_NotRealTime))                                    //on bloque 
+                    {
+                        while ((!coudlUse_listMatcherTask) || (listPrediction.Count() != 0)) { Thread.Sleep(8); };
+                    }
+
+
+                    if ((_detectionMode == DetectionMode.AllFrames) || (_detectionMode == DetectionMode.AllFrames_NotRealTime) ||
+                        (_detectionMode == DetectionMode.MultiThreadRealTime) ||
                         ((_detectionMode == DetectionMode.OneThreadOneFrame) && (listPrediction.Count() == 0))
                         )               //todo cas MultiThreadRealTime
                     {
-                        if (_detectionMode == DetectionMode.OneThreadOneFrame)
+                        if ((_detectionMode == DetectionMode.OneThreadOneFrame) || (_detectionMode == DetectionMode.MultiThreadRealTime))
                             pt.frame.index = pt.index = matchInc++;
 
 
@@ -1343,6 +1387,7 @@ namespace GeoLiveDectect
         static public bool isMatcherThreadFinished = false;
         static List<Match> listMatch = new List<Match>();
         static public bool coudlUse_listMatcherTask = true;
+        static double matchLastDuration = -1.0;
 
         public static void thread_Matcher()
         {
@@ -1368,6 +1413,7 @@ namespace GeoLiveDectect
                     List<PoolObject<KalmanTracker<DeepSortTrack>>> lastRemoved = (predictMatcher != null) ? (predictMatcher as DeepSortMatcher).lastRemoved : new List<PoolObject<KalmanTracker<DeepSortTrack>>>();
                     debugT.stop();
                     Tools.console_writeLine("LastMatch take " + debugT.lastDuration + " s nbTracks: "+ tracks.Count());
+                    matchLastDuration = debugT.lastDuration;
 
 
                     Match pr = new Match(Tools.getNowUtcTime_microSecond(), pt, tracks);
