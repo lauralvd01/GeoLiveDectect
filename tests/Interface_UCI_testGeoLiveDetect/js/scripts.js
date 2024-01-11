@@ -825,9 +825,9 @@ function sendSelectedRectsToGeoDetectLive()
 		let id = Number(rectDiv.attr("data_id"));
 
 		if(rectDiv.hasClass("selected"))
-			datas.selected.push(id);
+			datas.message.selected.push(id);
 		else
-			datas.unselected.push(id);
+			datas.message.unselected.push(id);
 	}
 
 	if (ckv(RENDER_SOCKET) && RENDER_SOCKET.readyState == 1)

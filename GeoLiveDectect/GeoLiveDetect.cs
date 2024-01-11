@@ -53,6 +53,7 @@ using System.Windows.Media.Media3D;
 using System.Windows.Xps;
 using Emgu.CV.XFeatures2D;
 using Emgu.CV.Ocl;
+using System.Windows.Controls.Primitives;
 
 
 // - Todo : 2 gros soucis
@@ -209,11 +210,12 @@ namespace GeoLiveDectect
             startDectections();
             startVideoSource();
 
-            
+
 
             //test_1b();
             //test3();
             //test5();
+            //test7();
         }
 
         public void restartServer()
@@ -869,59 +871,52 @@ namespace GeoLiveDectect
             else
             {                                      // json message
 
-                //  -sur reception d'un message json selectedTracks, simuler l'equivalent du click sur rectangle.=> renvoyer le flux sur GeoRender.
-                //  json = { selected: [1,4, ...], unselected: [2, 3, 5, ..]  }
 
+                dynamic json = null;
                 try
                 {
-                    dynamic jDoc = JsonConvert.DeserializeObject(messageReceived);
-
-                    //short msgid = short.Parse(jDoc.id);
-                    short msgid = jDoc.id;
-                    String message = JsonConvert.SerializeObject(jDoc.message);
-
-                    String[] selected = message.Split(",")[0].Split('[')[1].Split(']')[0].Split(',');
-                    String[] unselected = message.Split(",")[1].Split('[')[1].Split(']')[0].Split(',');
-
-                    long timestamp = Tools.getNowUtcTime_microSecond();
-                    String geoStr = "{ \"utcTime\": " + timestamp + ", \"tracks\": [";
-                    bool isFirst = true;
-                    foreach (String selectedTrack in selected)
-                    {
-                        foreach (ITrack track in MainWindow.curTracks)
-                        {
-                            if (track.Id == int.Parse(selectedTrack))
-                            {
-                                track.selected = !track.selected;
-                                str += ((!isFirst) ? "," : "") + "{ \"id\": " + track.Id + ", \"bb\":{ \"l\": " + track.CurrentBoundingBox.Left + ", \"r\":" + track.CurrentBoundingBox.Right + ", \"t\":" + track.CurrentBoundingBox.Top + ", \"b\":" + track.CurrentBoundingBox.Bottom + "}}";
-                                isFirst = false;
-                            }
-                        }
-                    }
-                    foreach (String unselectedTrack in unselected)
-                    {
-                        foreach (ITrack track in MainWindow.curTracks)
-                        {
-                            if (track.Id == int.Parse(unselectedTrack))
-                            {
-                                track.selected = !track.selected;
-                                str += ((!isFirst) ? "," : "") + "{ \"id\": " + track.Id + ", \"del\": true }";
-                                isFirst = false;
-                            }
-                        }
-                    }
-                    str += "]}";
-
-                    GeoSocket_notifyNewMessage(2309, str);
-
-                    conditionnalLog(msgid, message, false);
-
-                    GeoSocket_notifyNewMessage(msgid, message);
+                    json = JsonConvert.DeserializeObject(messageReceived);                                      // https://stackoverflow.com/questions/13839865/how-to-parse-my-json-string-in-c4-0using-newtonsoft-json-package
+                }catch (Exception e){
+                    Console.WriteLine("Error: fail to parse Json '" + messageReceived + "' : " + e.ToString() + "  {0}", context.ClientAddress);
+                    return;
                 }
-                catch (Exception e)
+
+
+                //  -sur reception d'un message json selectedTracks, simuler l'equivalent du click sur rectangle.=> renvoyer le flux sur GeoRender.
+                //  json = { id: 231, message: { selected: [1,4, ...], unselected: [2, 3, 5, ..]  } }
+
+                if((json == null)||(json.id==null) || (json.message == null))
                 {
-                    Tools.console_writeLine(String.Format("Erreur on Parsing Json {0}\r \t{1} :\t {2}", context.ClientAddress, messageReceived, e));
+                    Console.WriteLine("Error: fail to get minimum Json information (id and message in '" + messageReceived + "' ) {0}", context.ClientAddress);
+                    return;
                 }
+
+                
+                if(json.id == 2309)           // JSON_GR_SETTRACKERS // informations des Trackers (venant de GeoLiveDetect / interface)
+                {
+                    if((json.message.selected==null) || (json.message.unselected == null))
+                    {
+                        Console.WriteLine("Error: fail to get minimum information for JSON_GR_SETTRACKERS (2309) from WebInterface (need select and unselected). {0}", context.ClientAddress);
+                        return;
+                    }
+
+                    if (MainWindow.curTracks != null)
+                    {
+
+                        foreach (int id in json.message.selected)
+                        {
+                            foreach (ITrack track in MainWindow.curTracks)
+                                if (track.Id == id)
+                                    track.selected = true;
+                        }
+                        foreach (int id in json.message.unselected)
+                        {
+                            foreach (ITrack track in MainWindow.curTracks)
+                                if (track.Id == id)
+                                    track.selected = false;
+                        }
+                    }
+                }                
             }
 
 
@@ -2311,13 +2306,13 @@ namespace GeoLiveDectect
             Thread.Sleep(10000);
 
             Tools.console_writeLine("send Something");
-            WebSocket_notifyNewMessage(2309, "{ \"test\": true }");           //JSON_GR_SETTRACKERS 		2309	// informations des Trackers (venatn de GeoLiveDetect)
+            WebSocket_notifyNewMessage(2309, "{ \"utcTime\": 1704987898020000, \"tracks\": [{ \"id\": 2, \"selected\": false, \"bb\":{ \"l\": 850, \"r\":973, \"t\":371, \"b\":583}},{ \"id\": 3, \"selected\": false, \"bb\":{ \"l\": 1336, \"r\":1460, \"t\":350, \"b\":567}},{ \"id\": 4, \"selected\": false, \"bb\":{ \"l\": 1393, \"r\":1542, \"t\":542, \"b\":795}}]}");           //JSON_GR_SETTRACKERS 		2309	// informations des Trackers (venatn de GeoLiveDetect)
 
 
             Thread.Sleep(10000);
 
             Tools.console_writeLine("send Something 2");
-            WebSocket_notifyNewMessage(2309, "{ \"test2\": true }");           //JSON_GR_SETTRACKERS 		2309	// informations des Trackers (venatn de GeoLiveDetect)
+            WebSocket_notifyNewMessage(2309, "{ \"utcTime\": 1704987898020000, \"tracks\": [{ \"id\": 2, \"selected\": true, \"bb\":{ \"l\": 850, \"r\":973, \"t\":371, \"b\":583}},{ \"id\": 3, \"selected\": false, \"bb\":{ \"l\": 1336, \"r\":1460, \"t\":350, \"b\":567}},{ \"id\": 4, \"selected\": false, \"bb\":{ \"l\": 1393, \"r\":1542, \"t\":542, \"b\":795}}]}");           //JSON_GR_SETTRACKERS 		2309	// informations des Trackers (venatn de GeoLiveDetect)
         }
 
 
