@@ -7,6 +7,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
     <BaseOutputPath>..\bin\</BaseOutputPath>
+    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
   </PropertyGroup>
 
   <ItemGroup>
@@ -33,7 +34,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Alchemy-Websockets\src\Alchemy\Alchemy.csproj" />
     <ProjectReference Include="..\GeoSockNet\GeoSockNet.csproj" />
     <ProjectReference Include="..\MOT.CORE\MOT.CORE.csproj" />
   </ItemGroup>

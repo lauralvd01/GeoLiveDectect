@@ -341,16 +341,21 @@ namespace GeoLiveDectect
                             if ((a.frameBytes.Length != 0) && (a.frame != null))
                             {
                                 byte[] imgBuff = a.frameBytes;
-                                int width = (int)a.frame.Width;
-                                int height = (int)a.frame.Height;
-                                byte[] buf = new byte[imgBuff.Length + 2 * 4];
+                                int width = (int)a.frame.PixelWidth;
+                                int height = (int)a.frame.PixelHeight;
+                                int pixelsSize = width * height * 4;
+                                byte[] buf = new byte[2 * 4 + pixelsSize];
 
                                 for (int i = 0; i < 4; i++)
                                     buf[i] = (byte)(width >> i * 8);
                                 for (int i = 0; i < 4; i++)
                                     buf[i + 4] = (byte)(height >> i * 8);
 
-                                imgBuff.CopyTo(buf, 2*4);
+                                //imgBuff.CopyTo(buf, 2*4);                         //saddely the 54 first octets are not pixel in imgBuff
+                                //Array.Copy(imgBuff, 54, buf, 2 * 4, pixelsSize);          //saddely rows seam to be inversed
+
+                                for(int i=0;i<height; i++)
+                                    Array.Copy(imgBuff, 54 + ( (height - 1 - i) * width * 4), buf, 2 * 4 + (i * width * 4), width * 4);
 
                                 mGeoliveDetect.WebSocket_notifyNewMessage(211, buf);         // 211 == S3_PREVIEW_CONTINUE     buf = (int)width (int) height + tableau pixels rgba (32bits)     //Todo tester
                             }

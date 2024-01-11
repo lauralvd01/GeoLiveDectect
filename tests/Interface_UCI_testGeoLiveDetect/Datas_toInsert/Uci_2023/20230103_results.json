@@ -1,0 +1,61 @@
+{
+    "Message": "Results",
+    "SeasonID": 2023,
+    "EventID": 202301,
+    "RaceID": 20230103,
+    "RaceType": "Sprint",
+    "State": "Official",
+    "League": "Men Sprint",
+    "Gender": "Men",
+    "RaceName": "Men's Sprint First Round Heat 3",
+    "Heat": 3,
+    "TotalHeats": 6,
+    "Round": 1,
+    "TotalRounds": 3,
+    "Laps": "3",
+    "Distance": "750",
+    "RaceTime": 10.504,
+    "RaceSpeed": 68.54531607006855,
+    "TimeStamp": "2023-10-21T15:58:11.7832895Z",
+    "Results": [
+      {
+        "Rank": 1,
+        "Bib": "34",
+        "UCIID": "10017950943",
+        "FirstName": "Joe",
+        "LastName": "TRUMAN",
+        "ShortTVName": "",
+        "Team": "UNITED KINGDOM",
+        "NOC": "GBR",
+        "Status": "OK",
+        "Laps": 0,
+        "Diff": 0
+      },
+      {
+        "Rank": 2,
+        "Bib": "29",
+        "UCIID": "10034964036",
+        "FirstName": "Mikhail",
+        "LastName": "YAKOVLEV",
+        "ShortTVName": "",
+        "Team": "ISRAEL",
+        "NOC": "ISR",
+        "Status": "OK",
+        "Laps": 0,
+        "Diff": 0.027
+      },
+      {
+        "Rank": 3,
+        "Bib": "28",
+        "UCIID": "10023427908",
+        "FirstName": "Daan",
+        "LastName": "KOOL",
+        "ShortTVName": "",
+        "Team": "NETHERLANDS",
+        "NOC": "NED",
+        "Status": "OK",
+        "Laps": 0,
+        "Diff": 0.84
+      }
+    ]
+  }

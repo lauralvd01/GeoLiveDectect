@@ -1,0 +1,61 @@
+{
+    "Message": "Results",
+    "SeasonID": 2023,
+    "EventID": 202301,
+    "RaceID": 20230106,
+    "RaceType": "Sprint",
+    "State": "Official",
+    "League": "Men Sprint",
+    "Gender": "Men",
+    "RaceName": "Men's Sprint First Round Heat 6",
+    "Heat": 6,
+    "TotalHeats": 6,
+    "Round": 1,
+    "TotalRounds": 3,
+    "Laps": "3",
+    "Distance": "750",
+    "RaceTime": 10.126,
+    "RaceSpeed": 71.1040884850879,
+    "TimeStamp": "2023-10-21T18:31:14.6130063Z",
+    "Results": [
+      {
+        "Rank": 1,
+        "Bib": "19",
+        "UCIID": "10009535686",
+        "FirstName": "Harrie",
+        "LastName": "LAVREYSEN",
+        "ShortTVName": "",
+        "Team": "NETHERLANDS",
+        "NOC": "NED",
+        "Status": "OK",
+        "Laps": 0,
+        "Diff": 0
+      },
+      {
+        "Rank": 2,
+        "Bib": "30",
+        "UCIID": "10010713329",
+        "FirstName": "Melvin",
+        "LastName": "LANDERNEAU",
+        "ShortTVName": "",
+        "Team": "FRANCE",
+        "NOC": "FRA",
+        "Status": "OK",
+        "Laps": 0,
+        "Diff": 0.578
+      },
+      {
+        "Rank": 3,
+        "Bib": "21",
+        "UCIID": "10011141846",
+        "FirstName": "Nien Hsing",
+        "LastName": "HSIEH",
+        "ShortTVName": "",
+        "Team": "CHINESE TAIPEI",
+        "NOC": "TPE",
+        "Status": "OK",
+        "Laps": 0,
+        "Diff": 0.695
+      }
+    ]
+  }

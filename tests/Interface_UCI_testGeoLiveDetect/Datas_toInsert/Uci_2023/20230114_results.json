@@ -1,0 +1,61 @@
+{
+    "Message": "Results",
+    "SeasonID": 2023,
+    "EventID": 202301,
+    "RaceID": 20230114,
+    "RaceType": "Sprint",
+    "State": "Provisional",
+    "League": "Men Sprint",
+    "Gender": "Men",
+    "RaceName": "Men's Sprint Semi-Finals Heat 1",
+    "Heat": 1,
+    "TotalHeats": 2,
+    "Round": 2,
+    "TotalRounds": 3,
+    "Laps": "3",
+    "Distance": "750",
+    "RaceTime": 10.283999999999999,
+    "RaceSpeed": 70.01166861143524,
+    "TimeStamp": "2023-10-21T16:50:34.895844Z",
+    "Results": [
+      {
+        "Rank": 1,
+        "Bib": "31",
+        "UCIID": "10026071156",
+        "FirstName": "Tom",
+        "LastName": "DERACHE",
+        "ShortTVName": "",
+        "Team": "FRANCE",
+        "NOC": "FRA",
+        "Status": "OK",
+        "Laps": 0,
+        "Diff": 0
+      },
+      {
+        "Rank": 2,
+        "Bib": "24",
+        "UCIID": "10009079382",
+        "FirstName": "Mateusz",
+        "LastName": "RUDYK",
+        "ShortTVName": "",
+        "Team": "POLAND",
+        "NOC": "POL",
+        "Status": "OK",
+        "Laps": 0,
+        "Diff": 0.027
+      },
+      {
+        "Rank": 3,
+        "Bib": "34",
+        "UCIID": "10017950943",
+        "FirstName": "Joe",
+        "LastName": "TRUMAN",
+        "ShortTVName": "",
+        "Team": "UNITED KINGDOM",
+        "NOC": "GBR",
+        "Status": "OK",
+        "Laps": 0,
+        "Diff": 0.043
+      }
+    ]
+  }

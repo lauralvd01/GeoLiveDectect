@@ -1,0 +1,48 @@
+ {
+    "Message": "Results",
+    "SeasonID": 2023,
+    "EventID": 202301,
+    "RaceID": 20230119,
+    "RaceType": "Sprint",
+    "State": "Provisional",
+    "League": "Men Sprint",
+    "Gender": "Men",
+    "RaceName": "Men's Sprint Final",
+    "Heat": 1,
+    "TotalHeats": 1,
+    "Round": 3,
+    "TotalRounds": 3,
+    "Laps": "3",
+    "Distance": "750",
+    "RaceTime": 10.234,
+    "RaceSpeed": 70.35372288450264,
+    "TimeStamp": "2023-10-21T17:23:02.5067487Z",
+    "Results": [
+      {
+        "Rank": 1,
+        "Bib": "19",
+        "UCIID": "10009535686",
+        "FirstName": "Harrie",
+        "LastName": "LAVREYSEN",
+        "ShortTVName": "",
+        "Team": "NETHERLANDS",
+        "NOC": "NED",
+        "Status": "OK",
+        "Laps": 0,
+        "Diff": 0
+      },
+      {
+        "Rank": 2,
+        "Bib": "31",
+        "UCIID": "10026071156",
+        "FirstName": "Tom",
+        "LastName": "DERACHE",
+        "ShortTVName": "",
+        "Team": "FRANCE",
+        "NOC": "FRA",
+        "Status": "OK",
+        "Laps": 0,
+        "Diff": 0.493
+      }
+    ]
+  }

@@ -1,0 +1,2411 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Interface UCI</title>
+  
+  <link rel="stylesheet" href="css/styles.css">
+  <script src="libs/jquery-3.5.1.js"></script>
+  <script src="libs/jquery-ui_1.13.2.js"></script>
+  <script src="libs/chart.js"></script>
+  <script src="libs/moment.min.js"></script>
+  <script src="js/env.js"></script>
+  <script src="conf/riders.js"></script>
+  <script src="conf/standings.js"></script>
+  <script src="conf/races_names.js"></script>
+  <script src="js/utils.js"></script>  
+  <script src="js/scripts.js"></script>
+  <script src="js/interface.js"></script>
+  <script src="js/stats.js"></script>
+  <script src="js/tests_Ov.js"></script>
+</head>
+<body id="body">
+
+  <!-- Tab links -->
+<div id="tabs" class="tab">
+  <div id="logo_georacing"><img src="img/logo_georacing.png" width="140px" height="23px" /></div>
+  <div id="tabs_buttons">
+    <div id="tabSettings" class="tablinks" onclick="openTab('Settings')">Settings</div>
+    <div id="tabRaces"class="tablinks" onclick="openTab('Races')">Races</div>
+	<div id="tabQualifications" class="tablinks" onclick="openTab('Qualifications')">Qualifications</div>
+    <div id="tabClassifications"class="tablinks" onclick="openTab('Classifications')">Classifications</div>
+    <div id="tabManual" class="tablinks" onclick="openTab('Manual')">Riders</div> 	
+    <!-- <div id="tabStats" class="tablinks is_master" onclick="openTab('Stats')">Stats</div> -->
+    <div id="tabMessages" class="tablinks" onclick="openTab('Messages')">Messages</div>
+    <div id="tabButtonsOverlay" class="tablinks dev" onclick="openTab('ButtonsOverlay')">Buttons Overlay</div>
+	<div id="tabButtonsTimer" class="tablinks dev" onclick="openTab('ButtonsTimer')">Buttons Timer</div>    
+      
+	
+	 
+	<!-- <div id="tabMessage" class="tablinks dev" onclick="openTab('Message')">Message</div> -->
+  <div id="tabMessageTimer" class="tablinks dev" onclick="openTab('MessageTimer')">Message Timer</div>
+    
+  </div>
+  <div id="logo_uci"><img src="img/logo_uci.png" height="35px" /></div>
+</div>
+
+<!-- Tab content -->
+<div id="Settings" class="tabcontent">
+  <h3>Settings</h3>
+  <p>
+
+    <div class="div_settings">
+        <div class="div_settings_label">  
+          <label class="label_sport" for="current_sport">Sport:</label>
+        </div>
+        <div class="div_settings_value">
+           <span id="current_sport" class="settings_label">-</span>
+        </div>
+    </div>
+
+    <div class="div_settings">
+        <div class="div_settings_label">  
+          <label class="label_skin" for="current_skin">Skin:</label>
+        </div>
+        <div class="div_settings_value">
+           <span id="current_skin" class="settings_label">-</span>
+        </div>
+    </div>
+
+    <div class="div_settings">
+
+          <!--
+              <div class="div_settings">
+                  <div class="div_settings_label">  
+                    <label class="label_mode" for="current_mode">Display mode:</label>
+                  </div>
+                  <div class="div_settings_value">
+                    <select id="select_display_mode" name="select_display_mode">
+                        <option value="normal">Normal</option>
+                        <option value="dark">Dark</option>
+                    </select>
+                  </div>
+              </div>
+          -->
+              <div class="div_settings_general">
+                    <label class="label_is_master" for="is_master">Master:</label>
+                    <input type="checkbox" id="is_master" class="checkbox_auto" name="is_master" value="Master" />
+              </div>
+
+              <div class="div_settings_general">
+                    <label class="label_with_tracking" for="with_tracking">With Tracking :</label>
+                    <input type="checkbox" id="with_tracking" class="checkbox_auto" name="with_tracking" value="Tracking" />
+              </div>
+
+              <div class="div_settings_general">
+                  <label class="label_with_leaderboard" for="with_leaderboard">With Leaderboard :</label>
+                  <input type="checkbox" id="with_leaderboard" class="checkbox_auto" name="with_leaderboard" value="Tracking" />
+            </div>
+            
+            <div class="div_settings_general">
+                  <label class="label_without_listing" for="without_listing">Without Listing :</label>
+                  <input type="checkbox" id="without_listing" class="checkbox_auto" name="without_listing" value="without_listing" />
+            </div>
+
+              <div class="div_settings_general">
+                    <label class="label_mode_dev" for="mode_dev">Mode Dev :</label>
+                    <input type="checkbox" id="mode_dev" class="checkbox_auto" name="mode_dev" value="ModeDev" />
+              </div>
+
+              
+              <div class="div_settings_general">
+                  <label class="label_use_aws_season_rank" for="mode_dev">Use AWS Season Rank :</label>
+                  <input type="checkbox" id="use_aws_season_rank" class="checkbox_auto" name="use_aws_season_rank" value="1" checked/>
+            </div>
+
+            <div class="div_settings_general">
+                <label class="label_hide_backup_qualification_bracket" for="hide_backup_qualification_bracket">Hide backup qualification bracket :</label>
+                <input type="checkbox" id="hide_backup_qualification_bracket" class="checkbox_auto" name="hide_backup_qualification_bracket" value="1" />
+            </div>
+
+          <div class="div_settings_general">
+              <label class="label_hide_trimaran_season_standings" for="hide_trimaran_season_standings">Hide Trimaran season standings :</label>
+              <input type="checkbox" id="hide_trimaran_season_standings" class="checkbox_auto" name="hide_trimaran_season_standings" value="1" />
+          </div>
+
+          <div class="div_settings_general">
+              <label class="with_preview" for="with_preview">With Preview ? :</label>
+              <input type="checkbox" id="with_preview" class="checkbox_auto" name="with_preview" value="Preview" />
+          </div>
+
+          <div class="div_settings_general">
+              <label class="label_with_render2" for="with_render2">With Render2 :</label>
+              <input type="checkbox" id="with_render2" class="checkbox_auto" name="with_render2" value="Render2" />
+          </div>
+
+          <div class="div_settings_general">
+              <label class="label_with_generate_video" for="with_generate_video">With Generate Video :</label>
+              <input type="checkbox" id="with_generate_video" class="checkbox_auto" name="with_generate_video" value="GenerateVideo" />
+          </div>
+
+          <div class="div_settings_general">
+            <label class="label_with_rider_stat_data" for="with_rider_stat_data">With Rider Stat Data :</label>
+            <input type="checkbox" id="with_rider_stat_data" class="checkbox_auto" name="with_rider_stat_data" value="with_rider_stat_data" />
+        </div>
+        </div>
+
+  <hr class="dashed">
+  <h3>Connections</h3>
+
+      <div class="div_settings">
+        <div class="div_settings_label">  
+          <label for="render_ip">Render IP:</label>
+        </div>
+        <div class="div_settings_value">
+          <input type="text" id="render_ip" class="settings_connections" />
+        </div>
+      </div>
+
+      <div class="div_settings">
+        <div class="div_settings_label">  
+          <label for="render_port">Render Port:</label>
+        </div>
+        <div class="div_settings_value">
+          <input type="number" id="render_port" class="settings_connections">
+        </div>
+      </div>
+
+      <div class="div_settings">
+        <div class="div_settings_label">  
+          <label for="render2_ip">Render 2 IP:</label>
+        </div>
+        <div class="div_settings_value">
+          <input type="text" id="render2_ip" class="settings_connections" />
+        </div>
+      </div>
+
+      <div class="div_settings">
+        <div class="div_settings_label">  
+          <label for="render2_port">Render 2 Port:</label>
+        </div>
+        <div class="div_settings_value">
+          <input type="number" id="render2_port" class="settings_connections">
+        </div>
+      </div>
+
+      <div class="div_settings">
+        <div class="div_settings_label">  
+          <label for="timer_ip">Timer/Bridge IP:</label>
+        </div>
+        <div class="div_settings_value">
+          <input type="text" id="timer_ip" class="settings_connections" />
+        </div>
+      </div>
+
+      <div class="div_settings">
+        <div class="div_settings_label">  
+          <label for="timer_port">Timer Port:</label>
+        </div>
+        <div class="div_settings_value">
+           <input type="number" id="timer_port" class="settings_connections" />
+        </div>
+      </div>
+<!--
+      <div class="div_settings">
+        <div class="div_settings_label">  
+          <label for="tracker_ip">Tracker IP:</label>
+        </div>
+        <div class="div_settings_value">
+           <input type="text" id="tracker_ip" class="settings_connections" />
+        </div>
+      </div>
+
+      <div class="div_settings">
+        <div class="div_settings_label">  
+          <label for="tracker_port">Tracker Port:</label>
+        </div>
+        <div class="div_settings_value">
+           <input type="number" id="tracker_port" class="settings_connections" />
+        </div>
+      </div>
+    
+	  <hr class="dashed">
+    <h3>Tracking</h3>
+
+    <div class="div_settings">
+        <div class="div_settings_label">  
+          <label for="tracker_msg_modulo">Tracker Modulo msg:</label>
+        </div>
+        <div class="div_settings_value">
+           <input id="tracker_msg_modulo" type="number" value="10" min="1" max="10" style="width:35px" />
+        </div>
+    </div>
+-->
+
+	  <hr class="dashed">
+	  <h3>Overlay Auto</h3>
+
+    <div class="div_settings">
+        <div class="div_settings_label">  
+          <label class="label_auto" for="auto_render_StartTime">StartTime</label>
+        </div>
+        <div class="div_settings_value">
+           <input type="checkbox" id="auto_render_StartTime" class="checkbox_auto" name="auto_render_StartTime" value="Chrono" checked />
+        </div>
+    </div>
+
+    <div class="div_settings">
+        <div class="div_settings_label">  
+          <label class="label_auto" for="auto_render_LapCounter">LapCounter</label>
+        </div>
+        <div class="div_settings_value">
+           <input type="checkbox" id="auto_render_LapCounter" class="checkbox_auto" name="auto_render_LapCounter" value="LapCounter" checked />
+
+           <label class="label_message_duration_LapCounter" for="message_duration_LapCounter">Duration : </label>
+
+           <input id="message_duration_LapCounter" class="duration_auto" type="number" step="1" value="4" min="0" style="width: 30px"> s
+        </div>
+    </div>
+
+    <div class="div_settings">
+        <div class="div_settings_label">  
+          <label class="label_auto" for="auto_render_RiderEliminated">RiderEliminated</label>
+        </div>
+        <div class="div_settings_value">
+           <input type="checkbox" id="auto_render_RiderEliminated" class="checkbox_auto" name="auto_render_RiderEliminated" value="RiderEliminated" checked />
+          <label class="label_message_duration_RiderEliminated" for="message_duration_RiderEliminated">Duration : </label>
+          <input id="message_duration_RiderEliminated" class="duration_auto" type="number" step="1" value="5" min="0" style="width: 30px"> s
+        </div>
+    </div>
+
+    <div class="div_settings">
+        <div class="div_settings_label">  
+          <label class="label_auto" for="auto_render_FinishTime">FinishTime</label>
+        </div>
+        <div class="div_settings_value">
+           <input type="checkbox" id="auto_render_FinishTime" class="checkbox_auto" name="auto_render_FinishTime" value="FinishTime" checked />
+          <label class="label_message_duration_FinishTime" for="message_duration_FinishTime">Duration : </label>
+            <input id="message_duration_FinishTime" class="duration_auto" type="number" step="1" value="6" min="0" style="width: 30px"> s
+        </div>
+    </div>  
+
+
+    <div class="div_settings">
+        <div class="div_settings_label">  
+          <label class="label_auto">Logo AWS</label>
+        </div>
+        <div class="div_settings_value">
+           <input type="checkbox" id="overlay_show_logo_aws" class="checkbox_auto" name="overlay_show_logo_aws" value="Yes" checked />
+
+          <label class="label_duration_overlay_show_logo_aws" for="duration_overlay_show_logo_aws">Duration : </label>
+
+          <input id="duration_overlay_show_logo_aws" class="duration_auto" type="number" step="1" value="5" style="width: 30px"> s
+        </div>
+    </div>  
+
+
+<!--
+    <hr class="dashed">
+	  <h3>AWS</h3>
+
+    <div class="div_settings">
+        <div class="div_settings_label">  
+          <label class="label_forward_aws" for="forward_aws">Forward AWS</label>
+        </div>
+        <div class="div_settings_value">
+           <input type="checkbox" id="forward_aws" class="checkbox_auto" name="forward_aws" value="Yes" checked />
+        </div>
+    </div>
+-->	
+
+<hr class="dashed">
+	  <h3>Div</h3>
+
+    <div class="div_settings">
+        <div class="div_settings_label">  
+          <label class="label_auto" for="auto_render_LapResultsNbMax">Laps result nb max</label>
+        </div>
+        <div class="div_settings_value">
+           
+        </div>
+    </div>
+
+	<hr class="dashed">
+	<h3>Debug</h3>
+
+      <div class="div_settings">
+        <div class="div_settings_label">  
+          <label for="render_ip">Debug Image:</label>
+        </div>
+        <div class="div_settings_value">
+          <input type="text" id="debug_image" class="settings_connections" style="width: 500px;" />
+        </div>
+<!--
+		<div class="div_settings_label">  
+          <label class="label_auto" for="auto_render_StartTime">Capture image Render</label>
+        </div>
+        <div class="div_settings_value">
+           <input type="checkbox" id="capture_image" class="checkbox_auto" name="capture_image" value="1" />
+        </div>
+-->		        
+      </div>
+
+    <hr class="dashed">
+    <h3>Special</h3>
+
+    <input type="button" id="button_clear_storage" value="CLEAR STORAGE" />
+
+    <h3>Version</h3>
+    1.1.2
+  </p>
+</div>
+
+
+
+<div id="Races" class="tabcontent">
+  
+  <div id="listing_races">
+    <span type="previous" class="button_navigate_race">Prev</span>
+    <span type="next" class="button_navigate_race">Next</span>
+    <select id="select_races" name="select_races">
+      <option value="">--Please choose a race--</option>
+    </select>  
+  </div>
+
+  <div id="all_races"></div>
+</div>
+
+
+<div id="Qualifications" class="tabcontent">
+	  <div id="tabsQualifications">
+      
+      <div id="tabQualificationsSprintMenSemiFinals" class="tabLinkQualifications" onclick="openQualifications('QualificationsSprintMenSemiFinals')">Sprint Men Semi Finals</div>
+		<div id="tabQualificationsSprintMenFinals" class="tabLinkQualifications" onclick="openQualifications('QualificationsSprintMenFinals')">Sprint Men Final</div>
+		<div id="tabQualificationsSprintWomenSemiFinals" class="tabLinkQualifications" onclick="openQualifications('QualificationsSprintWomenSemiFinals')">Sprint Women Semi Finals</div>
+		<div id="tabQualificationsSprintWomenFinals" class="tabLinkQualifications" onclick="openQualifications('QualificationsSprintWomenFinals')">Sprint Women Final</div>
+		<div id="tabQualificationsKeirinMenFinals" class="tabLinkQualifications" onclick="openQualifications('QualificationsKeirinMenFinals')">Keirin Men Final</div>		
+		<div id="tabQualificationsKeirinWomenFinals" class="tabLinkQualifications" onclick="openQualifications('QualificationsKeirinWomenFinals')">Keirin Women Final</div>
+	  </div>
+	  
+	  <div id="QualificationsSprintMenSemiFinals" class="tabQualifications">
+		Label : <input id="input_label_QualificationsSprintMenSemiFinals" class="input_qualified_label" type="text" value="MEN'S SPRINT" style="width:400px;" /></span>&nbsp;&nbsp;</br>
+    Label2 : <input id="input_label2_QualificationsSprintMenSemiFinals" class="input_qualified_label" type="text" value="QUALIFIED FOR SEMI-FINALS" style="width:400px;" /></span>&nbsp;&nbsp;
+		  <p>
+			  <span>BIB UCI Riders : <input id="input_bib_QualificationsSprintMenSemiFinals" class="input_qualified_filter_riders" qualified="QualificationsSprintMenSemiFinals" type="text" value="" class=""> &nbsp; (Bibs separated by ,)</span> &nbsp;&nbsp;<input type="button" id="GetBibsFromQualificationsSprintMenSemiFinals" value="GET Bibs from Startlist" />
+
+			  <div id="div_QualificationsSprintMenSemiFinals" class="div_qualified_riders_table">        
+			  </div>
+			  <div class="div_qualified_riders_buttons">  
+				  <div class="message_clear_overlay button_data_general clear_overlay" />-- CLEAR --</div>
+				  <div class="button_show_qualified button_data_general button_data_manual button_play_overlay dataOn" qualified="QualificationsSprintMenSemiFinals" force_lines="6" max_riders="6" >Qualified</div>
+				  <div class="button_show_qualified button_data_general button_data_manual button_play_overlay dataOn" bracket="1" qualified="QualificationsSprintMenSemiFinals" label="Men's Sprint" max_riders="6" >Bracket</div>
+			  </div>
+		  </p>		
+	  </div>
+	  
+	  <div id="QualificationsSprintMenFinals" class="tabQualifications">
+		Label : <input id="input_label_QualificationsSprintMenFinals"  class="input_qualified_label" type="text" value="MEN'S SPRINT" style="width:400px;" /></span>&nbsp;&nbsp;</br>
+    Label2 : <input id="input_label2_QualificationsSprintMenFinals"  class="input_qualified_label" type="text" value="QUALIFIED FOR FINAL" style="width:400px;" /></span>&nbsp;&nbsp;
+		  <p>
+			  <span>BIB UCI Riders : <input id="input_bib_QualificationsSprintMenFinals" class="input_qualified_filter_riders" qualified="QualificationsSprintMenFinals" type="text" value="" class=""> &nbsp; (Bibs separated by ,)</span>
+
+			  <div id="div_QualificationsSprintMenFinals" class="div_qualified_riders_table">        
+			  </div>
+			  <div class="div_qualified_riders_buttons">  
+				  <div class="message_clear_overlay button_data_general clear_overlay" />-- CLEAR --</div>
+				  <div class="button_show_qualified button_data_general button_data_manual button_play_overlay dataOn" qualified="QualificationsSprintMenFinals" force_lines="2" max_riders="2" final="1">Qualified</div>
+				  <div class="button_show_qualified button_data_general button_data_manual button_play_overlay dataOn" bracket="1" qualified="QualificationsSprintMenFinals" label="Men's Sprint" max_riders="2" final="1">Bracket</div>
+			  </div>
+		  </p>				
+	  </div>
+	  
+	  <div id="QualificationsSprintWomenSemiFinals" class="tabQualifications">
+		Label : <input id="input_label_QualificationsSprintWomenSemiFinals" class="input_qualified_label" type="text" value="WOMEN'S SPRINT" style="width:400px;" /></span>&nbsp;&nbsp;</br>
+    Label2 : <input id="input_label2_QualificationsSprintWomenSemiFinals" class="input_qualified_label" type="text" value="QUALIFIED FOR SEMI-FINALS" style="width:400px;" /></span>&nbsp;&nbsp;
+		  <p>
+			  <span>BIB UCI Riders : <input id="input_bib_QualificationsSprintWomenSemiFinals" class="input_qualified_filter_riders" qualified="QualificationsSprintWomenSemiFinals" type="text" value="" class=""> &nbsp; (Bibs separated by ,)&nbsp;&nbsp;<input type="button" id="GetBibsFromQualificationsSprintWomenSemiFinals" value="GET Bibs from Startlist" /></span>
+
+			  <div id="div_QualificationsSprintWomenSemiFinals" class="div_qualified_riders_table">        
+			  </div>
+			  <div class="div_qualified_riders_buttons">  
+				  <div class="message_clear_overlay button_data_general clear_overlay" />-- CLEAR --</div>
+				  <div class="button_show_qualified button_data_general button_data_manual button_play_overlay dataOn" qualified="QualificationsSprintWomenSemiFinals" force_lines="6" max_riders="6">Qualified</div>
+				  <div class="button_show_qualified button_data_general button_data_manual button_play_overlay dataOn" bracket="1" qualified="QualificationsSprintWomenSemiFinals" label="Women's Sprint" max_riders="6">Bracket</div>
+			  </div>
+		  </p>			
+	  </div>
+	  
+	  <div id="QualificationsSprintWomenFinals" class="tabQualifications">
+		Label : <input id="input_label_QualificationsSprintWomenFinals" class="input_qualified_label" type="text" value="WOMEN'S SPRINT" style="width:400px;" /></span>&nbsp;&nbsp;</br>
+    Label2 : <input id="input_label2_QualificationsSprintWomenFinals" class="input_qualified_label" type="text" value="QUALIFIED FOR FINAL" style="width:400px;" /></span>&nbsp;&nbsp;
+		  <p>
+			  <span>BIB UCI Riders : <input id="input_bib_QualificationsSprintWomenFinals" class="input_qualified_filter_riders" qualified="QualificationsSprintWomenFinals" type="text" value="" class=""> &nbsp; (Bibs separated by ,)</span>
+
+			  <div id="div_QualificationsSprintWomenFinals" class="div_qualified_riders_table">        
+			  </div>
+			  <div class="div_qualified_riders_buttons">  
+				  <div class="message_clear_overlay button_data_general clear_overlay" />-- CLEAR --</div>
+				  <div class="button_show_qualified button_data_general button_data_manual button_play_overlay dataOn" qualified="QualificationsSprintWomenFinals" force_lines="2" max_riders="2" final="1">Qualified</div>
+				  <div class="button_show_qualified button_data_general button_data_manual button_play_overlay dataOn" bracket="1" qualified="QualificationsSprintWomenFinals" label="Women's Sprint" max_riders="2" final="1">Bracket</div>
+			  </div>
+		  </p>			
+	  </div>
+	  
+	  <div id="QualificationsKeirinMenFinals" class="tabQualifications">				
+		Label : <input id="input_label_QualificationsKeirinMenFinals" class="input_qualified_label" type="text" value="MEN'S KEIRIN" style="width:400px;" /></span>&nbsp;&nbsp;</br>
+    Label2 : <input id="input_label2_QualificationsKeirinMenFinals" class="input_qualified_label" type="text" value="RIDERS QUALIFIED FOR FINAL" style="width:400px;" /></span>&nbsp;&nbsp;
+		  <p>
+			  <span>BIB UCI Riders : <input id="input_bib_QualificationsKeirinMenFinals" class="input_qualified_filter_riders" qualified="QualificationsKeirinMenFinals" type="text" value="" class=""> &nbsp; (Bibs separated by ,)</span>
+
+			  <div id="div_QualificationsKeirinMenFinals" class="div_qualified_riders_table">        
+			  </div>
+			  <div class="div_qualified_riders_buttons">  
+				  <div class="message_clear_overlay button_data_general clear_overlay" />-- CLEAR --</div>
+				  <div class="button_show_qualified button_data_general button_data_manual button_play_overlay dataOn" qualified="QualificationsKeirinMenFinals" force_lines="6" max_riders="6">Qualified</div>
+			  </div>
+		  </p>	
+	  </div>
+	  
+	   <div id="QualificationsKeirinWomenFinals" class="tabQualifications">
+		Label : <input id="input_label_QualificationsKeirinWomenFinals" class="input_qualified_label" type="text" value="WOMEN'S KEIRIN" style="width:400px;" /></span>&nbsp;&nbsp;</br>
+    Label2 : <input id="input_label2_QualificationsKeirinWomenFinals" class="input_qualified_label" type="text" value="RIDERS QUALIFIED FOR FINAL" style="width:400px;" /></span>&nbsp;&nbsp;
+		  <p>
+			  <span>BIB UCI Riders : <input id="input_bib_QualificationsKeirinWomenFinals" class="input_qualified_filter_riders" qualified="QualificationsKeirinWomenFinals" type="text" value="" class=""> &nbsp; (Bibs separated by ,)</span>
+
+			  <div id="div_QualificationsKeirinWomenFinals" class="div_qualified_riders_table">        
+			  </div>
+			  <div class="div_qualified_riders_buttons">  
+				  <div class="message_clear_overlay button_data_general clear_overlay" />-- CLEAR --</div>
+				  <div class="button_show_qualified button_data_general button_data_manual button_play_overlay dataOn" qualified="QualificationsKeirinWomenFinals" force_lines="6" max_riders="6">Qualified</div>
+			  </div>
+		  </p>			
+	  </div>
+	
+</div>
+
+<div id="Classifications" class="tabcontent">     
+	
+  <div id="div_get_standings_aws" class="is_master">
+    <div id="button_get_standings_aws"  class="button_action button_race_normal ">Get AWS S. Standings</div>
+    <div>Last Update :</div> <div id="last_update_standings_aws">-</div>
+  </div>
+<!--
+    <div id="div_provisionnal_standings">
+    Show provisionnal ? <input type="checkbox" id="is_provisionnal_standings" class="checkbox" name="is_provisionnal_standings" value="1">
+ </div>
+-->
+
+  </br></br>
+  <div id="ClassificationPreview">PREVIEW</div>
+  <div id="ClassificationButtons">
+  	<h3>Men Endurance</h3>  
+        <div class="buttons_league_classification">
+          <div id="Classification_MenScratch" type="Classification" gender="Men" race_type="Scratch" class="button_play_overlay classification_button" />Men Scratch <div class="tooltiptext"></div></div>
+		  <div id="Classification_MenElimination" type="Classification" gender="Men" race_type="Elimination" class="button_play_overlay classification_button" />Men Elimination <div class="tooltiptext"></div></div>          
+          <!--<div id="ClassificationLeague_MenEndurance" type="ClassificationLeague" gender="Men" league="Endurance" class="button_play_overlay classification_button" />Event Men Endurance <div class="tooltiptext"></div></div>-->
+  		  &nbsp;&nbsp;&nbsp;<div id="ClassificationSeason_MenEndurance" type="ClassificationSeason" gender="Men" league="Endurance" class="button_play_overlay classification_button" />Tr. Season Men Endurance <div class="tooltiptext"></div></div>
+
+        <div class="classification_button_bloc">
+          <div id="ClassificationSeasonAws_MenEndurance" type="ClassificationSeasonAws" gender="Men" league="Endurance" class="button_play_overlay classification_button force_bloc" />Season Men Endurance <div class="tooltiptext"></div></div>
+          <div id="MiniClassificationSeasonAws_MenEndurance" type="ClassificationSeasonAws" overlay="MiniStandings" gender="Men" league="Endurance" class="button_play_overlay classification_button force_bloc button_top5" />TOP 5 Men Endurance <div class="tooltiptext"></div></div>                  
+        </div>      
+      </div>
+  	</br></br>
+  	<hr class="dashed">
+  	</br>
+  	<h3>Men Sprint</h3>
+          <div class="buttons_league_classification">
+              <div id="Classification_MenSprint" type="Classification" gender="Men" race_type="Sprint" class="button_play_overlay classification_button" />Men Sprint <div class="tooltiptext"></div></div>
+			  <div class="classification_button_bloc">
+				<div id="Classification_MenKeirin" type="Classification" gender="Men" race_type="Keirin" class="button_play_overlay classification_button force_bloc" />Men Keirin <div class="tooltiptext"></div></div>
+				<div id="Classification_MenKeirin6" type="Classification" gender="Men" race_type="Keirin" class="button_play_overlay classification_button force_bloc" limit="6" />Men Keirin (6)<div class="tooltiptext"></div></div>
+			 </div>
+       <!--  <div id="ClassificationLeague_MenSprint" type="ClassificationLeague" gender="Men" league="Sprint" class="button_play_overlay classification_button" />Event Men Sprint <div class="tooltiptext"></div></div> -->
+  			<div id="ClassificationSeason_MenSprint" type="ClassificationSeason" gender="Men" league="Sprint" class="button_play_overlay classification_button" />Tr. Season Men Sprint <div class="tooltiptext"></div></div>
+        <div class="classification_button_bloc">
+          <div id="ClassificationSeasonAws_MenSprint" type="ClassificationSeasonAws" gender="Men" league="Sprint" class="button_play_overlay classification_button force_bloc" />Season Men Sprint <div class="tooltiptext"></div></div>
+          <div id="MiniClassificationSeasonAws_MenSprint" type="ClassificationSeasonAws" overlay="MiniStandings" gender="Men" league="Sprint" class="button_play_overlay classification_button force_bloc button_top5" />TOP 5 Men Sprint <div class="tooltiptext"></div></div>
+        </div>
+        
+  		</div>
+  	
+  	</br></br>
+  	<hr class="dashed">
+  	</br>
+  	<h3>Women Endurance</h3>
+        <div class="buttons_league_classification">
+          <div id="Classification_WomenScratch" type="Classification" gender="Women" race_type="Scratch" class="button_play_overlay classification_button" />Women Scratch <div class="tooltiptext"></div></div>
+		  <div id="Classification_WomenElimination" type="Classification" gender="Women" race_type="Elimination" class="button_play_overlay classification_button" />Women Elimination <div class="tooltiptext"></div></div>          
+          <!-- <div id="ClassificationLeague_WomenEndurance" type="ClassificationLeague" gender="Women" league="Endurance" class="button_play_overlay classification_button" />Event Women Endurance <div class="tooltiptext"></div></div> -->
+  		<div id="ClassificationSeason_WomenEndurance" type="ClassificationSeason" gender="Women" league="Endurance" class="button_play_overlay classification_button" />Tr. Season Women Endurance <div class="tooltiptext"></div></div>
+      <div class="classification_button_bloc">
+        <div id="ClassificationSeasonAws_WomenEndurance" type="ClassificationSeasonAws" gender="Women" league="Endurance" class="button_play_overlay classification_button force_bloc" />Season Women Endurance <div class="tooltiptext"></div></div>
+        <div id="MiniClassificationSeasonAws_WomenEndurance" type="ClassificationSeasonAws" overlay="MiniStandings" gender="Women" league="Endurance" class="button_play_overlay classification_button force_bloc button_top5" />TOP 5 Women Endurance <div class="tooltiptext"></div></div>
+      </div>
+      
+  	  </div>
+  	
+  	</br></br>
+  	<hr class="dashed">
+  	</br>
+  	<h3>Women Sprint</h3>
+        <div class="buttons_league_classification">  		 
+  		  <div class="classification_button_bloc">
+			<div id="Classification_WomenKeirin" type="Classification" gender="Women" race_type="Keirin" class="button_play_overlay classification_button force_bloc" />Women Keirin <div class="tooltiptext"></div></div>
+			<div id="Classification_WomenKeirin6" type="Classification" gender="Women" race_type="Keirin" class="button_play_overlay classification_button force_bloc" limit="6" />Women Keirin (6) <div class="tooltiptext"></div></div>
+		  </div>
+		  <div id="Classification_WomenSprint" type="Classification" gender="Women" race_type="Sprint" class="button_play_overlay classification_button" />Women Sprint <div class="tooltiptext"></div></div>
+  		 <!--  <div id="ClassificationLeague_WomenSprint" type="ClassificationLeague" gender="Women" league="Sprint" class="button_play_overlay classification_button" />Event Women Sprint <div class="tooltiptext"></div></div>-->
+  		  <div id="ClassificationSeason_WomenSprint" type="ClassificationSeason" gender="Women" league="Sprint" class="button_play_overlay classification_button" />Tr. Season Women Sprint <div class="tooltiptext"></div></div>
+        <div class="classification_button_bloc">
+          <div id="ClassificationSeasonAws_WomenSprint" type="ClassificationSeasonAws" gender="Women" league="Sprint" class="button_play_overlay classification_button force_bloc" />Season Women Sprint <div class="tooltiptext"></div></div>
+          <div id="MiniClassificationSeasonAws_WomenSprint" type="ClassificationSeasonAws" overlay="MiniStandings" gender="Women" league="Sprint" class="button_play_overlay classification_button force_bloc button_top5" />TOP 5 Women Sprint <div class="tooltiptext"></div></div>
+        </div>
+       
+  	  </div>
+
+    </div>
+</div>
+
+
+<div id="Message" class="tabcontent">
+  <label class="label_message_id" for="message_id">Message ID : </label>
+  <input id="message_id" type="number" step="1" value="2303" style="width: 50px"> &nbsp;&nbsp;&nbsp;&nbsp;
+  <label class="label_message_duration" for="message_duration">Message Duration : </label>
+  <input id="message_duration" type="number" step="1" value="0" style="width: 30px"> s
+        <br /><br />      
+     <textarea id="message_content" name="message_content" rows="30" >
+	  <Params><Overlay xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" IconName="Overlay-message-small" name="COUNTER" TemplateVisible="true" RenderAutoRefresh="false" Frequency="1"><Template TemplateName="PST\RankingSmall.lua"><FunctionList><Function Name="Prepare"><Param><Info><GRAPHIC_TEMPLATE>Scripts/GENERAL.lua</GRAPHIC_TEMPLATE><SCENARIO_NAME>SMALL_CLASS_DIST_10</SCENARIO_NAME><MAX_PAGES>-1</MAX_PAGES><PLAY_MODE>ANIME</PLAY_MODE><PLAY_AUTO>TRUE</PLAY_AUTO><CAPTURE filename="Out/Shoot3DDebug" Mode="NONE" tempo="0">FALSE</CAPTURE><DATA><Content><LapCounter nb_seconds="0"><JsonData><![CDATA[{
+ "Message": "LapCounter",		 
+ "SeasonID": 2021,			
+ "EventID": 202101, 			
+ "RaceID": 20210121,			
+ "LapsToGo": 20, 				
+ "DistanceToGo": 5000,
+ "TimeStamp": "2021-11-05T19:08:42.358000Z"  	
+} ]]></JsonData></LapCounter></Content></DATA></Info></Param></Function></FunctionList></Template></Overlay></Params>
+        
+        </textarea>
+    <br />
+    
+    <input type="button" id="message_send" value="SEND" />
+</div>
+
+
+<div id="MessageTimer" class="tabcontent">
+     <textarea id="message_timer_content" name="message_timer_content" rows="30" style="width: 800px;">
+        </textarea>
+    <br />
+    <input type="button" id="message_timer_send" value="SEND" />
+</div>
+
+<div id="ButtonsOverlay" class="tabcontent">
+  <p>
+    
+	
+  
+	<!--
+	<div id="message_send_leaderboard" class="div_button">LeaderBoard</div>
+  -->
+  <div id="message_send_big_winner" class="div_button">Big Winner</div>
+  <div id="message_send_big_winner_racetype" class="div_button">Big Winner Race Type</div>
+	<div id="message_send_competitor" class="div_button">Competitor 1</div>
+  <div id="message_send_competitor_2" class="div_button">Competitor 2 - S/C</div>
+  <div id="message_send_competitor_2_power_cadency" class="div_button">Competitor 2 - P/C</div>
+  <div id="message_send_competitor_slowmo" class="div_button">Competitor SlowMo</div>
+  <div id="message_send_competitor_slowmo2" class="div_button">Competitor SlowMo 2</div>
+  <div id="message_send_finish_slowmo" class="div_button">Finish SlowMo</div>
+  <div id="message_send_compare" class="div_button">Comparatif</div>
+	<div id="message_send_competitor_pres_low" class="div_button">Competitor Low</div>
+	<div id="message_send_classification" class="div_button">Classification</div>
+  <div id="message_send_standings_elimination" class="div_button">Elimination</div>
+
+  <div id="message_send_competitor_max_data" class="div_button">Competitor Max Data</div>
+  <div id="message_send_competitor_max_data_name" class="div_button">Competitor Max Data Name</div>
+  
+<!--
+  <div id="message_send_TestMultiOverlay" class="div_button">Test MultiSend</div>
+  <div id="message_send_NoOverlay" class="div_button">No Overlay</div>
+  <div id="message_send_NoOverlayDefault" class="div_button">No Overlay Default</div>
+  <div id="message_send_NoOverlayFront" class="div_button">No Overlay front</div>
+  <div id="message_send_NoOverlayLap" class="div_button">No Overlay Lap</div>
+
+  <div id="message_send_multi_messages" class="div_button">Multi messages</div>
+
+  <div id="message_send_test_preview" class="div_button">Test preview</div>
+
+  <div id="message_send_test_preview_Play" class="div_button">Test preview Play</div>
+  <div id="message_send_test_preview_Abort" class="div_button">Test preview Abort</div>
+  <div id="message_send_test_preview_Test" class="div_button">Test preview Test</div>
+  
+  
+  <div id="message_generate_overlay_ra" class="div_button">GENERATE OVERLAY RA</div>
+  
+	
+  <div id="message_send_test_enablePreview" class="div_button">Enable Preview</div>
+  <div id="message_send_test_unablePreview" class="div_button">Unable Preview</div>
+  <div id="message_send_test0" class="div_button">Test0 SimpleTest.lua PlayAuto</div>
+  <div id="message_send_test1" class="div_button">Test1 SimpleTest.lua Confirmations</div>
+  <div id="message_send_test2" class="div_button">Test2 SimpleTest.lua AbortAuto</div>
+
+	<div id="message_send_test0_b" class="div_button">Test0 St2 PlayAuto</div>
+  <div id="message_send_test1_b" class="div_button">Test1 St2 Confirmations</div>
+  <div id="message_send_test2_b" class="div_button">Test2 St2 AbortAuto</div>
+
+
+  <div id="message_send_test_rider_data_4L" class="div_button">Test Rider Data 4L</div>
+  <div id="message_send_test_rider_data_2L" class="div_button">Test Rider Data 2L</div>
+
+
+  <div id="message_send_generate_img" class="div_button">Test Generate Img</div>
+-->
+
+<!--    
+    <div class="div_button">
+	<br /><br />
+		 Interval : <input id="message_interval" type="number" step="1" value="1000" style="width: 50px;">  ms
+		 <br /><br />
+		 <input type="button" id="message_stop_test" value="STOP" />
+		 <br /><br />
+		<input type="button" id="message_test" value="TEST" />
+	</div>
+-->	
+  </p>
+</div>
+
+
+<div id="ButtonsTimer" class="tabcontent">
+  <p>
+    <div id="message_send_start_time" class="div_button">StartTime</div>
+	<div id="message_send_finish_time" class="div_button">FinishTime</div>
+	<div id="message_send_lap_counter" class="div_button">LapCounter</div>
+
+	<div id="message_send_running_order" class="div_button">RunningOrder</div>
+	<div id="message_send_start_list" class="div_button">StartList</div>
+	<div id="message_send_start_list2" class="div_button">StartList2</div>
+  <div id="message_send_rider_elimined" class="div_button">RiderElimined</div>
+	<div id="message_send_results_provisional" class="div_button">Provisional Results</div>
+	<div id="message_send_results_under_review" class="div_button">Under_Review Results</div>
+	<div id="message_send_results_official" class="div_button">Official Results</div>
+	<div id="message_send_leaderboard" class="div_button">LeaderBoard</div>
+	<div id="message_send_competitor" class="div_button">Competitor</div>
+	<div id="message_send_competitor_pres_low" class="div_button">Competitor Low</div>
+	<div id="message_send_classification_timer" class="div_button">Classification</div>
+	<div id="message_send_classification_league_timer" class="div_button">Classification League</div>
+  <div id="message_send_test_finish_time" class="div_button">Finish Time</div>
+  
+  <div id="message_send_test_scratch_men_classification" class="div_button">Scratch Men Classification</div>
+  <div id="message_send_test_elimination_men_classification" class="div_button">Elimination Men Classification</div>
+  <div id="message_send_test_endurance_men_classification" class="div_button">Endurance Men Classification</div>
+  
+  
+  <div id="message_send_test_sprint_men_classification" class="div_button">Sprint Men Classification</div>
+  <div id="message_send_test_keirin_men_classification" class="div_button">Keirin Men Classification</div>
+  <div id="message_send_test_sprint_league_men_classification" class="div_button">Sprint League Men Classification</div>
+	
+	
+<!--    
+    <div class="div_button">
+	<br /><br />
+		 Interval : <input id="message_interval" type="number" step="1" value="1000" style="width: 50px;">  ms
+		 <br /><br />
+		 <input type="button" id="message_stop_test" value="STOP" />
+		 <br /><br />
+		<input type="button" id="message_test" value="TEST" />
+	</div>
+-->	
+  </p>
+</div>
+
+<div id="Manual" class="tabcontent">
+  <p>
+      <p id="search_rider_filter">UCI Rider : <input id="search_rider" type="text" value="" class=""></p>
+
+      <div id="search_rider_results" class="search_rider_results">        
+      </div>
+
+      <div id="div_columns_presets">
+          <div id="search_rider_buttons" class="search_rider_buttons">  
+              <div class="message_clear_overlay button_data_general clear_overlay" />-- CLEAR --</div>
+              <div>&nbsp;</div>
+              <div id="search_rider_buttons_play_overlay">
+                <div class="button_data_general_presentation_competitor button_data_general button_data_manual button_play_overlay ">RIDER</div>
+                <div>&nbsp;</div><div>&nbsp;</div>
+                <div class="button_data_general_rider_leader button_data_general  button_data_manual  button_play_overlay ">Leader</div>
+                <div>&nbsp;</div><div>&nbsp;</div>
+                <div class="button_data_general_rider_eliminated button_data_general  button_data_manual  button_play_overlay ">Eliminated</div>
+                <div>&nbsp;</div><div>&nbsp;</div>		  	  
+                <div class="button_data_general_rider_qualified button_data_general  button_data_manual  button_play_overlay ">Qualified</div>
+                <div>&nbsp;</div><div>&nbsp;</div>
+                <div class="button_data_general_manual_winner button_data_general button_data_manual  button_play_overlay ">Winner</div>
+      <!--              
+                <div>&nbsp;</div><div>&nbsp;</div><div>&nbsp;</div><div>&nbsp;</div>
+                <div class="button_data_general_manual_generate_ra button_data_general button_data_manual  button_play_overlay dev">Generate RA</div>
+      -->
+                  
+          <!--
+                  <div class="button_data_general_competitor_data button_data_general  button_data_manual  button_play_overlay ">Rider Power</div>
+                  -->
+              </div>
+
+          </div>
+
+          <div id="preset_rider_data" class="preset_rider_data">
+              PRESETS
+          </div>
+    </div>
+
+      <div id="search_rider_data" class="search_rider_data"> 
+        <table id="table_rider_data">
+          <tr>
+            <td class="row_name"></td>
+            <td class="row_select_data"></td>
+            <td class="row_label"></td>
+            <td class="row_label_value"></td>
+            <td class="row_value"></td>
+            <td><span rider_num="1" target="rider1_data_name" class="set_rider rider_name">SET RIDER 1</span></td>
+            <td><span rider_num="2" target="rider2_data_name" class="set_rider rider_name">SET RIDER 2</span></td>
+            <td><span rider_num="3" target="rider3_data_name" class="set_rider rider_name">SET RIDER 3</span></td>
+          </tr>          
+
+          <tr>
+            <td class="row_name"></td>
+            <td class="row_select_data"></td>
+            <td class="row_label"></td>
+            <td class="row_label_value"></td>
+            <td class="row_value">Rider</td>
+            <td><span id="rider1_data_name" uciid="" class="rider_name"></span></td>
+            <td><span id="rider2_data_name" uciid="" class="rider_name"></span></td>
+            <td><span id="rider3_data_name" uciid="" class="rider_name"></span></td>
+          </tr>
+
+          <tr style="height:20px">
+            <td colspan="8" style="text-align: left;">
+              <input class="set_preset_data_rider"  mode="rider_profile" type="button" value="Profile"/>
+              <input class="set_preset_data_rider"  mode="rider_profile_results_1l" type="button" value="Profile Results 1L"/>
+              <input class="set_preset_data_rider"  mode="rider_profile_results_2l" type="button" value="Profile Results 2L"/>
+              <input class="set_preset_data_rider"  mode="top_results" type="button" value="Top Results"/>              
+            </td>
+          </tr>
+
+          <tr style="height:20px">
+            <td colspan="8" style="text-align: left;">
+              <!--
+              <input class="set_preset_data_rider"  mode="season_stat" type="button" value="Season event stat"/>
+              <input class="set_preset_data_rider"  mode="all_seasons_stat" type="button" value="All seasons event stat"/>
+                -->
+              Season
+              <input class="set_preset_data_rider"  mode="season_discipline_stat" type="button" value="Season UCI TCL"/>            
+              <input class="set_preset_data_rider"  mode="season_league_sprint_stat" type="button" value="Season Sprint UCI TCL"/>
+              <input class="set_preset_data_rider"  mode="season_league_endurance_stat" type="button" value="Season Endurance UCI TCL"/>
+              All time
+              <input class="set_preset_data_rider"  mode="all_seasons_discipline_stat" type="button" value="All time UCI TCL"/>
+              <input class="set_preset_data_rider"  mode="all_seasons_league_sprint_stat" type="button" value="All time Sprint UCI TCL"/>
+              <input class="set_preset_data_rider"  mode="all_seasons_league_endurance_stat" type="button" value="All time Endurance UCI TCL"/>
+              
+            </td>
+          </tr>
+
+          <tr style="height:20px;">
+            <td colspan="8" style="text-align: left;">
+              Season
+              <input class="set_preset_data_rider"  mode="season_sprint_stat" type="button" value="Season Sprint stat"/>
+              <input class="set_preset_data_rider"  mode="season_keirin_stat" type="button" value="Season Keirin stat"/>             
+              <input class="set_preset_data_rider"  mode="season_scratch_stat" type="button" value="Season Scratch stat"/>
+              <input class="set_preset_data_rider"  mode="season_elimination_stat" type="button" value="Season Elim stat"/>
+              All time
+              <input class="set_preset_data_rider"  mode="all_seasons_keirin_stat" type="button" value="All time Keirin stat"/>
+              <input class="set_preset_data_rider"  mode="all_seasons_sprint_stat" type="button" value="All time Sprint stat"/>
+              <input class="set_preset_data_rider"  mode="all_seasons_scratch_stat" type="button" value="All time Scratch stat"/>
+              <input class="set_preset_data_rider"  mode="all_seasons_elimination_stat" type="button" value="All time Elim stat"/>
+            </td>
+          </tr>
+          <tr style="height:20px;">
+            <td colspan="8" style="text-align: left;">
+             
+              <input class="set_preset_data_rider"  mode="event_data" type="button" value="Event Max Data"/> 
+              Sprint
+              <input class="set_preset_data_rider"  mode="sprint_bpm_max" type="button" value="Sprint BPM Max"/>
+              <input class="set_preset_data_rider"  mode="sprint_power_max" type="button" value="Sprint Power Max"/>
+              <input class="set_preset_data_rider"  mode="sprint_speed_max" type="button" value="Sprint Speed Max"/> 
+              Keirin
+              <input class="set_preset_data_rider"  mode="keirin_bpm_max" type="button" value="Keirin BPM Max"/>
+              <input class="set_preset_data_rider"  mode="keirin_power_max" type="button" value="Keirin Power Max"/>
+              <input class="set_preset_data_rider"  mode="keirin_speed_max" type="button" value="Keirin Speed Max"/>
+            </td>
+          </tr>
+
+        
+          <tr>
+            <td class="row_name">Header</td>
+            <td colspan="3"><input id="input_header" style="width:304px" type="text" value=""></td>
+            <td ></td>
+            <td><span id="rider1_data_name" uciid="" class="rider_name"></span></td>
+            <td><span id="rider2_data_name" uciid="" class="rider_name"></span></td>
+            <td><span id="rider3_data_name" uciid="" class="rider_name"></span></td>
+          </tr>
+          
+          
+
+          <tr>
+<!--             
+            <td class="row_races">
+              <select id="row_1_select_races" class="select_races">
+                <option value="">Race</option>
+              </select>  
+            </td>
+-->            
+            <td class="row_name">Row 1</td>
+            <td class="row_select_data">
+              <select id="row_1_select_data">
+                <option value=""></option>                
+                <option value="BirthDate" force_label="Age" type="bio">Age</option>
+                <option value="HeightCm" force_label="Height" unit="cm" type="bio">Height</option>
+                <option value="WeightKg" force_label="Weight" unit="kg" type="bio">Weight</option>
+                <option value="MaxHrBpm" force_label="Max HR" unit="bpm" type="bio">Max HR</option>
+                <option value="RestHrBpm" force_label="Rest HR" unit="bpm" type="bio">Rest HR</option>
+                <option value="PowerPeakW" force_label="Max power" unit="w" type="bio">Max power</option>
+                <option value="SeasonTitle" force_label="Top result" season_title="1" type="bio">Palmares 1L</option>
+
+                <option value="eventWins" force_label="Wins" type="season_stat">Season Wins</option>
+                <option value="eventStarts" force_label="Starts" type="season_stat">Season Starts</option>
+                <option value="eventWinRate" force_label="Win rate" unit="%" type="season_stat">Season Win rate</option>
+                <option value="eventInTop3" force_label="In Top 3" type="season_stat">Season In Top 3</option>
+                <option value="eventInTop5" force_label="In Top 5" type="season_stat">Season In Top 5</option>
+                <option value="eventInTop6" force_label="In Top 6" type="season_stat">Season In Top 6</option>
+                <option value="eventInBottom5" force_label="In Bottom 5" type="season_stat">Season In Bottom 5</option>
+                <option value="aggregatedPoints" force_label="Points" type="season_stat">Season Points</option>
+                <option value="pointsRate" force_label="Points rate" unit="%" type="season_stat">Season Points rate</option>
+                                
+                <option value="eventWins" force_label="Wins" type="all_seasons_stat">All seasons Wins</option>
+                <option value="eventStarts" force_label="Starts" type="all_seasons_stat">All seasons Starts</option>
+                <option value="eventWinRate" force_label="Win rate" unit="%" type="all_seasons_stat">All seasons Win rate</option>
+                <option value="eventInTop3" force_label="In Top 3" type="all_seasons_stat">All seasons In Top 3</option>
+                <option value="eventInTop5" force_label="In Top 5" type="all_seasons_stat">All seasons In Top 5</option>
+                <option value="eventInTop6" force_label="In Top 6" type="all_seasons_stat">All seasons In Top 6</option>
+                <option value="eventInBottom5" force_label="In Bottom 5" type="all_seasons_stat">All seasons In Bottom 5</option>
+                <option value="aggregatedPoints" force_label="Points" type="all_seasons_stat">All seasons Points</option>
+                <option value="pointsRate" force_label="Points rate" unit="%" type="all_seasons_stat">All seasons Points rate</option>
+
+                <option value="eventWins" force_label="Wins" type="season_discipline_stat">Season Disc. Wins</option>
+                <option value="eventStarts" force_label="Starts" type="season_discipline_stat">Season Disc. Starts</option>
+                <option value="eventWinRate" force_label="Win rate" unit="%" type="season_discipline_stat">Season Disc. Win rate</option>
+                <option value="eventInTop3" force_label="In Top 3" type="season_discipline_stat">Season Disc. In Top 3</option>
+                <option value="eventInTop5" force_label="In Top 5" type="season_discipline_stat">Season Disc. In Top 5</option>
+                <option value="eventInTop6" force_label="In Top 6" type="season_discipline_stat">Season Disc. In Top 6</option>
+                <option value="eventInBottom5" force_label="In Bottom 5" type="season_discipline_stat">Season Disc. In Bottom 5</option>
+                <option value="aggregatedPoints" force_label="Points" type="season_discipline_stat">Season Disc. Points</option>
+                <option value="pointsRate" force_label="Points rate" unit="%" type="season_discipline_stat">Season Disc. Points rate</option>
+                                
+                <option value="eventWins" force_label="Wins" type="all_seasons_discipline_stat">All seasons Disc. Wins</option>
+                <option value="eventStarts" force_label="Starts" type="all_seasons_discipline_stat">All seasons Disc. Starts</option>
+                <option value="eventWinRate" force_label="Win rate" unit="%" type="all_seasons_discipline_stat">All seasons Disc. Win rate</option>
+                <option value="eventInTop3" force_label="In Top 3" type="all_seasons_discipline_stat">All seasons Disc. In Top 3</option>
+                <option value="eventInTop5" force_label="In Top 5" type="all_seasons_discipline_stat">All seasons Disc. In Top 5</option>
+                <option value="eventInTop6" force_label="In Top 6" type="all_seasons_discipline_stat">All seasons Disc. In Top 6</option>
+                <option value="eventInBottom5" force_label="In Bottom 5" type="all_seasons_discipline_stat">All seasons Disc. In Bottom 5</option>
+                <option value="aggregatedPoints" force_label="Points" type="all_seasons_discipline_stat">All seasons Disc. Points</option>
+                <option value="pointsRate" force_label="Points rate" unit="%" type="all_seasons_discipline_stat">All seasons Disc. Points rate</option>
+
+                <option value="eventWins" force_label="Wins" type="season_keirin_stat">Season Keirin Wins</option>
+                <option value="eventStarts" force_label="Starts" type="season_keirin_stat">Season Keirin Starts</option>
+                <option value="eventWinRate" force_label="Win rate" unit="%" type="season_keirin_stat">Season Keirin Win rate</option>
+                <option value="eventInTop3" force_label="In Top 3" type="season_keirin_stat">Season Keirin In Top 3</option>
+                <option value="eventInTop5" force_label="In Top 5" type="season_keirin_stat">Season Keirin In Top 5</option>
+                <option value="eventInTop6" force_label="In Top 6" type="season_keirin_stat">Season Keirin In Top 6</option>
+                <option value="eventInBottom5" force_label="In Bottom 5" type="season_keirin_stat">Season Keirin In Bottom 5</option>
+                <option value="aggregatedPoints" force_label="Points" type="season_keirin_stat">Season Keirin Points</option>
+                <option value="pointsRate" force_label="Points rate" unit="%" type="season_keirin_stat">Season Keirin Points rate</option>
+
+                <option value="eventWins" force_label="Keirin wins" race_type="Keirin" type="season_keirin_stat">Season Keirin Wins</option>
+                <option value="aggregatedPoints" force_label="Keirin points" race_type="Keirin" type="season_keirin_stat">Season Keirin Points</option>
+
+                <option value="eventWins" force_label="Wins" type="season_sprint_stat">Season Sprint Wins</option>
+                <option value="eventStarts" force_label="Starts" type="season_sprint_stat">Season Sprint Starts</option>
+                <option value="eventWinRate" force_label="Win rate" unit="%" type="season_sprint_stat">Season Sprint Win rate</option>
+                <option value="eventInTop3" force_label="In Top 3" type="season_sprint_stat">Season Sprint In Top 3</option>
+                <option value="eventInTop5" force_label="In Top 5" type="season_sprint_stat">Season Sprint In Top 5</option>
+                <option value="eventInTop6" force_label="In Top 6" type="season_sprint_stat">Season Sprint In Top 6</option>
+                <option value="eventInBottom5" force_label="In Bottom 5" type="season_sprint_stat">Season Sprint In Bottom 5</option>
+                <option value="aggregatedPoints" force_label="Points" type="season_sprint_stat">Season Sprint Points</option>
+                <option value="pointsRate" force_label="Points rate" unit="%" type="season_sprint_stat">Season Sprint Points rate</option>
+
+                <option value="eventWins" force_label="Sprint wins" race_type="Sprint" type="season_sprint_stat">Season Sprint Wins</option>
+                <option value="aggregatedPoints" force_label="Sprint points" race_type="Sprint" type="season_sprint_stat">Season Sprint Points</option>
+
+
+                <option value="eventWins" force_label="Wins" type="season_scratch_stat">Season Scratch Wins</option>
+                <option value="eventStarts" force_label="Starts" type="season_scratch_stat">Season Scratch Starts</option>
+                <option value="eventWinRate" force_label="Win rate" unit="%" type="season_scratch_stat">Season Scratch Win rate</option>
+                <option value="eventInTop3" force_label="In Top 3" type="season_scratch_stat">Season Scratch In Top 3</option>
+                <option value="eventInTop5" force_label="In Top 5" type="season_scratch_stat">Season Scratch In Top 5</option>
+                <option value="eventInTop6" force_label="In Top 6" type="season_scratch_stat">Season Scratch In Top 6</option>
+                <option value="eventInBottom5" force_label="In Bottom 5" type="season_scratch_stat">Season Scratch In Bottom 5</option>
+                <option value="aggregatedPoints" force_label="Points" type="season_scratch_stat">Season Scratch Points</option>
+                <option value="pointsRate" force_label="Points rate" unit="%" type="season_scratch_stat">Season Scratch Points rate</option>
+
+                <option value="eventWins" force_label="Scratch wins" race_type="Scratch" type="season_scratch_stat">Season Scratch Wins</option>
+                <option value="aggregatedPoints" force_label="Scratch points" race_type="Scratch" type="season_scratch_stat">Season Scratch Points</option>
+
+                <option value="eventWins" force_label="Wins" type="season_elimination_stat">Season Elimination Wins</option>
+                <option value="eventStarts" force_label="Starts" type="season_elimination_stat">Season Elimination Starts</option>
+                <option value="eventWinRate" force_label="Win rate" unit="%" type="season_elimination_stat">Season Elimination Win rate</option>
+                <option value="eventInTop3" force_label="In Top 3" type="season_elimination_stat">Season Elimination In Top 3</option>
+                <option value="eventInTop5" force_label="In Top 5" type="season_elimination_stat">Season Elimination In Top 5</option>
+                <option value="eventInTop6" force_label="In Top 6" type="season_elimination_stat">Season Elimination In Top 6</option>
+                <option value="eventInBottom5" force_label="In Bottom 5" type="season_elimination_stat">Season Elimination In Bottom 5</option>
+                <option value="aggregatedPoints" force_label="Points" type="season_elimination_stat">Season Elimination Points</option>
+                <option value="pointsRate" force_label="Points rate" unit="%" type="season_elimination_stat">Season Elimination Points rate</option>
+
+                <option value="eventWins" force_label="Elimination wins" race_type="Elimination" type="season_elimination_stat">Season Elimination Wins</option>
+                <option value="aggregatedPoints" force_label="Elimination points" race_type="Elimination" type="season_elimination_stat">Season Elimination Points</option>
+
+
+                <option value="eventWins" force_label="Wins" type="all_seasons_keirin_stat">All seasons Keirin Wins</option>
+                <option value="eventStarts" force_label="Starts" type="all_seasons_keirin_stat">All seasons Keirin Starts</option>
+                <option value="eventWinRate" force_label="Win rate" unit="%" type="all_seasons_keirin_stat">All seasons Keirin Win rate</option>
+                <option value="eventInTop3" force_label="In Top 3" type="all_seasons_keirin_stat">All seasons Keirin In Top 3</option>
+                <option value="eventInTop5" force_label="In Top 5" type="all_seasons_keirin_stat">All seasons Keirin In Top 5</option>
+                <option value="eventInTop6" force_label="In Top 6" type="all_seasons_keirin_stat">All seasons Keirin In Top 6</option>
+                <option value="eventInBottom5" force_label="In Bottom 5" type="all_seasons_keirin_stat">All seasons Keirin In Bottom 5</option>
+                <option value="aggregatedPoints" force_label="Points" type="all_seasons_keirin_stat">All seasons Keirin Points</option>
+                <option value="pointsRate" force_label="Points rate" unit="%" type="all_seasons_keirin_stat">All seasons Keirin Points rate</option>
+
+                <option value="eventWins" force_label="Keirin wins" race_type="Keirin" type="all_seasons_keirin_stat">All seasons Keirin Wins</option>
+                <option value="aggregatedPoints" force_label="Keirin points" race_type="Keirin" type="all_seasons_keirin_stat">All seasons Keirin Points</option>
+
+                <option value="eventWins" force_label="Wins" type="all_seasons_sprint_stat">All seasons Sprint Wins</option>
+                <option value="eventStarts" force_label="Starts" type="all_seasons_sprint_stat">All seasons Sprint Starts</option>
+                <option value="eventWinRate" force_label="Win rate" unit="%" type="all_seasons_sprint_stat">All seasons Sprint Win rate</option>
+                <option value="eventInTop3" force_label="In Top 3" type="all_seasons_sprint_stat">All seasons Sprint In Top 3</option>
+                <option value="eventInTop5" force_label="In Top 5" type="all_seasons_sprint_stat">All seasons Sprint In Top 5</option>
+                <option value="eventInTop6" force_label="In Top 6" type="all_seasons_sprint_stat">All seasons Sprint In Top 6</option>
+                <option value="eventInBottom5" force_label="In Bottom 5" type="all_seasons_sprint_stat">All seasons Sprint In Bottom 5</option>
+                <option value="aggregatedPoints" force_label="Points" type="all_seasons_sprint_stat">All seasons Sprint Points</option>
+                <option value="pointsRate" force_label="Points rate" unit="%" type="all_seasons_sprint_stat">All seasons Sprint Points rate</option>
+
+                <option value="eventWins" force_label="Sprint wins" race_type="Sprint" type="all_seasons_sprint_stat">All seasons Sprint Wins</option>
+                <option value="aggregatedPoints" force_label="Sprint points" race_type="Sprint" type="all_seasons_sprint_stat">All seasons Sprint Points</option>
+
+                <option value="eventWins" force_label="Wins" type="all_seasons_scratch_stat">All seasons Scratch Wins</option>
+                <option value="eventStarts" force_label="Starts" type="all_seasons_scratch_stat">All seasons Scratch Starts</option>
+                <option value="eventWinRate" force_label="Win rate" unit="%" type="all_seasons_scratch_stat">All seasons Scratch Win rate</option>
+                <option value="eventInTop3" force_label="In Top 3" type="all_seasons_scratch_stat">All seasons Scratch In Top 3</option>
+                <option value="eventInTop5" force_label="In Top 5" type="all_seasons_scratch_stat">All seasons Scratch In Top 5</option>
+                <option value="eventInTop6" force_label="In Top 6" type="all_seasons_scratch_stat">All seasons Scratch In Top 6</option>
+                <option value="eventInBottom5" force_label="In Bottom 5" type="all_seasons_scratch_stat">All seasons Scratch In Bottom 5</option>
+                <option value="aggregatedPoints" force_label="Points" type="all_seasons_scratch_stat">All seasons Scratch Points</option>
+                <option value="pointsRate" force_label="Points rate" unit="%" type="all_seasons_scratch_stat">All seasons Scratch Points rate</option>
+
+                <option value="eventWins" force_label="Scratch wins" race_type="Scratch" type="all_seasons_scratch_stat">All seasons Scratch Wins</option>
+                <option value="aggregatedPoints" force_label="Scratch points" race_type="Scratch" type="all_seasons_scratch_stat">All seasons Scratch Points</option>
+
+                <option value="eventWins" force_label="Wins" type="all_seasons_elimination_stat">All seasons Elimination Wins</option>
+                <option value="eventStarts" force_label="Starts" type="all_seasons_elimination_stat">All seasons Elimination Starts</option>
+                <option value="eventWinRate" force_label="Win rate" unit="%" type="all_seasons_elimination_stat">All seasons Elimination Win rate</option>
+                <option value="eventInTop3" force_label="In Top 3" type="all_seasons_elimination_stat">All seasons Elimination In Top 3</option>
+                <option value="eventInTop5" force_label="In Top 5" type="all_seasons_elimination_stat">All seasons Elimination In Top 5</option>
+                <option value="eventInTop6" force_label="In Top 6" type="all_seasons_elimination_stat">All seasons Elimination In Top 6</option>
+                <option value="eventInBottom5" force_label="In Bottom 5" type="all_seasons_elimination_stat">All seasons Elimination In Bottom 5</option>
+                <option value="aggregatedPoints" force_label="Points" type="all_seasons_elimination_stat">All seasons Elimination Points</option>
+                <option value="pointsRate" force_label="Points rate" unit="%" type="all_seasons_elimination_stat">All seasons Elimination Points rate</option>
+
+                <option value="eventWins" force_label="Elimination wins" race_type="Elimination" type="all_seasons_elimination_stat">All seasons Elimination Wins</option>
+                <option value="aggregatedPoints" force_label="Elimination points" race_type="Elimination" type="all_seasons_elimination_stat">All seasons Elimination Points</option>
+
+                
+                <option value="MaxSpeed" force_label="Max Speed" type="event_data"  unit="km/h">Event Max Speed</option>
+                <option value="MaxPower" force_label="Max Power" type="event_data"  unit="w">Event Max Power</option>
+                <option value="MaxHeartrate" force_label="Max Heartrate" type="event_data">Event Max Heartrate</option>
+                <option value="MaxCadence" force_label="Max Cadence" type="event_data"  unit="rpm">Event Max Cadence</option>
+                <option value="MaxHeartratePercentage" force_label="Max Heartrate %" type="event_data"  unit="%">Event Max Heartrate %</option>
+                <option value="MaxPowerPercentage" force_label="Max Power %" type="event_data"  unit="%">Event Max Power %</option>
+
+                <option value="MaxRaceRiderSpeed" force_label="First Round" type="race_data" race_type="Sprint" round="1" unit_old="km/h">Sprint First round Max Speed</option>
+                <option value="MaxRacePower" force_label="First Round" type="race_data" race_type="Sprint" round="1"  unit_old="w">Sprint First round Max Power</option>
+                <option value="MaxRaceHeartrate" force_label="First Round" type="race_data" race_type="Sprint" round="1" >Sprint First round Max Heartrate</option>
+                <option value="MaxRaceCadence" force_label="First Round" type="race_data" race_type="Sprint" round="1"  unit_old="rpm">Sprint First round Max Cadence</option>
+                <option value="MaxRaceHeartratePercentage" force_label="First Round" type="race_data" race_type="Sprint" round="1"  unit_old="%">Sprint First round Max Heartrate %</option>
+                <option value="MaxRacePowerPercentage" force_label="First Round" type="race_data" race_type="Sprint" round="1"  unit_old="%">Sprint First round Max Power %</option>
+
+                <option value="MaxRaceRiderSpeed" force_label="Semi-Final" type="race_data" race_type="Sprint" round="2" unit_old="km/h">Sprint Semi final Max Speed</option>
+                <option value="MaxRacePower" force_label="Semi-Final" type="race_data" race_type="Sprint" round="2"  unit_old="w">Sprint Semi final Max Power</option>
+                <option value="MaxRaceHeartrate" force_label="Semi-Final" type="race_data" race_type="Sprint" round="2" >Sprint Semi final Max Heartrate</option>
+                <option value="MaxRaceCadence" force_label="Semi-Final" type="race_data" race_type="Sprint" round="2"  unit_old="rpm">Sprint Semi final Max Cadence</option>
+                <option value="MaxRaceHeartratePercentage" force_label="Semi-Final" type="race_data" race_type="Sprint" round="2"  unit_old="%">Sprint Semi final Max Heartrate %</option>
+                <option value="MaxRacePowerPercentage" force_label="Semi-Final" type="race_data" race_type="Sprint" round="2"  unit_old="%">Sprint Semi final Max Power %</option>
+
+                <option value="MaxRaceRiderSpeed" force_label="First Round" type="race_data" race_type="Keirin" round="1" unit_old="km/h">Keirin First round Max Speed</option>
+                <option value="MaxRacePower" force_label="First Round" type="race_data" race_type="Keirin" round="1"  unit_old="w">Keirin First round Max Power</option>
+                <option value="MaxRaceHeartrate" force_label="First Round" type="race_data" race_type="Keirin" round="1">Keirin First round Max Heartrate</option>
+                <option value="MaxRaceCadence" force_label="First Round" type="race_data" race_type="Keirin" round="1"  unit_old="rpm">Keirin First round Max Cadence</option>
+                <option value="MaxRaceHeartratePercentage" force_label="First Round" type="race_data" race_type="Keirin" round="1"  unit_old="%">Keirin First round Max Heartrate %</option>
+                <option value="MaxRacePowerPercentage" force_label="First Round" type="race_data" race_type="Keirin" round="1"  unit_old="%">Keirin First round Max Power %</option>
+
+
+
+
+
+                
+              </select>
+            </td>
+            <td class="row_label">Label</td>
+            <td class="row_label_value"><input id="row_1_label" class="data_rider_label" type="text" value=""></td>
+            <td class="row_value">Value</td>
+            <td class="row_value_value"><input id="row_1_1_value" class="data_rider_value" type="text" value="">  </td>
+            <td class="row_value_value"><input id="row_1_2_value" class="data_rider_value" type="text" value="">  </td>
+            <td class="row_value_value"><input id="row_1_3_value" class="data_rider_value" type="text" value="">  </td>
+          </tr>
+
+          <tr>
+            <td class="row_name">Row 2</td>
+            <td class="row_select_data">
+              <select id="row_2_select_data">
+                <option value=""></option>                
+                <option value="BirthDate" force_label="Age" type="bio">Age</option>
+                <option value="HeightCm" force_label="Height" unit="cm" type="bio">Height</option>
+                <option value="WeightKg" force_label="Weight" unit="kg" type="bio">Weight</option>
+                <option value="MaxHrBpm" force_label="Max HR" unit="bpm" type="bio">Max HR</option>
+                <option value="RestHrBpm" force_label="Rest HR" unit="bpm" type="bio">Rest HR</option>
+                <option value="PowerPeakW" force_label="Max power" unit="w" type="bio">Max power</option>
+                <option value="SeasonTitle" force_label="Top result" season_title="1" type="bio">Palmares 1L</option>
+
+                <option value="eventWins" force_label="Wins" type="season_stat">Season Wins</option>
+                <option value="eventStarts" force_label="Starts" type="season_stat">Season Starts</option>
+                <option value="eventWinRate" force_label="Win rate" unit="%" type="season_stat">Season Win rate</option>
+                <option value="eventInTop3" force_label="In Top 3" type="season_stat">Season In Top 3</option>
+                <option value="eventInTop5" force_label="In Top 5" type="season_stat">Season In Top 5</option>
+                <option value="eventInTop6" force_label="In Top 6" type="season_stat">Season In Top 6</option>
+                <option value="eventInBottom5" force_label="In Bottom 5" type="season_stat">Season In Bottom 5</option>
+                <option value="aggregatedPoints" force_label="Points" type="season_stat">Season Points</option>
+                <option value="pointsRate" force_label="Points rate" unit="%" type="season_stat">Season Points rate</option>
+                                
+                <option value="eventWins" force_label="Wins" type="all_seasons_stat">All seasons Wins</option>
+                <option value="eventStarts" force_label="Starts" type="all_seasons_stat">All seasons Starts</option>
+                <option value="eventWinRate" force_label="Win rate" unit="%" type="all_seasons_stat">All seasons Win rate</option>
+                <option value="eventInTop3" force_label="In Top 3" type="all_seasons_stat">All seasons In Top 3</option>
+                <option value="eventInTop5" force_label="In Top 5" type="all_seasons_stat">All seasons In Top 5</option>
+                <option value="eventInTop6" force_label="In Top 6" type="all_seasons_stat">All seasons In Top 6</option>
+                <option value="eventInBottom5" force_label="In Bottom 5" type="all_seasons_stat">All seasons In Bottom 5</option>
+                <option value="aggregatedPoints" force_label="Points" type="all_seasons_stat">All seasons Points</option>
+                <option value="pointsRate" force_label="Points rate" unit="%" type="all_seasons_stat">All seasons Points rate</option>
+
+                <option value="eventWins" force_label="Wins" type="season_discipline_stat">Season Disc. Wins</option>
+                <option value="eventStarts" force_label="Starts" type="season_discipline_stat">Season Disc. Starts</option>
+                <option value="eventWinRate" force_label="Win rate" unit="%" type="season_discipline_stat">Season Disc. Win rate</option>
+                <option value="eventInTop3" force_label="In Top 3" type="season_discipline_stat">Season Disc. In Top 3</option>
+                <option value="eventInTop5" force_label="In Top 5" type="season_discipline_stat">Season Disc. In Top 5</option>
+                <option value="eventInTop6" force_label="In Top 6" type="season_discipline_stat">Season Disc. In Top 6</option>
+                <option value="eventInBottom5" force_label="In Bottom 5" type="season_discipline_stat">Season Disc. In Bottom 5</option>
+                <option value="aggregatedPoints" force_label="Points" type="season_discipline_stat">Season Disc. Points</option>
+                <option value="pointsRate" force_label="Points rate" unit="%" type="season_discipline_stat">Season Disc. Points rate</option>
+                                
+                <option value="eventWins" force_label="Wins" type="all_seasons_discipline_stat">All seasons Disc. Wins</option>
+                <option value="eventStarts" force_label="Starts" type="all_seasons_discipline_stat">All seasons Disc. Starts</option>
+                <option value="eventWinRate" force_label="Win rate" unit="%" type="all_seasons_discipline_stat">All seasons Disc. Win rate</option>
+                <option value="eventInTop3" force_label="In Top 3" type="all_seasons_discipline_stat">All seasons Disc. In Top 3</option>
+                <option value="eventInTop5" force_label="In Top 5" type="all_seasons_discipline_stat">All seasons Disc. In Top 5</option>
+                <option value="eventInTop6" force_label="In Top 6" type="all_seasons_discipline_stat">All seasons Disc. In Top 6</option>
+                <option value="eventInBottom5" force_label="In Bottom 5" type="all_seasons_discipline_stat">All seasons Disc. In Bottom 5</option>
+                <option value="aggregatedPoints" force_label="Points" type="all_seasons_discipline_stat">All seasons Disc. Points</option>
+                <option value="pointsRate" force_label="Points rate" unit="%" type="all_seasons_discipline_stat">All seasons Disc. Points rate</option>
+
+                <option value="eventWins" force_label="Wins" type="season_keirin_stat">Season Keirin Wins</option>
+                <option value="eventStarts" force_label="Starts" type="season_keirin_stat">Season Keirin Starts</option>
+                <option value="eventWinRate" force_label="Win rate" unit="%" type="season_keirin_stat">Season Keirin Win rate</option>
+                <option value="eventInTop3" force_label="In Top 3" type="season_keirin_stat">Season Keirin In Top 3</option>
+                <option value="eventInTop5" force_label="In Top 5" type="season_keirin_stat">Season Keirin In Top 5</option>
+                <option value="eventInTop6" force_label="In Top 6" type="season_keirin_stat">Season Keirin In Top 6</option>
+                <option value="eventInBottom5" force_label="In Bottom 5" type="season_keirin_stat">Season Keirin In Bottom 5</option>
+                <option value="aggregatedPoints" force_label="Points" type="season_keirin_stat">Season Keirin Points</option>
+                <option value="pointsRate" force_label="Points rate" unit="%" type="season_keirin_stat">Season Keirin Points rate</option>
+
+                <option value="eventWins" force_label="Keirin wins" race_type="Keirin" type="season_keirin_stat">Season Keirin Wins</option>
+                <option value="aggregatedPoints" force_label="Keirin points" race_type="Keirin" type="season_keirin_stat">Season Keirin Points</option>
+
+                <option value="eventWins" force_label="Wins" type="season_sprint_stat">Season Sprint Wins</option>
+                <option value="eventStarts" force_label="Starts" type="season_sprint_stat">Season Sprint Starts</option>
+                <option value="eventWinRate" force_label="Win rate" unit="%" type="season_sprint_stat">Season Sprint Win rate</option>
+                <option value="eventInTop3" force_label="In Top 3" type="season_sprint_stat">Season Sprint In Top 3</option>
+                <option value="eventInTop5" force_label="In Top 5" type="season_sprint_stat">Season Sprint In Top 5</option>
+                <option value="eventInTop6" force_label="In Top 6" type="season_sprint_stat">Season Sprint In Top 6</option>
+                <option value="eventInBottom5" force_label="In Bottom 5" type="season_sprint_stat">Season Sprint In Bottom 5</option>
+                <option value="aggregatedPoints" force_label="Points" type="season_sprint_stat">Season Sprint Points</option>
+                <option value="pointsRate" force_label="Points rate" unit="%" type="season_sprint_stat">Season Sprint Points rate</option>
+
+                <option value="eventWins" force_label="Sprint wins" race_type="Sprint" type="season_sprint_stat">Season Sprint Wins</option>
+                <option value="aggregatedPoints" force_label="Sprint points" race_type="Sprint" type="season_sprint_stat">Season Sprint Points</option>
+
+
+                <option value="eventWins" force_label="Wins" type="season_scratch_stat">Season Scratch Wins</option>
+                <option value="eventStarts" force_label="Starts" type="season_scratch_stat">Season Scratch Starts</option>
+                <option value="eventWinRate" force_label="Win rate" unit="%" type="season_scratch_stat">Season Scratch Win rate</option>
+                <option value="eventInTop3" force_label="In Top 3" type="season_scratch_stat">Season Scratch In Top 3</option>
+                <option value="eventInTop5" force_label="In Top 5" type="season_scratch_stat">Season Scratch In Top 5</option>
+                <option value="eventInTop6" force_label="In Top 6" type="season_scratch_stat">Season Scratch In Top 6</option>
+                <option value="eventInBottom5" force_label="In Bottom 5" type="season_scratch_stat">Season Scratch In Bottom 5</option>
+                <option value="aggregatedPoints" force_label="Points" type="season_scratch_stat">Season Scratch Points</option>
+                <option value="pointsRate" force_label="Points rate" unit="%" type="season_scratch_stat">Season Scratch Points rate</option>
+
+                <option value="eventWins" force_label="Scratch wins" race_type="Scratch" type="season_scratch_stat">Season Scratch Wins</option>
+                <option value="aggregatedPoints" force_label="Scratch points" race_type="Scratch" type="season_scratch_stat">Season Scratch Points</option>
+
+                <option value="eventWins" force_label="Wins" type="season_elimination_stat">Season Elimination Wins</option>
+                <option value="eventStarts" force_label="Starts" type="season_elimination_stat">Season Elimination Starts</option>
+                <option value="eventWinRate" force_label="Win rate" unit="%" type="season_elimination_stat">Season Elimination Win rate</option>
+                <option value="eventInTop3" force_label="In Top 3" type="season_elimination_stat">Season Elimination In Top 3</option>
+                <option value="eventInTop5" force_label="In Top 5" type="season_elimination_stat">Season Elimination In Top 5</option>
+                <option value="eventInTop6" force_label="In Top 6" type="season_elimination_stat">Season Elimination In Top 6</option>
+                <option value="eventInBottom5" force_label="In Bottom 5" type="season_elimination_stat">Season Elimination In Bottom 5</option>
+                <option value="aggregatedPoints" force_label="Points" type="season_elimination_stat">Season Elimination Points</option>
+                <option value="pointsRate" force_label="Points rate" unit="%" type="season_elimination_stat">Season Elimination Points rate</option>
+
+                <option value="eventWins" force_label="Elimination wins" race_type="Elimination" type="season_elimination_stat">Season Elimination Wins</option>
+                <option value="aggregatedPoints" force_label="Elimination points" race_type="Elimination" type="season_elimination_stat">Season Elimination Points</option>
+
+
+                <option value="eventWins" force_label="Wins" type="all_seasons_keirin_stat">All seasons Keirin Wins</option>
+                <option value="eventStarts" force_label="Starts" type="all_seasons_keirin_stat">All seasons Keirin Starts</option>
+                <option value="eventWinRate" force_label="Win rate" unit="%" type="all_seasons_keirin_stat">All seasons Keirin Win rate</option>
+                <option value="eventInTop3" force_label="In Top 3" type="all_seasons_keirin_stat">All seasons Keirin In Top 3</option>
+                <option value="eventInTop5" force_label="In Top 5" type="all_seasons_keirin_stat">All seasons Keirin In Top 5</option>
+                <option value="eventInTop6" force_label="In Top 6" type="all_seasons_keirin_stat">All seasons Keirin In Top 6</option>
+                <option value="eventInBottom5" force_label="In Bottom 5" type="all_seasons_keirin_stat">All seasons Keirin In Bottom 5</option>
+                <option value="aggregatedPoints" force_label="Points" type="all_seasons_keirin_stat">All seasons Keirin Points</option>
+                <option value="pointsRate" force_label="Points rate" unit="%" type="all_seasons_keirin_stat">All seasons Keirin Points rate</option>
+
+                <option value="eventWins" force_label="Keirin wins" race_type="Keirin" type="all_seasons_keirin_stat">All seasons Keirin Wins</option>
+                <option value="aggregatedPoints" force_label="Keirin points" race_type="Keirin" type="all_seasons_keirin_stat">All seasons Keirin Points</option>
+
+                <option value="eventWins" force_label="Wins" type="all_seasons_sprint_stat">All seasons Sprint Wins</option>
+                <option value="eventStarts" force_label="Starts" type="all_seasons_sprint_stat">All seasons Sprint Starts</option>
+                <option value="eventWinRate" force_label="Win rate" unit="%" type="all_seasons_sprint_stat">All seasons Sprint Win rate</option>
+                <option value="eventInTop3" force_label="In Top 3" type="all_seasons_sprint_stat">All seasons Sprint In Top 3</option>
+                <option value="eventInTop5" force_label="In Top 5" type="all_seasons_sprint_stat">All seasons Sprint In Top 5</option>
+                <option value="eventInTop6" force_label="In Top 6" type="all_seasons_sprint_stat">All seasons Sprint In Top 6</option>
+                <option value="eventInBottom5" force_label="In Bottom 5" type="all_seasons_sprint_stat">All seasons Sprint In Bottom 5</option>
+                <option value="aggregatedPoints" force_label="Points" type="all_seasons_sprint_stat">All seasons Sprint Points</option>
+                <option value="pointsRate" force_label="Points rate" unit="%" type="all_seasons_sprint_stat">All seasons Sprint Points rate</option>
+
+                <option value="eventWins" force_label="Sprint wins" race_type="Sprint" type="all_seasons_sprint_stat">All seasons Sprint Wins</option>
+                <option value="aggregatedPoints" force_label="Sprint points" race_type="Sprint" type="all_seasons_sprint_stat">All seasons Sprint Points</option>
+
+                <option value="eventWins" force_label="Wins" type="all_seasons_scratch_stat">All seasons Scratch Wins</option>
+                <option value="eventStarts" force_label="Starts" type="all_seasons_scratch_stat">All seasons Scratch Starts</option>
+                <option value="eventWinRate" force_label="Win rate" unit="%" type="all_seasons_scratch_stat">All seasons Scratch Win rate</option>
+                <option value="eventInTop3" force_label="In Top 3" type="all_seasons_scratch_stat">All seasons Scratch In Top 3</option>
+                <option value="eventInTop5" force_label="In Top 5" type="all_seasons_scratch_stat">All seasons Scratch In Top 5</option>
+                <option value="eventInTop6" force_label="In Top 6" type="all_seasons_scratch_stat">All seasons Scratch In Top 6</option>
+                <option value="eventInBottom5" force_label="In Bottom 5" type="all_seasons_scratch_stat">All seasons Scratch In Bottom 5</option>
+                <option value="aggregatedPoints" force_label="Points" type="all_seasons_scratch_stat">All seasons Scratch Points</option>
+                <option value="pointsRate" force_label="Points rate" unit="%" type="all_seasons_scratch_stat">All seasons Scratch Points rate</option>
+
+                <option value="eventWins" force_label="Scratch wins" race_type="Scratch" type="all_seasons_scratch_stat">All seasons Scratch Wins</option>
+                <option value="aggregatedPoints" force_label="Scratch points" race_type="Scratch" type="all_seasons_scratch_stat">All seasons Scratch Points</option>
+
+                <option value="eventWins" force_label="Wins" type="all_seasons_elimination_stat">All seasons Elimination Wins</option>
+                <option value="eventStarts" force_label="Starts" type="all_seasons_elimination_stat">All seasons Elimination Starts</option>
+                <option value="eventWinRate" force_label="Win rate" unit="%" type="all_seasons_elimination_stat">All seasons Elimination Win rate</option>
+                <option value="eventInTop3" force_label="In Top 3" type="all_seasons_elimination_stat">All seasons Elimination In Top 3</option>
+                <option value="eventInTop5" force_label="In Top 5" type="all_seasons_elimination_stat">All seasons Elimination In Top 5</option>
+                <option value="eventInTop6" force_label="In Top 6" type="all_seasons_elimination_stat">All seasons Elimination In Top 6</option>
+                <option value="eventInBottom5" force_label="In Bottom 5" type="all_seasons_elimination_stat">All seasons Elimination In Bottom 5</option>
+                <option value="aggregatedPoints" force_label="Points" type="all_seasons_elimination_stat">All seasons Elimination Points</option>
+                <option value="pointsRate" force_label="Points rate" unit="%" type="all_seasons_elimination_stat">All seasons Elimination Points rate</option>
+
+                <option value="eventWins" force_label="Elimination wins" race_type="Elimination" type="all_seasons_elimination_stat">All seasons Elimination Wins</option>
+                <option value="aggregatedPoints" force_label="Elimination points" race_type="Elimination" type="all_seasons_elimination_stat">All seasons Elimination Points</option>
+
+                
+                <option value="MaxSpeed" force_label="Max Speed" type="event_data"  unit="km/h">Event Max Speed</option>
+                <option value="MaxPower" force_label="Max Power" type="event_data"  unit="w">Event Max Power</option>
+                <option value="MaxHeartrate" force_label="Max Heartrate" type="event_data">Event Max Heartrate</option>
+                <option value="MaxCadence" force_label="Max Cadence" type="event_data"  unit="rpm">Event Max Cadence</option>
+                <option value="MaxHeartratePercentage" force_label="Max Heartrate %" type="event_data"  unit="%">Event Max Heartrate %</option>
+                <option value="MaxPowerPercentage" force_label="Max Power %" type="event_data"  unit="%">Event Max Power %</option>
+
+                <option value="MaxRaceRiderSpeed" force_label="First Round" type="race_data" race_type="Sprint" round="1" unit_old="km/h">Sprint First round Max Speed</option>
+                <option value="MaxRacePower" force_label="First Round" type="race_data" race_type="Sprint" round="1"  unit_old="w">Sprint First round Max Power</option>
+                <option value="MaxRaceHeartrate" force_label="First Round" type="race_data" race_type="Sprint" round="1" >Sprint First round Max Heartrate</option>
+                <option value="MaxRaceCadence" force_label="First Round" type="race_data" race_type="Sprint" round="1"  unit_old="rpm">Sprint First round Max Cadence</option>
+                <option value="MaxRaceHeartratePercentage" force_label="First Round" type="race_data" race_type="Sprint" round="1"  unit_old="%">Sprint First round Max Heartrate %</option>
+                <option value="MaxRacePowerPercentage" force_label="First Round" type="race_data" race_type="Sprint" round="1"  unit_old="%">Sprint First round Max Power %</option>
+
+                <option value="MaxRaceRiderSpeed" force_label="Semi-Final" type="race_data" race_type="Sprint" round="2" unit_old="km/h">Sprint Semi final Max Speed</option>
+                <option value="MaxRacePower" force_label="Semi-Final" type="race_data" race_type="Sprint" round="2"  unit_old="w">Sprint Semi final Max Power</option>
+                <option value="MaxRaceHeartrate" force_label="Semi-Final" type="race_data" race_type="Sprint" round="2" >Sprint Semi final Max Heartrate</option>
+                <option value="MaxRaceCadence" force_label="Semi-Final" type="race_data" race_type="Sprint" round="2"  unit_old="rpm">Sprint Semi final Max Cadence</option>
+                <option value="MaxRaceHeartratePercentage" force_label="Semi-Final" type="race_data" race_type="Sprint" round="2"  unit_old="%">Sprint Semi final Max Heartrate %</option>
+                <option value="MaxRacePowerPercentage" force_label="Semi-Final" type="race_data" race_type="Sprint" round="2"  unit_old="%">Sprint Semi final Max Power %</option>
+
+                <option value="MaxRaceRiderSpeed" force_label="First Round" type="race_data" race_type="Keirin" round="1" unit_old="km/h">Keirin First round Max Speed</option>
+                <option value="MaxRacePower" force_label="First Round" type="race_data" race_type="Keirin" round="1"  unit_old="w">Keirin First round Max Power</option>
+                <option value="MaxRaceHeartrate" force_label="First Round" type="race_data" race_type="Keirin" round="1">Keirin First round Max Heartrate</option>
+                <option value="MaxRaceCadence" force_label="First Round" type="race_data" race_type="Keirin" round="1"  unit_old="rpm">Keirin First round Max Cadence</option>
+                <option value="MaxRaceHeartratePercentage" force_label="First Round" type="race_data" race_type="Keirin" round="1"  unit_old="%">Keirin First round Max Heartrate %</option>
+                <option value="MaxRacePowerPercentage" force_label="First Round" type="race_data" race_type="Keirin" round="1"  unit_old="%">Keirin First round Max Power %</option>
+
+
+
+
+                   </select>
+            </td>
+            <td class="row_label">Label</td>
+            <td class="row_label_value"><input id="row_2_label" class="data_rider_label" type="text" value=""></td>
+            <td class="row_value">Value</td>
+            <td class="row_value_value"><input id="row_2_1_value" class="data_rider_value" type="text" value="">  </td>
+            <td class="row_value_value"><input id="row_2_2_value" class="data_rider_value" type="text" value="">  </td>
+            <td class="row_value_value"><input id="row_2_3_value" class="data_rider_value" type="text" value="">  </td>
+          </tr>
+
+          <tr>
+
+            </td>
+            <td class="row_name">Row 3</td>
+            <td class="row_select_data">
+              <select id="row_3_select_data">
+                <option value=""></option>                
+                <option value="BirthDate" force_label="Age" type="bio">Age</option>
+                <option value="HeightCm" force_label="Height" unit="cm" type="bio">Height</option>
+                <option value="WeightKg" force_label="Weight" unit="kg" type="bio">Weight</option>
+                <option value="MaxHrBpm" force_label="Max HR" unit="bpm" type="bio">Max HR</option>
+                <option value="RestHrBpm" force_label="Rest HR" unit="bpm" type="bio">Rest HR</option>
+                <option value="PowerPeakW" force_label="Max power" unit="w" type="bio">Max power</option>
+                <option value="SeasonTitle" force_label="Top result" season_title="1" type="bio">Palmares 1L</option>
+
+                <option value="eventWins" force_label="Wins" type="season_stat">Season Wins</option>
+                <option value="eventStarts" force_label="Starts" type="season_stat">Season Starts</option>
+                <option value="eventWinRate" force_label="Win rate" unit="%" type="season_stat">Season Win rate</option>
+                <option value="eventInTop3" force_label="In Top 3" type="season_stat">Season In Top 3</option>
+                <option value="eventInTop5" force_label="In Top 5" type="season_stat">Season In Top 5</option>
+                <option value="eventInTop6" force_label="In Top 6" type="season_stat">Season In Top 6</option>
+                <option value="eventInBottom5" force_label="In Bottom 5" type="season_stat">Season In Bottom 5</option>
+                <option value="aggregatedPoints" force_label="Points" type="season_stat">Season Points</option>
+                <option value="pointsRate" force_label="Points rate" unit="%" type="season_stat">Season Points rate</option>
+                                
+                <option value="eventWins" force_label="Wins" type="all_seasons_stat">All seasons Wins</option>
+                <option value="eventStarts" force_label="Starts" type="all_seasons_stat">All seasons Starts</option>
+                <option value="eventWinRate" force_label="Win rate" unit="%" type="all_seasons_stat">All seasons Win rate</option>
+                <option value="eventInTop3" force_label="In Top 3" type="all_seasons_stat">All seasons In Top 3</option>
+                <option value="eventInTop5" force_label="In Top 5" type="all_seasons_stat">All seasons In Top 5</option>
+                <option value="eventInTop6" force_label="In Top 6" type="all_seasons_stat">All seasons In Top 6</option>
+                <option value="eventInBottom5" force_label="In Bottom 5" type="all_seasons_stat">All seasons In Bottom 5</option>
+                <option value="aggregatedPoints" force_label="Points" type="all_seasons_stat">All seasons Points</option>
+                <option value="pointsRate" force_label="Points rate" unit="%" type="all_seasons_stat">All seasons Points rate</option>
+
+                <option value="eventWins" force_label="Wins" type="season_discipline_stat">Season Disc. Wins</option>
+                <option value="eventStarts" force_label="Starts" type="season_discipline_stat">Season Disc. Starts</option>
+                <option value="eventWinRate" force_label="Win rate" unit="%" type="season_discipline_stat">Season Disc. Win rate</option>
+                <option value="eventInTop3" force_label="In Top 3" type="season_discipline_stat">Season Disc. In Top 3</option>
+                <option value="eventInTop5" force_label="In Top 5" type="season_discipline_stat">Season Disc. In Top 5</option>
+                <option value="eventInTop6" force_label="In Top 6" type="season_discipline_stat">Season Disc. In Top 6</option>
+                <option value="eventInBottom5" force_label="In Bottom 5" type="season_discipline_stat">Season Disc. In Bottom 5</option>
+                <option value="aggregatedPoints" force_label="Points" type="season_discipline_stat">Season Disc. Points</option>
+                <option value="pointsRate" force_label="Points rate" unit="%" type="season_discipline_stat">Season Disc. Points rate</option>
+                                
+                <option value="eventWins" force_label="Wins" type="all_seasons_discipline_stat">All seasons Disc. Wins</option>
+                <option value="eventStarts" force_label="Starts" type="all_seasons_discipline_stat">All seasons Disc. Starts</option>
+                <option value="eventWinRate" force_label="Win rate" unit="%" type="all_seasons_discipline_stat">All seasons Disc. Win rate</option>
+                <option value="eventInTop3" force_label="In Top 3" type="all_seasons_discipline_stat">All seasons Disc. In Top 3</option>
+                <option value="eventInTop5" force_label="In Top 5" type="all_seasons_discipline_stat">All seasons Disc. In Top 5</option>
+                <option value="eventInTop6" force_label="In Top 6" type="all_seasons_discipline_stat">All seasons Disc. In Top 6</option>
+                <option value="eventInBottom5" force_label="In Bottom 5" type="all_seasons_discipline_stat">All seasons Disc. In Bottom 5</option>
+                <option value="aggregatedPoints" force_label="Points" type="all_seasons_discipline_stat">All seasons Disc. Points</option>
+                <option value="pointsRate" force_label="Points rate" unit="%" type="all_seasons_discipline_stat">All seasons Disc. Points rate</option>
+
+                <option value="eventWins" force_label="Wins" type="season_keirin_stat">Season Keirin Wins</option>
+                <option value="eventStarts" force_label="Starts" type="season_keirin_stat">Season Keirin Starts</option>
+                <option value="eventWinRate" force_label="Win rate" unit="%" type="season_keirin_stat">Season Keirin Win rate</option>
+                <option value="eventInTop3" force_label="In Top 3" type="season_keirin_stat">Season Keirin In Top 3</option>
+                <option value="eventInTop5" force_label="In Top 5" type="season_keirin_stat">Season Keirin In Top 5</option>
+                <option value="eventInTop6" force_label="In Top 6" type="season_keirin_stat">Season Keirin In Top 6</option>
+                <option value="eventInBottom5" force_label="In Bottom 5" type="season_keirin_stat">Season Keirin In Bottom 5</option>
+                <option value="aggregatedPoints" force_label="Points" type="season_keirin_stat">Season Keirin Points</option>
+                <option value="pointsRate" force_label="Points rate" unit="%" type="season_keirin_stat">Season Keirin Points rate</option>
+
+                <option value="eventWins" force_label="Keirin wins" race_type="Keirin" type="season_keirin_stat">Season Keirin Wins</option>
+                <option value="aggregatedPoints" force_label="Keirin points" race_type="Keirin" type="season_keirin_stat">Season Keirin Points</option>
+
+                <option value="eventWins" force_label="Wins" type="season_sprint_stat">Season Sprint Wins</option>
+                <option value="eventStarts" force_label="Starts" type="season_sprint_stat">Season Sprint Starts</option>
+                <option value="eventWinRate" force_label="Win rate" unit="%" type="season_sprint_stat">Season Sprint Win rate</option>
+                <option value="eventInTop3" force_label="In Top 3" type="season_sprint_stat">Season Sprint In Top 3</option>
+                <option value="eventInTop5" force_label="In Top 5" type="season_sprint_stat">Season Sprint In Top 5</option>
+                <option value="eventInTop6" force_label="In Top 6" type="season_sprint_stat">Season Sprint In Top 6</option>
+                <option value="eventInBottom5" force_label="In Bottom 5" type="season_sprint_stat">Season Sprint In Bottom 5</option>
+                <option value="aggregatedPoints" force_label="Points" type="season_sprint_stat">Season Sprint Points</option>
+                <option value="pointsRate" force_label="Points rate" unit="%" type="season_sprint_stat">Season Sprint Points rate</option>
+
+                <option value="eventWins" force_label="Sprint wins" race_type="Sprint" type="season_sprint_stat">Season Sprint Wins</option>
+                <option value="aggregatedPoints" force_label="Sprint points" race_type="Sprint" type="season_sprint_stat">Season Sprint Points</option>
+
+
+                <option value="eventWins" force_label="Wins" type="season_scratch_stat">Season Scratch Wins</option>
+                <option value="eventStarts" force_label="Starts" type="season_scratch_stat">Season Scratch Starts</option>
+                <option value="eventWinRate" force_label="Win rate" unit="%" type="season_scratch_stat">Season Scratch Win rate</option>
+                <option value="eventInTop3" force_label="In Top 3" type="season_scratch_stat">Season Scratch In Top 3</option>
+                <option value="eventInTop5" force_label="In Top 5" type="season_scratch_stat">Season Scratch In Top 5</option>
+                <option value="eventInTop6" force_label="In Top 6" type="season_scratch_stat">Season Scratch In Top 6</option>
+                <option value="eventInBottom5" force_label="In Bottom 5" type="season_scratch_stat">Season Scratch In Bottom 5</option>
+                <option value="aggregatedPoints" force_label="Points" type="season_scratch_stat">Season Scratch Points</option>
+                <option value="pointsRate" force_label="Points rate" unit="%" type="season_scratch_stat">Season Scratch Points rate</option>
+
+                <option value="eventWins" force_label="Scratch wins" race_type="Scratch" type="season_scratch_stat">Season Scratch Wins</option>
+                <option value="aggregatedPoints" force_label="Scratch points" race_type="Scratch" type="season_scratch_stat">Season Scratch Points</option>
+
+                <option value="eventWins" force_label="Wins" type="season_elimination_stat">Season Elimination Wins</option>
+                <option value="eventStarts" force_label="Starts" type="season_elimination_stat">Season Elimination Starts</option>
+                <option value="eventWinRate" force_label="Win rate" unit="%" type="season_elimination_stat">Season Elimination Win rate</option>
+                <option value="eventInTop3" force_label="In Top 3" type="season_elimination_stat">Season Elimination In Top 3</option>
+                <option value="eventInTop5" force_label="In Top 5" type="season_elimination_stat">Season Elimination In Top 5</option>
+                <option value="eventInTop6" force_label="In Top 6" type="season_elimination_stat">Season Elimination In Top 6</option>
+                <option value="eventInBottom5" force_label="In Bottom 5" type="season_elimination_stat">Season Elimination In Bottom 5</option>
+                <option value="aggregatedPoints" force_label="Points" type="season_elimination_stat">Season Elimination Points</option>
+                <option value="pointsRate" force_label="Points rate" unit="%" type="season_elimination_stat">Season Elimination Points rate</option>
+
+                <option value="eventWins" force_label="Elimination wins" race_type="Elimination" type="season_elimination_stat">Season Elimination Wins</option>
+                <option value="aggregatedPoints" force_label="Elimination points" race_type="Elimination" type="season_elimination_stat">Season Elimination Points</option>
+
+
+                <option value="eventWins" force_label="Wins" type="all_seasons_keirin_stat">All seasons Keirin Wins</option>
+                <option value="eventStarts" force_label="Starts" type="all_seasons_keirin_stat">All seasons Keirin Starts</option>
+                <option value="eventWinRate" force_label="Win rate" unit="%" type="all_seasons_keirin_stat">All seasons Keirin Win rate</option>
+                <option value="eventInTop3" force_label="In Top 3" type="all_seasons_keirin_stat">All seasons Keirin In Top 3</option>
+                <option value="eventInTop5" force_label="In Top 5" type="all_seasons_keirin_stat">All seasons Keirin In Top 5</option>
+                <option value="eventInTop6" force_label="In Top 6" type="all_seasons_keirin_stat">All seasons Keirin In Top 6</option>
+                <option value="eventInBottom5" force_label="In Bottom 5" type="all_seasons_keirin_stat">All seasons Keirin In Bottom 5</option>
+                <option value="aggregatedPoints" force_label="Points" type="all_seasons_keirin_stat">All seasons Keirin Points</option>
+                <option value="pointsRate" force_label="Points rate" unit="%" type="all_seasons_keirin_stat">All seasons Keirin Points rate</option>
+
+                <option value="eventWins" force_label="Keirin wins" race_type="Keirin" type="all_seasons_keirin_stat">All seasons Keirin Wins</option>
+                <option value="aggregatedPoints" force_label="Keirin points" race_type="Keirin" type="all_seasons_keirin_stat">All seasons Keirin Points</option>
+
+                <option value="eventWins" force_label="Wins" type="all_seasons_sprint_stat">All seasons Sprint Wins</option>
+                <option value="eventStarts" force_label="Starts" type="all_seasons_sprint_stat">All seasons Sprint Starts</option>
+                <option value="eventWinRate" force_label="Win rate" unit="%" type="all_seasons_sprint_stat">All seasons Sprint Win rate</option>
+                <option value="eventInTop3" force_label="In Top 3" type="all_seasons_sprint_stat">All seasons Sprint In Top 3</option>
+                <option value="eventInTop5" force_label="In Top 5" type="all_seasons_sprint_stat">All seasons Sprint In Top 5</option>
+                <option value="eventInTop6" force_label="In Top 6" type="all_seasons_sprint_stat">All seasons Sprint In Top 6</option>
+                <option value="eventInBottom5" force_label="In Bottom 5" type="all_seasons_sprint_stat">All seasons Sprint In Bottom 5</option>
+                <option value="aggregatedPoints" force_label="Points" type="all_seasons_sprint_stat">All seasons Sprint Points</option>
+                <option value="pointsRate" force_label="Points rate" unit="%" type="all_seasons_sprint_stat">All seasons Sprint Points rate</option>
+
+                <option value="eventWins" force_label="Sprint wins" race_type="Sprint" type="all_seasons_sprint_stat">All seasons Sprint Wins</option>
+                <option value="aggregatedPoints" force_label="Sprint points" race_type="Sprint" type="all_seasons_sprint_stat">All seasons Sprint Points</option>
+
+                <option value="eventWins" force_label="Wins" type="all_seasons_scratch_stat">All seasons Scratch Wins</option>
+                <option value="eventStarts" force_label="Starts" type="all_seasons_scratch_stat">All seasons Scratch Starts</option>
+                <option value="eventWinRate" force_label="Win rate" unit="%" type="all_seasons_scratch_stat">All seasons Scratch Win rate</option>
+                <option value="eventInTop3" force_label="In Top 3" type="all_seasons_scratch_stat">All seasons Scratch In Top 3</option>
+                <option value="eventInTop5" force_label="In Top 5" type="all_seasons_scratch_stat">All seasons Scratch In Top 5</option>
+                <option value="eventInTop6" force_label="In Top 6" type="all_seasons_scratch_stat">All seasons Scratch In Top 6</option>
+                <option value="eventInBottom5" force_label="In Bottom 5" type="all_seasons_scratch_stat">All seasons Scratch In Bottom 5</option>
+                <option value="aggregatedPoints" force_label="Points" type="all_seasons_scratch_stat">All seasons Scratch Points</option>
+                <option value="pointsRate" force_label="Points rate" unit="%" type="all_seasons_scratch_stat">All seasons Scratch Points rate</option>
+
+                <option value="eventWins" force_label="Scratch wins" race_type="Scratch" type="all_seasons_scratch_stat">All seasons Scratch Wins</option>
+                <option value="aggregatedPoints" force_label="Scratch points" race_type="Scratch" type="all_seasons_scratch_stat">All seasons Scratch Points</option>
+
+                <option value="eventWins" force_label="Wins" type="all_seasons_elimination_stat">All seasons Elimination Wins</option>
+                <option value="eventStarts" force_label="Starts" type="all_seasons_elimination_stat">All seasons Elimination Starts</option>
+                <option value="eventWinRate" force_label="Win rate" unit="%" type="all_seasons_elimination_stat">All seasons Elimination Win rate</option>
+                <option value="eventInTop3" force_label="In Top 3" type="all_seasons_elimination_stat">All seasons Elimination In Top 3</option>
+                <option value="eventInTop5" force_label="In Top 5" type="all_seasons_elimination_stat">All seasons Elimination In Top 5</option>
+                <option value="eventInTop6" force_label="In Top 6" type="all_seasons_elimination_stat">All seasons Elimination In Top 6</option>
+                <option value="eventInBottom5" force_label="In Bottom 5" type="all_seasons_elimination_stat">All seasons Elimination In Bottom 5</option>
+                <option value="aggregatedPoints" force_label="Points" type="all_seasons_elimination_stat">All seasons Elimination Points</option>
+                <option value="pointsRate" force_label="Points rate" unit="%" type="all_seasons_elimination_stat">All seasons Elimination Points rate</option>
+
+                <option value="eventWins" force_label="Elimination wins" race_type="Elimination" type="all_seasons_elimination_stat">All seasons Elimination Wins</option>
+                <option value="aggregatedPoints" force_label="Elimination points" race_type="Elimination" type="all_seasons_elimination_stat">All seasons Elimination Points</option>
+
+                
+                <option value="MaxSpeed" force_label="Max Speed" type="event_data"  unit="km/h">Event Max Speed</option>
+                <option value="MaxPower" force_label="Max Power" type="event_data"  unit="w">Event Max Power</option>
+                <option value="MaxHeartrate" force_label="Max Heartrate" type="event_data">Event Max Heartrate</option>
+                <option value="MaxCadence" force_label="Max Cadence" type="event_data"  unit="rpm">Event Max Cadence</option>
+                <option value="MaxHeartratePercentage" force_label="Max Heartrate %" type="event_data"  unit="%">Event Max Heartrate %</option>
+                <option value="MaxPowerPercentage" force_label="Max Power %" type="event_data"  unit="%">Event Max Power %</option>
+
+                <option value="MaxRaceRiderSpeed" force_label="First Round" type="race_data" race_type="Sprint" round="1" unit_old="km/h">Sprint First round Max Speed</option>
+                <option value="MaxRacePower" force_label="First Round" type="race_data" race_type="Sprint" round="1"  unit_old="w">Sprint First round Max Power</option>
+                <option value="MaxRaceHeartrate" force_label="First Round" type="race_data" race_type="Sprint" round="1" >Sprint First round Max Heartrate</option>
+                <option value="MaxRaceCadence" force_label="First Round" type="race_data" race_type="Sprint" round="1"  unit_old="rpm">Sprint First round Max Cadence</option>
+                <option value="MaxRaceHeartratePercentage" force_label="First Round" type="race_data" race_type="Sprint" round="1"  unit_old="%">Sprint First round Max Heartrate %</option>
+                <option value="MaxRacePowerPercentage" force_label="First Round" type="race_data" race_type="Sprint" round="1"  unit_old="%">Sprint First round Max Power %</option>
+
+                <option value="MaxRaceRiderSpeed" force_label="Semi-Final" type="race_data" race_type="Sprint" round="2" unit_old="km/h">Sprint Semi final Max Speed</option>
+                <option value="MaxRacePower" force_label="Semi-Final" type="race_data" race_type="Sprint" round="2"  unit_old="w">Sprint Semi final Max Power</option>
+                <option value="MaxRaceHeartrate" force_label="Semi-Final" type="race_data" race_type="Sprint" round="2" >Sprint Semi final Max Heartrate</option>
+                <option value="MaxRaceCadence" force_label="Semi-Final" type="race_data" race_type="Sprint" round="2"  unit_old="rpm">Sprint Semi final Max Cadence</option>
+                <option value="MaxRaceHeartratePercentage" force_label="Semi-Final" type="race_data" race_type="Sprint" round="2"  unit_old="%">Sprint Semi final Max Heartrate %</option>
+                <option value="MaxRacePowerPercentage" force_label="Semi-Final" type="race_data" race_type="Sprint" round="2"  unit_old="%">Sprint Semi final Max Power %</option>
+
+                <option value="MaxRaceRiderSpeed" force_label="First Round" type="race_data" race_type="Keirin" round="1" unit_old="km/h">Keirin First round Max Speed</option>
+                <option value="MaxRacePower" force_label="First Round" type="race_data" race_type="Keirin" round="1"  unit_old="w">Keirin First round Max Power</option>
+                <option value="MaxRaceHeartrate" force_label="First Round" type="race_data" race_type="Keirin" round="1">Keirin First round Max Heartrate</option>
+                <option value="MaxRaceCadence" force_label="First Round" type="race_data" race_type="Keirin" round="1"  unit_old="rpm">Keirin First round Max Cadence</option>
+                <option value="MaxRaceHeartratePercentage" force_label="First Round" type="race_data" race_type="Keirin" round="1"  unit_old="%">Keirin First round Max Heartrate %</option>
+                <option value="MaxRacePowerPercentage" force_label="First Round" type="race_data" race_type="Keirin" round="1"  unit_old="%">Keirin First round Max Power %</option>
+
+
+
+
+
+
+              </select>
+            </td>
+            <td class="row_label">Label</td>
+            <td class="row_label_value"><input id="row_3_label" class="data_rider_label" type="text" value=""></td>
+            <td class="row_value">Value</td>
+            <td class="row_value_value"><input id="row_3_1_value" class="data_rider_value" type="text" value="">  </td>
+            <td class="row_value_value"><input id="row_3_2_value" class="data_rider_value" type="text" value="">  </td>
+            <td class="row_value_value"><input id="row_3_3_value" class="data_rider_value" type="text" value="">  </td>
+          </tr>
+
+          <tr>
+            <td class="row_name">Row 4</td>
+            <td class="row_select_data">
+              <select id="row_4_select_data">
+                <option value=""></option>                
+                <option value="BirthDate" force_label="Age" type="bio">Age</option>
+                <option value="HeightCm" force_label="Height" unit="cm" type="bio">Height</option>
+                <option value="WeightKg" force_label="Weight" unit="kg" type="bio">Weight</option>
+                <option value="MaxHrBpm" force_label="Max HR" unit="bpm" type="bio">Max HR</option>
+                <option value="RestHrBpm" force_label="Rest HR" unit="bpm" type="bio">Rest HR</option>
+                <option value="PowerPeakW" force_label="Max power" unit="w" type="bio">Max power</option>
+                <option value="SeasonTitle" force_label="Top result" season_title="1" type="bio">Palmares 1L</option>
+
+                <option value="eventWins" force_label="Wins" type="season_stat">Season Wins</option>
+                <option value="eventStarts" force_label="Starts" type="season_stat">Season Starts</option>
+                <option value="eventWinRate" force_label="Win rate" unit="%" type="season_stat">Season Win rate</option>
+                <option value="eventInTop3" force_label="In Top 3" type="season_stat">Season In Top 3</option>
+                <option value="eventInTop5" force_label="In Top 5" type="season_stat">Season In Top 5</option>
+                <option value="eventInTop6" force_label="In Top 6" type="season_stat">Season In Top 6</option>
+                <option value="eventInBottom5" force_label="In Bottom 5" type="season_stat">Season In Bottom 5</option>
+                <option value="aggregatedPoints" force_label="Points" type="season_stat">Season Points</option>
+                <option value="pointsRate" force_label="Points rate" unit="%" type="season_stat">Season Points rate</option>
+                                
+                <option value="eventWins" force_label="Wins" type="all_seasons_stat">All seasons Wins</option>
+                <option value="eventStarts" force_label="Starts" type="all_seasons_stat">All seasons Starts</option>
+                <option value="eventWinRate" force_label="Win rate" unit="%" type="all_seasons_stat">All seasons Win rate</option>
+                <option value="eventInTop3" force_label="In Top 3" type="all_seasons_stat">All seasons In Top 3</option>
+                <option value="eventInTop5" force_label="In Top 5" type="all_seasons_stat">All seasons In Top 5</option>
+                <option value="eventInTop6" force_label="In Top 6" type="all_seasons_stat">All seasons In Top 6</option>
+                <option value="eventInBottom5" force_label="In Bottom 5" type="all_seasons_stat">All seasons In Bottom 5</option>
+                <option value="aggregatedPoints" force_label="Points" type="all_seasons_stat">All seasons Points</option>
+                <option value="pointsRate" force_label="Points rate" unit="%" type="all_seasons_stat">All seasons Points rate</option>
+
+                <option value="eventWins" force_label="Wins" type="season_discipline_stat">Season Disc. Wins</option>
+                <option value="eventStarts" force_label="Starts" type="season_discipline_stat">Season Disc. Starts</option>
+                <option value="eventWinRate" force_label="Win rate" unit="%" type="season_discipline_stat">Season Disc. Win rate</option>
+                <option value="eventInTop3" force_label="In Top 3" type="season_discipline_stat">Season Disc. In Top 3</option>
+                <option value="eventInTop5" force_label="In Top 5" type="season_discipline_stat">Season Disc. In Top 5</option>
+                <option value="eventInTop6" force_label="In Top 6" type="season_discipline_stat">Season Disc. In Top 6</option>
+                <option value="eventInBottom5" force_label="In Bottom 5" type="season_discipline_stat">Season Disc. In Bottom 5</option>
+                <option value="aggregatedPoints" force_label="Points" type="season_discipline_stat">Season Disc. Points</option>
+                <option value="pointsRate" force_label="Points rate" unit="%" type="season_discipline_stat">Season Disc. Points rate</option>
+                                
+                <option value="eventWins" force_label="Wins" type="all_seasons_discipline_stat">All seasons Disc. Wins</option>
+                <option value="eventStarts" force_label="Starts" type="all_seasons_discipline_stat">All seasons Disc. Starts</option>
+                <option value="eventWinRate" force_label="Win rate" unit="%" type="all_seasons_discipline_stat">All seasons Disc. Win rate</option>
+                <option value="eventInTop3" force_label="In Top 3" type="all_seasons_discipline_stat">All seasons Disc. In Top 3</option>
+                <option value="eventInTop5" force_label="In Top 5" type="all_seasons_discipline_stat">All seasons Disc. In Top 5</option>
+                <option value="eventInTop6" force_label="In Top 6" type="all_seasons_discipline_stat">All seasons Disc. In Top 6</option>
+                <option value="eventInBottom5" force_label="In Bottom 5" type="all_seasons_discipline_stat">All seasons Disc. In Bottom 5</option>
+                <option value="aggregatedPoints" force_label="Points" type="all_seasons_discipline_stat">All seasons Disc. Points</option>
+                <option value="pointsRate" force_label="Points rate" unit="%" type="all_seasons_discipline_stat">All seasons Disc. Points rate</option>
+
+                <option value="eventWins" force_label="Wins" type="season_keirin_stat">Season Keirin Wins</option>
+                <option value="eventStarts" force_label="Starts" type="season_keirin_stat">Season Keirin Starts</option>
+                <option value="eventWinRate" force_label="Win rate" unit="%" type="season_keirin_stat">Season Keirin Win rate</option>
+                <option value="eventInTop3" force_label="In Top 3" type="season_keirin_stat">Season Keirin In Top 3</option>
+                <option value="eventInTop5" force_label="In Top 5" type="season_keirin_stat">Season Keirin In Top 5</option>
+                <option value="eventInTop6" force_label="In Top 6" type="season_keirin_stat">Season Keirin In Top 6</option>
+                <option value="eventInBottom5" force_label="In Bottom 5" type="season_keirin_stat">Season Keirin In Bottom 5</option>
+                <option value="aggregatedPoints" force_label="Points" type="season_keirin_stat">Season Keirin Points</option>
+                <option value="pointsRate" force_label="Points rate" unit="%" type="season_keirin_stat">Season Keirin Points rate</option>
+
+                <option value="eventWins" force_label="Keirin wins" race_type="Keirin" type="season_keirin_stat">Season Keirin Wins</option>
+                <option value="aggregatedPoints" force_label="Keirin points" race_type="Keirin" type="season_keirin_stat">Season Keirin Points</option>
+
+                <option value="eventWins" force_label="Wins" type="season_sprint_stat">Season Sprint Wins</option>
+                <option value="eventStarts" force_label="Starts" type="season_sprint_stat">Season Sprint Starts</option>
+                <option value="eventWinRate" force_label="Win rate" unit="%" type="season_sprint_stat">Season Sprint Win rate</option>
+                <option value="eventInTop3" force_label="In Top 3" type="season_sprint_stat">Season Sprint In Top 3</option>
+                <option value="eventInTop5" force_label="In Top 5" type="season_sprint_stat">Season Sprint In Top 5</option>
+                <option value="eventInTop6" force_label="In Top 6" type="season_sprint_stat">Season Sprint In Top 6</option>
+                <option value="eventInBottom5" force_label="In Bottom 5" type="season_sprint_stat">Season Sprint In Bottom 5</option>
+                <option value="aggregatedPoints" force_label="Points" type="season_sprint_stat">Season Sprint Points</option>
+                <option value="pointsRate" force_label="Points rate" unit="%" type="season_sprint_stat">Season Sprint Points rate</option>
+
+                <option value="eventWins" force_label="Sprint wins" race_type="Sprint" type="season_sprint_stat">Season Sprint Wins</option>
+                <option value="aggregatedPoints" force_label="Sprint points" race_type="Sprint" type="season_sprint_stat">Season Sprint Points</option>
+
+
+                <option value="eventWins" force_label="Wins" type="season_scratch_stat">Season Scratch Wins</option>
+                <option value="eventStarts" force_label="Starts" type="season_scratch_stat">Season Scratch Starts</option>
+                <option value="eventWinRate" force_label="Win rate" unit="%" type="season_scratch_stat">Season Scratch Win rate</option>
+                <option value="eventInTop3" force_label="In Top 3" type="season_scratch_stat">Season Scratch In Top 3</option>
+                <option value="eventInTop5" force_label="In Top 5" type="season_scratch_stat">Season Scratch In Top 5</option>
+                <option value="eventInTop6" force_label="In Top 6" type="season_scratch_stat">Season Scratch In Top 6</option>
+                <option value="eventInBottom5" force_label="In Bottom 5" type="season_scratch_stat">Season Scratch In Bottom 5</option>
+                <option value="aggregatedPoints" force_label="Points" type="season_scratch_stat">Season Scratch Points</option>
+                <option value="pointsRate" force_label="Points rate" unit="%" type="season_scratch_stat">Season Scratch Points rate</option>
+
+                <option value="eventWins" force_label="Scratch wins" race_type="Scratch" type="season_scratch_stat">Season Scratch Wins</option>
+                <option value="aggregatedPoints" force_label="Scratch points" race_type="Scratch" type="season_scratch_stat">Season Scratch Points</option>
+
+                <option value="eventWins" force_label="Wins" type="season_elimination_stat">Season Elimination Wins</option>
+                <option value="eventStarts" force_label="Starts" type="season_elimination_stat">Season Elimination Starts</option>
+                <option value="eventWinRate" force_label="Win rate" unit="%" type="season_elimination_stat">Season Elimination Win rate</option>
+                <option value="eventInTop3" force_label="In Top 3" type="season_elimination_stat">Season Elimination In Top 3</option>
+                <option value="eventInTop5" force_label="In Top 5" type="season_elimination_stat">Season Elimination In Top 5</option>
+                <option value="eventInTop6" force_label="In Top 6" type="season_elimination_stat">Season Elimination In Top 6</option>
+                <option value="eventInBottom5" force_label="In Bottom 5" type="season_elimination_stat">Season Elimination In Bottom 5</option>
+                <option value="aggregatedPoints" force_label="Points" type="season_elimination_stat">Season Elimination Points</option>
+                <option value="pointsRate" force_label="Points rate" unit="%" type="season_elimination_stat">Season Elimination Points rate</option>
+
+                <option value="eventWins" force_label="Elimination wins" race_type="Elimination" type="season_elimination_stat">Season Elimination Wins</option>
+                <option value="aggregatedPoints" force_label="Elimination points" race_type="Elimination" type="season_elimination_stat">Season Elimination Points</option>
+
+
+                <option value="eventWins" force_label="Wins" type="all_seasons_keirin_stat">All seasons Keirin Wins</option>
+                <option value="eventStarts" force_label="Starts" type="all_seasons_keirin_stat">All seasons Keirin Starts</option>
+                <option value="eventWinRate" force_label="Win rate" unit="%" type="all_seasons_keirin_stat">All seasons Keirin Win rate</option>
+                <option value="eventInTop3" force_label="In Top 3" type="all_seasons_keirin_stat">All seasons Keirin In Top 3</option>
+                <option value="eventInTop5" force_label="In Top 5" type="all_seasons_keirin_stat">All seasons Keirin In Top 5</option>
+                <option value="eventInTop6" force_label="In Top 6" type="all_seasons_keirin_stat">All seasons Keirin In Top 6</option>
+                <option value="eventInBottom5" force_label="In Bottom 5" type="all_seasons_keirin_stat">All seasons Keirin In Bottom 5</option>
+                <option value="aggregatedPoints" force_label="Points" type="all_seasons_keirin_stat">All seasons Keirin Points</option>
+                <option value="pointsRate" force_label="Points rate" unit="%" type="all_seasons_keirin_stat">All seasons Keirin Points rate</option>
+
+                <option value="eventWins" force_label="Keirin wins" race_type="Keirin" type="all_seasons_keirin_stat">All seasons Keirin Wins</option>
+                <option value="aggregatedPoints" force_label="Keirin points" race_type="Keirin" type="all_seasons_keirin_stat">All seasons Keirin Points</option>
+
+                <option value="eventWins" force_label="Wins" type="all_seasons_sprint_stat">All seasons Sprint Wins</option>
+                <option value="eventStarts" force_label="Starts" type="all_seasons_sprint_stat">All seasons Sprint Starts</option>
+                <option value="eventWinRate" force_label="Win rate" unit="%" type="all_seasons_sprint_stat">All seasons Sprint Win rate</option>
+                <option value="eventInTop3" force_label="In Top 3" type="all_seasons_sprint_stat">All seasons Sprint In Top 3</option>
+                <option value="eventInTop5" force_label="In Top 5" type="all_seasons_sprint_stat">All seasons Sprint In Top 5</option>
+                <option value="eventInTop6" force_label="In Top 6" type="all_seasons_sprint_stat">All seasons Sprint In Top 6</option>
+                <option value="eventInBottom5" force_label="In Bottom 5" type="all_seasons_sprint_stat">All seasons Sprint In Bottom 5</option>
+                <option value="aggregatedPoints" force_label="Points" type="all_seasons_sprint_stat">All seasons Sprint Points</option>
+                <option value="pointsRate" force_label="Points rate" unit="%" type="all_seasons_sprint_stat">All seasons Sprint Points rate</option>
+
+                <option value="eventWins" force_label="Sprint wins" race_type="Sprint" type="all_seasons_sprint_stat">All seasons Sprint Wins</option>
+                <option value="aggregatedPoints" force_label="Sprint points" race_type="Sprint" type="all_seasons_sprint_stat">All seasons Sprint Points</option>
+
+                <option value="eventWins" force_label="Wins" type="all_seasons_scratch_stat">All seasons Scratch Wins</option>
+                <option value="eventStarts" force_label="Starts" type="all_seasons_scratch_stat">All seasons Scratch Starts</option>
+                <option value="eventWinRate" force_label="Win rate" unit="%" type="all_seasons_scratch_stat">All seasons Scratch Win rate</option>
+                <option value="eventInTop3" force_label="In Top 3" type="all_seasons_scratch_stat">All seasons Scratch In Top 3</option>
+                <option value="eventInTop5" force_label="In Top 5" type="all_seasons_scratch_stat">All seasons Scratch In Top 5</option>
+                <option value="eventInTop6" force_label="In Top 6" type="all_seasons_scratch_stat">All seasons Scratch In Top 6</option>
+                <option value="eventInBottom5" force_label="In Bottom 5" type="all_seasons_scratch_stat">All seasons Scratch In Bottom 5</option>
+                <option value="aggregatedPoints" force_label="Points" type="all_seasons_scratch_stat">All seasons Scratch Points</option>
+                <option value="pointsRate" force_label="Points rate" unit="%" type="all_seasons_scratch_stat">All seasons Scratch Points rate</option>
+
+                <option value="eventWins" force_label="Scratch wins" race_type="Scratch" type="all_seasons_scratch_stat">All seasons Scratch Wins</option>
+                <option value="aggregatedPoints" force_label="Scratch points" race_type="Scratch" type="all_seasons_scratch_stat">All seasons Scratch Points</option>
+
+                <option value="eventWins" force_label="Wins" type="all_seasons_elimination_stat">All seasons Elimination Wins</option>
+                <option value="eventStarts" force_label="Starts" type="all_seasons_elimination_stat">All seasons Elimination Starts</option>
+                <option value="eventWinRate" force_label="Win rate" unit="%" type="all_seasons_elimination_stat">All seasons Elimination Win rate</option>
+                <option value="eventInTop3" force_label="In Top 3" type="all_seasons_elimination_stat">All seasons Elimination In Top 3</option>
+                <option value="eventInTop5" force_label="In Top 5" type="all_seasons_elimination_stat">All seasons Elimination In Top 5</option>
+                <option value="eventInTop6" force_label="In Top 6" type="all_seasons_elimination_stat">All seasons Elimination In Top 6</option>
+                <option value="eventInBottom5" force_label="In Bottom 5" type="all_seasons_elimination_stat">All seasons Elimination In Bottom 5</option>
+                <option value="aggregatedPoints" force_label="Points" type="all_seasons_elimination_stat">All seasons Elimination Points</option>
+                <option value="pointsRate" force_label="Points rate" unit="%" type="all_seasons_elimination_stat">All seasons Elimination Points rate</option>
+
+                <option value="eventWins" force_label="Elimination wins" race_type="Elimination" type="all_seasons_elimination_stat">All seasons Elimination Wins</option>
+                <option value="aggregatedPoints" force_label="Elimination points" race_type="Elimination" type="all_seasons_elimination_stat">All seasons Elimination Points</option>
+
+                
+                <option value="MaxSpeed" force_label="Max Speed" type="event_data"  unit="km/h">Event Max Speed</option>
+                <option value="MaxPower" force_label="Max Power" type="event_data"  unit="w">Event Max Power</option>
+                <option value="MaxHeartrate" force_label="Max Heartrate" type="event_data">Event Max Heartrate</option>
+                <option value="MaxCadence" force_label="Max Cadence" type="event_data"  unit="rpm">Event Max Cadence</option>
+                <option value="MaxHeartratePercentage" force_label="Max Heartrate %" type="event_data"  unit="%">Event Max Heartrate %</option>
+                <option value="MaxPowerPercentage" force_label="Max Power %" type="event_data"  unit="%">Event Max Power %</option>
+
+                <option value="MaxRaceRiderSpeed" force_label="First Round" type="race_data" race_type="Sprint" round="1" unit_old="km/h">Sprint First round Max Speed</option>
+                <option value="MaxRacePower" force_label="First Round" type="race_data" race_type="Sprint" round="1"  unit_old="w">Sprint First round Max Power</option>
+                <option value="MaxRaceHeartrate" force_label="First Round" type="race_data" race_type="Sprint" round="1" >Sprint First round Max Heartrate</option>
+                <option value="MaxRaceCadence" force_label="First Round" type="race_data" race_type="Sprint" round="1"  unit_old="rpm">Sprint First round Max Cadence</option>
+                <option value="MaxRaceHeartratePercentage" force_label="First Round" type="race_data" race_type="Sprint" round="1"  unit_old="%">Sprint First round Max Heartrate %</option>
+                <option value="MaxRacePowerPercentage" force_label="First Round" type="race_data" race_type="Sprint" round="1"  unit_old="%">Sprint First round Max Power %</option>
+
+                <option value="MaxRaceRiderSpeed" force_label="Semi-Final" type="race_data" race_type="Sprint" round="2" unit_old="km/h">Sprint Semi final Max Speed</option>
+                <option value="MaxRacePower" force_label="Semi-Final" type="race_data" race_type="Sprint" round="2"  unit_old="w">Sprint Semi final Max Power</option>
+                <option value="MaxRaceHeartrate" force_label="Semi-Final" type="race_data" race_type="Sprint" round="2" >Sprint Semi final Max Heartrate</option>
+                <option value="MaxRaceCadence" force_label="Semi-Final" type="race_data" race_type="Sprint" round="2"  unit_old="rpm">Sprint Semi final Max Cadence</option>
+                <option value="MaxRaceHeartratePercentage" force_label="Semi-Final" type="race_data" race_type="Sprint" round="2"  unit_old="%">Sprint Semi final Max Heartrate %</option>
+                <option value="MaxRacePowerPercentage" force_label="Semi-Final" type="race_data" race_type="Sprint" round="2"  unit_old="%">Sprint Semi final Max Power %</option>
+
+                <option value="MaxRaceRiderSpeed" force_label="First Round" type="race_data" race_type="Keirin" round="1" unit_old="km/h">Keirin First round Max Speed</option>
+                <option value="MaxRacePower" force_label="First Round" type="race_data" race_type="Keirin" round="1"  unit_old="w">Keirin First round Max Power</option>
+                <option value="MaxRaceHeartrate" force_label="First Round" type="race_data" race_type="Keirin" round="1">Keirin First round Max Heartrate</option>
+                <option value="MaxRaceCadence" force_label="First Round" type="race_data" race_type="Keirin" round="1"  unit_old="rpm">Keirin First round Max Cadence</option>
+                <option value="MaxRaceHeartratePercentage" force_label="First Round" type="race_data" race_type="Keirin" round="1"  unit_old="%">Keirin First round Max Heartrate %</option>
+                <option value="MaxRacePowerPercentage" force_label="First Round" type="race_data" race_type="Keirin" round="1"  unit_old="%">Keirin First round Max Power %</option>
+
+
+
+
+
+
+              </select>
+            </td>
+            <td class="row_label">Label</td>
+            <td class="row_label_value"><input id="row_4_label" class="data_rider_label" type="text" value=""></td>
+            <td class="row_value">Value</td>
+            <td class="row_value_value"><input id="row_4_1_value" class="data_rider_value" type="text" value="">  </td>
+            <td class="row_value_value"><input id="row_4_2_value" class="data_rider_value" type="text" value="">  </td>
+            <td class="row_value_value"><input id="row_4_3_value" class="data_rider_value" type="text" value="">  </td>
+          </tr>
+
+          <tr>
+            <td class="row_name">Row 5</td>
+            <td class="row_select_data">
+              <select id="row_5_select_data">
+
+                <option value=""></option>                
+                <option value="BirthDate" force_label="Age" type="bio">Age</option>
+                <option value="HeightCm" force_label="Height" unit="cm" type="bio">Height</option>
+                <option value="WeightKg" force_label="Weight" unit="kg" type="bio">Weight</option>
+                <option value="MaxHrBpm" force_label="Max HR" unit="bpm" type="bio">Max HR</option>
+                <option value="RestHrBpm" force_label="Rest HR" unit="bpm" type="bio">Rest HR</option>
+                <option value="PowerPeakW" force_label="Max power" unit="w" type="bio">Max power</option>
+                <option value="SeasonTitle" force_label="Top result" season_title="1" type="bio">Palmares 1L</option>
+                <option value="SeasonTitle" force_label="Top result" season_title="1" type="bio" nb_lines="2">Palmares 2L</option>
+
+                <option value="eventWins" force_label="Wins" type="season_stat">Season Wins</option>
+                <option value="eventStarts" force_label="Starts" type="season_stat">Season Starts</option>
+                <option value="eventWinRate" force_label="Win rate" unit="%" type="season_stat">Season Win rate</option>
+                <option value="eventInTop3" force_label="In Top 3" type="season_stat">Season In Top 3</option>
+                <option value="eventInTop5" force_label="In Top 5" type="season_stat">Season In Top 5</option>
+                <option value="eventInTop6" force_label="In Top 6" type="season_stat">Season In Top 6</option>
+                <option value="eventInBottom5" force_label="In Bottom 5" type="season_stat">Season In Bottom 5</option>
+                <option value="aggregatedPoints" force_label="Points" type="season_stat">Season Points</option>
+                <option value="pointsRate" force_label="Points rate" unit="%" type="season_stat">Season Points rate</option>
+                                
+                <option value="eventWins" force_label="Wins" type="all_seasons_stat">All seasons Wins</option>
+                <option value="eventStarts" force_label="Starts" type="all_seasons_stat">All seasons Starts</option>
+                <option value="eventWinRate" force_label="Win rate" unit="%" type="all_seasons_stat">All seasons Win rate</option>
+                <option value="eventInTop3" force_label="In Top 3" type="all_seasons_stat">All seasons In Top 3</option>
+                <option value="eventInTop5" force_label="In Top 5" type="all_seasons_stat">All seasons In Top 5</option>
+                <option value="eventInTop6" force_label="In Top 6" type="all_seasons_stat">All seasons In Top 6</option>
+                <option value="eventInBottom5" force_label="In Bottom 5" type="all_seasons_stat">All seasons In Bottom 5</option>
+                <option value="aggregatedPoints" force_label="Points" type="all_seasons_stat">All seasons Points</option>
+                <option value="pointsRate" force_label="Points rate" unit="%" type="all_seasons_stat">All seasons Points rate</option>
+
+                <option value="eventWins" force_label="Wins" type="season_discipline_stat">Season Disc. Wins</option>
+                <option value="eventStarts" force_label="Starts" type="season_discipline_stat">Season Disc. Starts</option>
+                <option value="eventWinRate" force_label="Win rate" unit="%" type="season_discipline_stat">Season Disc. Win rate</option>
+                <option value="eventInTop3" force_label="In Top 3" type="season_discipline_stat">Season Disc. In Top 3</option>
+                <option value="eventInTop5" force_label="In Top 5" type="season_discipline_stat">Season Disc. In Top 5</option>
+                <option value="eventInTop6" force_label="In Top 6" type="season_discipline_stat">Season Disc. In Top 6</option>
+                <option value="eventInBottom5" force_label="In Bottom 5" type="season_discipline_stat">Season Disc. In Bottom 5</option>
+                <option value="aggregatedPoints" force_label="Points" type="season_discipline_stat">Season Disc. Points</option>
+                <option value="pointsRate" force_label="Points rate" unit="%" type="season_discipline_stat">Season Disc. Points rate</option>
+                                
+                <option value="eventWins" force_label="Wins" type="all_seasons_discipline_stat">All seasons Disc. Wins</option>
+                <option value="eventStarts" force_label="Starts" type="all_seasons_discipline_stat">All seasons Disc. Starts</option>
+                <option value="eventWinRate" force_label="Win rate" unit="%" type="all_seasons_discipline_stat">All seasons Disc. Win rate</option>
+                <option value="eventInTop3" force_label="In Top 3" type="all_seasons_discipline_stat">All seasons Disc. In Top 3</option>
+                <option value="eventInTop5" force_label="In Top 5" type="all_seasons_discipline_stat">All seasons Disc. In Top 5</option>
+                <option value="eventInTop6" force_label="In Top 6" type="all_seasons_discipline_stat">All seasons Disc. In Top 6</option>
+                <option value="eventInBottom5" force_label="In Bottom 5" type="all_seasons_discipline_stat">All seasons Disc. In Bottom 5</option>
+                <option value="aggregatedPoints" force_label="Points" type="all_seasons_discipline_stat">All seasons Disc. Points</option>
+                <option value="pointsRate" force_label="Points rate" unit="%" type="all_seasons_discipline_stat">All seasons Disc. Points rate</option>
+
+                <option value="eventWins" force_label="Wins" type="season_keirin_stat">Season Keirin Wins</option>
+                <option value="eventStarts" force_label="Starts" type="season_keirin_stat">Season Keirin Starts</option>
+                <option value="eventWinRate" force_label="Win rate" unit="%" type="season_keirin_stat">Season Keirin Win rate</option>
+                <option value="eventInTop3" force_label="In Top 3" type="season_keirin_stat">Season Keirin In Top 3</option>
+                <option value="eventInTop5" force_label="In Top 5" type="season_keirin_stat">Season Keirin In Top 5</option>
+                <option value="eventInTop6" force_label="In Top 6" type="season_keirin_stat">Season Keirin In Top 6</option>
+                <option value="eventInBottom5" force_label="In Bottom 5" type="season_keirin_stat">Season Keirin In Bottom 5</option>
+                <option value="aggregatedPoints" force_label="Points" type="season_keirin_stat">Season Keirin Points</option>
+                <option value="pointsRate" force_label="Points rate" unit="%" type="season_keirin_stat">Season Keirin Points rate</option>
+
+                <option value="eventWins" force_label="Keirin wins" race_type="Keirin" type="season_keirin_stat">Season Keirin Wins</option>
+                <option value="aggregatedPoints" force_label="Keirin points" race_type="Keirin" type="season_keirin_stat">Season Keirin Points</option>
+
+                <option value="eventWins" force_label="Wins" type="season_sprint_stat">Season Sprint Wins</option>
+                <option value="eventStarts" force_label="Starts" type="season_sprint_stat">Season Sprint Starts</option>
+                <option value="eventWinRate" force_label="Win rate" unit="%" type="season_sprint_stat">Season Sprint Win rate</option>
+                <option value="eventInTop3" force_label="In Top 3" type="season_sprint_stat">Season Sprint In Top 3</option>
+                <option value="eventInTop5" force_label="In Top 5" type="season_sprint_stat">Season Sprint In Top 5</option>
+                <option value="eventInTop6" force_label="In Top 6" type="season_sprint_stat">Season Sprint In Top 6</option>
+                <option value="eventInBottom5" force_label="In Bottom 5" type="season_sprint_stat">Season Sprint In Bottom 5</option>
+                <option value="aggregatedPoints" force_label="Points" type="season_sprint_stat">Season Sprint Points</option>
+                <option value="pointsRate" force_label="Points rate" unit="%" type="season_sprint_stat">Season Sprint Points rate</option>
+
+                <option value="eventWins" force_label="Sprint wins" race_type="Sprint" type="season_sprint_stat">Season Sprint Wins</option>
+                <option value="aggregatedPoints" force_label="Sprint points" race_type="Sprint" type="season_sprint_stat">Season Sprint Points</option>
+
+
+                <option value="eventWins" force_label="Wins" type="season_scratch_stat">Season Scratch Wins</option>
+                <option value="eventStarts" force_label="Starts" type="season_scratch_stat">Season Scratch Starts</option>
+                <option value="eventWinRate" force_label="Win rate" unit="%" type="season_scratch_stat">Season Scratch Win rate</option>
+                <option value="eventInTop3" force_label="In Top 3" type="season_scratch_stat">Season Scratch In Top 3</option>
+                <option value="eventInTop5" force_label="In Top 5" type="season_scratch_stat">Season Scratch In Top 5</option>
+                <option value="eventInTop6" force_label="In Top 6" type="season_scratch_stat">Season Scratch In Top 6</option>
+                <option value="eventInBottom5" force_label="In Bottom 5" type="season_scratch_stat">Season Scratch In Bottom 5</option>
+                <option value="aggregatedPoints" force_label="Points" type="season_scratch_stat">Season Scratch Points</option>
+                <option value="pointsRate" force_label="Points rate" unit="%" type="season_scratch_stat">Season Scratch Points rate</option>
+
+                <option value="eventWins" force_label="Scratch wins" race_type="Scratch" type="season_scratch_stat">Season Scratch Wins</option>
+                <option value="aggregatedPoints" force_label="Scratch points" race_type="Scratch" type="season_scratch_stat">Season Scratch Points</option>
+
+                <option value="eventWins" force_label="Wins" type="season_elimination_stat">Season Elimination Wins</option>
+                <option value="eventStarts" force_label="Starts" type="season_elimination_stat">Season Elimination Starts</option>
+                <option value="eventWinRate" force_label="Win rate" unit="%" type="season_elimination_stat">Season Elimination Win rate</option>
+                <option value="eventInTop3" force_label="In Top 3" type="season_elimination_stat">Season Elimination In Top 3</option>
+                <option value="eventInTop5" force_label="In Top 5" type="season_elimination_stat">Season Elimination In Top 5</option>
+                <option value="eventInTop6" force_label="In Top 6" type="season_elimination_stat">Season Elimination In Top 6</option>
+                <option value="eventInBottom5" force_label="In Bottom 5" type="season_elimination_stat">Season Elimination In Bottom 5</option>
+                <option value="aggregatedPoints" force_label="Points" type="season_elimination_stat">Season Elimination Points</option>
+                <option value="pointsRate" force_label="Points rate" unit="%" type="season_elimination_stat">Season Elimination Points rate</option>
+
+                <option value="eventWins" force_label="Elimination wins" race_type="Elimination" type="season_elimination_stat">Season Elimination Wins</option>
+                <option value="aggregatedPoints" force_label="Elimination points" race_type="Elimination" type="season_elimination_stat">Season Elimination Points</option>
+
+
+                <option value="eventWins" force_label="Wins" type="all_seasons_keirin_stat">All seasons Keirin Wins</option>
+                <option value="eventStarts" force_label="Starts" type="all_seasons_keirin_stat">All seasons Keirin Starts</option>
+                <option value="eventWinRate" force_label="Win rate" unit="%" type="all_seasons_keirin_stat">All seasons Keirin Win rate</option>
+                <option value="eventInTop3" force_label="In Top 3" type="all_seasons_keirin_stat">All seasons Keirin In Top 3</option>
+                <option value="eventInTop5" force_label="In Top 5" type="all_seasons_keirin_stat">All seasons Keirin In Top 5</option>
+                <option value="eventInTop6" force_label="In Top 6" type="all_seasons_keirin_stat">All seasons Keirin In Top 6</option>
+                <option value="eventInBottom5" force_label="In Bottom 5" type="all_seasons_keirin_stat">All seasons Keirin In Bottom 5</option>
+                <option value="aggregatedPoints" force_label="Points" type="all_seasons_keirin_stat">All seasons Keirin Points</option>
+                <option value="pointsRate" force_label="Points rate" unit="%" type="all_seasons_keirin_stat">All seasons Keirin Points rate</option>
+
+                <option value="eventWins" force_label="Keirin wins" race_type="Keirin" type="all_seasons_keirin_stat">All seasons Keirin Wins</option>
+                <option value="aggregatedPoints" force_label="Keirin points" race_type="Keirin" type="all_seasons_keirin_stat">All seasons Keirin Points</option>
+
+                <option value="eventWins" force_label="Wins" type="all_seasons_sprint_stat">All seasons Sprint Wins</option>
+                <option value="eventStarts" force_label="Starts" type="all_seasons_sprint_stat">All seasons Sprint Starts</option>
+                <option value="eventWinRate" force_label="Win rate" unit="%" type="all_seasons_sprint_stat">All seasons Sprint Win rate</option>
+                <option value="eventInTop3" force_label="In Top 3" type="all_seasons_sprint_stat">All seasons Sprint In Top 3</option>
+                <option value="eventInTop5" force_label="In Top 5" type="all_seasons_sprint_stat">All seasons Sprint In Top 5</option>
+                <option value="eventInTop6" force_label="In Top 6" type="all_seasons_sprint_stat">All seasons Sprint In Top 6</option>
+                <option value="eventInBottom5" force_label="In Bottom 5" type="all_seasons_sprint_stat">All seasons Sprint In Bottom 5</option>
+                <option value="aggregatedPoints" force_label="Points" type="all_seasons_sprint_stat">All seasons Sprint Points</option>
+                <option value="pointsRate" force_label="Points rate" unit="%" type="all_seasons_sprint_stat">All seasons Sprint Points rate</option>
+
+                <option value="eventWins" force_label="Sprint wins" race_type="Sprint" type="all_seasons_sprint_stat">All seasons Sprint Wins</option>
+                <option value="aggregatedPoints" force_label="Sprint points" race_type="Sprint" type="all_seasons_sprint_stat">All seasons Sprint Points</option>
+
+                <option value="eventWins" force_label="Wins" type="all_seasons_scratch_stat">All seasons Scratch Wins</option>
+                <option value="eventStarts" force_label="Starts" type="all_seasons_scratch_stat">All seasons Scratch Starts</option>
+                <option value="eventWinRate" force_label="Win rate" unit="%" type="all_seasons_scratch_stat">All seasons Scratch Win rate</option>
+                <option value="eventInTop3" force_label="In Top 3" type="all_seasons_scratch_stat">All seasons Scratch In Top 3</option>
+                <option value="eventInTop5" force_label="In Top 5" type="all_seasons_scratch_stat">All seasons Scratch In Top 5</option>
+                <option value="eventInTop6" force_label="In Top 6" type="all_seasons_scratch_stat">All seasons Scratch In Top 6</option>
+                <option value="eventInBottom5" force_label="In Bottom 5" type="all_seasons_scratch_stat">All seasons Scratch In Bottom 5</option>
+                <option value="aggregatedPoints" force_label="Points" type="all_seasons_scratch_stat">All seasons Scratch Points</option>
+                <option value="pointsRate" force_label="Points rate" unit="%" type="all_seasons_scratch_stat">All seasons Scratch Points rate</option>
+
+                <option value="eventWins" force_label="Scratch wins" race_type="Scratch" type="all_seasons_scratch_stat">All seasons Scratch Wins</option>
+                <option value="aggregatedPoints" force_label="Scratch points" race_type="Scratch" type="all_seasons_scratch_stat">All seasons Scratch Points</option>
+
+                <option value="eventWins" force_label="Wins" type="all_seasons_elimination_stat">All seasons Elimination Wins</option>
+                <option value="eventStarts" force_label="Starts" type="all_seasons_elimination_stat">All seasons Elimination Starts</option>
+                <option value="eventWinRate" force_label="Win rate" unit="%" type="all_seasons_elimination_stat">All seasons Elimination Win rate</option>
+                <option value="eventInTop3" force_label="In Top 3" type="all_seasons_elimination_stat">All seasons Elimination In Top 3</option>
+                <option value="eventInTop5" force_label="In Top 5" type="all_seasons_elimination_stat">All seasons Elimination In Top 5</option>
+                <option value="eventInTop6" force_label="In Top 6" type="all_seasons_elimination_stat">All seasons Elimination In Top 6</option>
+                <option value="eventInBottom5" force_label="In Bottom 5" type="all_seasons_elimination_stat">All seasons Elimination In Bottom 5</option>
+                <option value="aggregatedPoints" force_label="Points" type="all_seasons_elimination_stat">All seasons Elimination Points</option>
+                <option value="pointsRate" force_label="Points rate" unit="%" type="all_seasons_elimination_stat">All seasons Elimination Points rate</option>
+
+                <option value="eventWins" force_label="Elimination wins" race_type="Elimination" type="all_seasons_elimination_stat">All seasons Elimination Wins</option>
+                <option value="aggregatedPoints" force_label="Elimination points" race_type="Elimination" type="all_seasons_elimination_stat">All seasons Elimination Points</option>
+
+                
+                <option value="MaxSpeed" force_label="Max Speed" type="event_data"  unit="km/h">Event Max Speed</option>
+                <option value="MaxPower" force_label="Max Power" type="event_data"  unit="w">Event Max Power</option>
+                <option value="MaxHeartrate" force_label="Max Heartrate" type="event_data">Event Max Heartrate</option>
+                <option value="MaxCadence" force_label="Max Cadence" type="event_data"  unit="rpm">Event Max Cadence</option>
+                <option value="MaxHeartratePercentage" force_label="Max Heartrate %" type="event_data"  unit="%">Event Max Heartrate %</option>
+                <option value="MaxPowerPercentage" force_label="Max Power %" type="event_data"  unit="%">Event Max Power %</option>
+
+                <option value="MaxRaceRiderSpeed" force_label="First Round" type="race_data" race_type="Sprint" round="1" unit_old="km/h">Sprint First round Max Speed</option>
+                <option value="MaxRacePower" force_label="First Round" type="race_data" race_type="Sprint" round="1"  unit_old="w">Sprint First round Max Power</option>
+                <option value="MaxRaceHeartrate" force_label="First Round" type="race_data" race_type="Sprint" round="1" >Sprint First round Max Heartrate</option>
+                <option value="MaxRaceCadence" force_label="First Round" type="race_data" race_type="Sprint" round="1"  unit_old="rpm">Sprint First round Max Cadence</option>
+                <option value="MaxRaceHeartratePercentage" force_label="First Round" type="race_data" race_type="Sprint" round="1"  unit_old="%">Sprint First round Max Heartrate %</option>
+                <option value="MaxRacePowerPercentage" force_label="First Round" type="race_data" race_type="Sprint" round="1"  unit_old="%">Sprint First round Max Power %</option>
+
+                <option value="MaxRaceRiderSpeed" force_label="Semi-Final" type="race_data" race_type="Sprint" round="2" unit_old="km/h">Sprint Semi final Max Speed</option>
+                <option value="MaxRacePower" force_label="Semi-Final" type="race_data" race_type="Sprint" round="2"  unit_old="w">Sprint Semi final Max Power</option>
+                <option value="MaxRaceHeartrate" force_label="Semi-Final" type="race_data" race_type="Sprint" round="2" >Sprint Semi final Max Heartrate</option>
+                <option value="MaxRaceCadence" force_label="Semi-Final" type="race_data" race_type="Sprint" round="2"  unit_old="rpm">Sprint Semi final Max Cadence</option>
+                <option value="MaxRaceHeartratePercentage" force_label="Semi-Final" type="race_data" race_type="Sprint" round="2"  unit_old="%">Sprint Semi final Max Heartrate %</option>
+                <option value="MaxRacePowerPercentage" force_label="Semi-Final" type="race_data" race_type="Sprint" round="2"  unit_old="%">Sprint Semi final Max Power %</option>
+
+                <option value="MaxRaceRiderSpeed" force_label="First Round" type="race_data" race_type="Keirin" round="1" unit_old="km/h">Keirin First round Max Speed</option>
+                <option value="MaxRacePower" force_label="First Round" type="race_data" race_type="Keirin" round="1"  unit_old="w">Keirin First round Max Power</option>
+                <option value="MaxRaceHeartrate" force_label="First Round" type="race_data" race_type="Keirin" round="1">Keirin First round Max Heartrate</option>
+                <option value="MaxRaceCadence" force_label="First Round" type="race_data" race_type="Keirin" round="1"  unit_old="rpm">Keirin First round Max Cadence</option>
+                <option value="MaxRaceHeartratePercentage" force_label="First Round" type="race_data" race_type="Keirin" round="1"  unit_old="%">Keirin First round Max Heartrate %</option>
+                <option value="MaxRacePowerPercentage" force_label="First Round" type="race_data" race_type="Keirin" round="1"  unit_old="%">Keirin First round Max Power %</option>
+
+
+
+
+
+              </select>
+            </td>
+            <td class="row_label">Label</td>
+            <td class="row_label_value"><input id="row_5_label" class="data_rider_label" type="text" value=""></td>
+            <td class="row_value">Value</td>
+            <td class="row_value_value"><input id="row_5_1_value" class="data_rider_value" type="text" value="">  </td>
+            <td class="row_value_value"><input id="row_5_2_value" class="data_rider_value" type="text" value="">  </td>
+            <td class="row_value_value"><input id="row_5_3_value" class="data_rider_value" type="text" value="">  </td>
+          </tr>
+
+          <tr>
+            <td class="row_name"></td>
+            <td class="row_select_data"><input id="clear_row_data_rider" type="button" value="Clear Data"/></td>
+            <td class="row_label"></td>
+            <td class="row_label_value">Outline ? <input type="checkbox" id="ckb_with_outline"  checked="">Logo AWS ? <input type="checkbox" id="overlay_rider_data_show_logo_aws"  value="Yes"></td>
+
+            <td class="row_value"></td>
+            <td class="row_value_value"><input rider_num="1" class="get_data_rider"  type="button" value="Get Data Rider 1"/>  </td>
+            <td class="row_value_value"><input rider_num="2" class="get_data_rider"  type="button" value="Get Data Rider 2"/>  </td>
+            <td class="row_value_value"><input rider_num="3" class="get_data_rider"  type="button" value="Get Data Rider 3"/> </td>
+          </tr>
+        </table> 
+              
+      
+
+       <div id="div_rider_play_button">
+        <div class="div_rider_data_buttons">            
+            <input id="preset_name" type="text" value="">
+            <input id="btn_add_preset" type="button" value="Add preset">
+            Save labels and values ?<input type="checkbox" id="ckb_add_preset_save_labels_values">
+            Save labels only ?<input type="checkbox" id="ckb_add_preset_save_labels">
+            </br></br>            
+        </div>
+
+          <div class="div_rider_data_buttons">
+            <div class="button_show_rider_data button_data_general  button_play_overlay" type="Short">Rider short Left</div>
+            <div class="button_show_rider_data button_data_general  button_play_overlay" type="Medium">Rider medium Left</div>
+            <div class="button_show_rider_data button_data_general  button_play_overlay" type="Long">Rider long Left</div>
+            <div class="button_show_rider_data button_data_general  button_play_overlay" type="Palmares">Rider Top Results</div>
+            <div class="button_show_rider_data button_data_general  button_play_overlay" type="Right" check_outline="1">Rider PIP Right</div>        
+          </div>
+          <div class="div_rider_data_buttons">
+              <div class="button_show_riders_h2h button_data_general  button_play_overlay" type="Small">Head to head</div>
+              <div class="button_show_riders_h2h button_data_general  button_play_overlay" type="Big" check_outline="1">Head to head Big</div>
+          </div>
+
+          <div class="div_rider_data_buttons">
+              <div class="button_show_riders_three2head button_data_general  button_play_overlay">Three to head</div>
+          </div>
+
+          
+        </div>
+
+      </div>
+
+  </p>
+</div>
+
+
+
+
+<div id="Messages" class="tabcontent">
+<select id="select_type_message_timer" name="select_type_message_timer">
+  <option value="">All</option>
+  <option value="StartList">StartList</option>
+  <option value="Results">Results</option>
+  <option value="LapCounter">LapCounter</option>
+  <option value="Starttime">Starttime</option>
+  <option value="Finishtime">Finishtime</option>
+  <option value="Classification">Classification</option>
+</select>
+  <p>
+	<div id="div_timer_messages"></div>
+  <div id="div_timer_message_preview">
+    <pre id="timer_message_preview"></pre>
+
+  </div>
+  </p>
+</div>
+
+<div id="Stats" class="tabcontent is_master">
+  <div class="RaceInfos">
+    <div id="simulationInfos"></div>
+  </div>
+  <div class="RaceControl">
+    <div id="getLogs">Save Logs</div>
+    <div id="getStats">Save Stats</div>
+  </div>
+  
+  <div class="RaceErrors">
+    <div class="RaceErrors_header">Errors : </div>
+    <div class="RaceErrors_body"></div>
+  </div>
+
+  <div class="simulationStats"></div>
+
+  
+  <div id="ErrorListBox"></div>
+  <div id="LastMsg"></div>
+</div>
+
+<div id="div_special_buttons">
+	 <!--
+	 <div class="button_action button_race_normal is_master connect_maclloyd_hpv2" />Connect ML HPV2</div>
+	 <div>&nbsp;</div><div>&nbsp;</div>
+	 <div class="button_action button_race_normal is_master disconnect_maclloyd_hpv2" />Disonnect ML HPV2</div>
+	 <div>&nbsp;</div><div>&nbsp;</div>
+   -->
+	 <div class="message_clear_overlay button_play_overlay clear_overlay" />-- CLEAR --</div>
+	 <div>&nbsp;</div>
+   <div style="display:none" class="message_clear_overlay_render2 button_play_overlay clear_overlay" />-- CLEAR 2 --</div>
+	 <div>&nbsp;</div>
+	 <div id="selected_rider"  class="button_play_overlay button_data_manual" />Sel. Rider</div>
+	 <div>&nbsp;</div>
+	 <div id="selected_eliminated"  class="button_play_overlay button_data_manual elimination" />Sel. Eliminated</div> 
+	 <div>&nbsp;</div>
+	 <div id="selected_leader"  class="button_play_overlay button_data_manual" />Sel. Leader</div> 
+	 <div>&nbsp;</div>
+	 <div id="selected_qualified"  class="button_play_overlay button_data_manual" />Sel. Qualified</div> 
+	 <div>&nbsp;</div>
+	 <div id="selected_small_winner" class="button_play_overlay button_data_manual" />Sel. Winner</div> 
+	 <div id="selected_big_winner" class="button_play_overlay button_data_manual" />Sel. Big Winner</div> 
+	 <div id="selected_big_winner_race_type" type="WinnerRace" class="button_play_overlay button_data_manual" />Sel. Big Winner Race</div> 
+	 <div>&nbsp;</div>
+	 <div id="data_ManualRankings" type="Results"  class="button_data_manual button_data_manual_rankings button_play_overlay" />M. Results</div>
+	 
+   
+
+
+
+	 <div>&nbsp;</div>
+
+
+
+
+   <div>&nbsp;</div>
+   <div>&nbsp;</div>
+   <!--
+   <div class="button_anim button_play_overlay dataOn" folder="bracket_sprint/heat1" pattern_image="anim_" nbCharForIndex="5" startIndex="0" endIndex="170" posX="100" posY="100" />Bracket</div>
+
+   <div>&nbsp;</div>
+   <div class="button_anim button_play_overlay dataOn" folder="bracket_sprint/heat1_winner" pattern_image="anim_" nbCharForIndex="5" startIndex="0" endIndex="170" posX="100" posY="100" />Bracket Winner</div>
+-->
+
+   <!--
+	 <div class="button_anim button_play_overlay dataOn" folder="start" pattern_image="A2.18_RACE_INFORMATION_Start_" nbCharForIndex="5" startIndex="0" endIndex="124" />START</div>
+
+   <div class="button_anim button_play_overlay dataOn" folder="finish" pattern_image="A2.19_RACE_INFORMATION_Finish)_" nbCharForIndex="5" startIndex="0" endIndex="124" />FINISH</div> 
+	 
+   <div  class="button_anim button_play_overlay dataOn" folder="jingle" pattern_image="anim_" nbCharForIndex="5" startIndex="0" endIndex="374" />JINGLE</div>
+
+     <div class="button_anim button_play_overlay dataOn" folder="sprint" pattern_image="anim_" nbCharForIndex="5" startIndex="0" endIndex="229" />SPRINT</div>
+	 <div class="button_anim button_play_overlay dataOn" folder="keirin" pattern_image="anim_" nbCharForIndex="5" startIndex="0" endIndex="124" />KEIRIN</div>
+	 -->   
+   <!--
+   <input type="button"  class="button_anim" folder="big_rider" pattern_image="anim_" nbCharForIndex="5" startIndex="0" endIndex="250" value="B.RIDER" />
+	 <input type="button" class="button_anim" folder="big_rider_palmares" pattern_image="anim_" nbCharForIndex="5" startIndex="0" endIndex="249" value="B.RIDER Palm" />
+	 <input type="button"  class="button_anim" folder="lowthird_palmares" pattern_image="A2.14_RIDERSS_PRESENTATION_Photo_4L_" nbCharForIndex="5" startIndex="0" endIndex="93" value="L.RIDER Palm" />
+  -->
+	 
+	<!-- 
+	 <input type="button"  class="button_anim" folder="4laps" pattern_image="anim_" nbCharForIndex="5" startIndex="0" endIndex="124" value="4 LAPS" />
+	 <input type="button"  class="button_anim" folder="3laps" pattern_image="anim_" nbCharForIndex="5" startIndex="0" endIndex="124" value="3 LAPS" />
+	 <input type="button"  class="button_anim" folder="2laps" pattern_image="anim_" nbCharForIndex="5" startIndex="0" endIndex="124" value="2 LAPS" />
+	 <input type="button"  class="button_anim" folder="final_laps" pattern_image="anim_" nbCharForIndex="5" startIndex="0" endIndex="124" value="FINAL LAP" />
+	 -->
+     
+	 
+	 <!--
+   <input type="button"  class="button_anim" folder="big_winner" pattern_image="anim_" nbCharForIndex="5" startIndex="0" endIndex="250" value="B.WINNER" />
+	 <input type="button" class="button_anim" folder="power" pattern_image="anim_" nbCharForIndex="5" startIndex="0" endIndex="250" value="POWER" />
+	 <input type="button" class="button_anim" folder="heartrate" pattern_image="anim_" nbCharForIndex="5" startIndex="0" endIndex="250" value="HEARTRATE" />	 
+	 <input type="button" class="button_anim" folder="competitor_presentation_low" pattern_image="anim_" nbCharForIndex="5" startIndex="0" endIndex="124" value="TEST" />
+  
+   <div id="message_send_lap_counter_5" class="button_play button_play_overlay dataOn" />Lap Counter 5</div> 
+   <div id="message_send_lap_counter_4" class="button_play button_play_overlay dataOn" />Lap Counter 4</div> 
+   <div id="message_send_lap_counter_3" class="button_play button_play_overlay dataOn" />Lap Counter 3</div> 
+   <div id="message_send_lap_counter_2" class="button_play button_play_overlay dataOn" />Lap Counter 2</div> 
+   <div id="message_send_lap_counter_1" class="button_play button_play_overlay dataOn" />Lap Counter 1</div>
+    
+
+   <div lap="5" distance_to_go="1250" class="button_play button_play_overlay button_lap_counter dataOn" />Lap Counter 5</div>
+   <div lap="4" distance_to_go="1000" class="button_play button_play_overlay button_lap_counter dataOn" />Lap Counter 4</div>
+   <div lap="3" distance_to_go="750" class="button_play button_play_overlay button_lap_counter dataOn" />Lap Counter 3</div>
+   <div lap="2" distance_to_go="500" class="button_play button_play_overlay button_lap_counter dataOn" />Lap Counter 2</div>
+   <div lap="1" distance_to_go="250" class="button_play button_play_overlay button_lap_counter dataOn" />Lap Counter 1</div>
+-->
+    
+   <!--<div id="message_send_finish_time" class="button_play button_play_overlay dataOn" />Finish Time</div> -->
+
+
+
+</div> 
+
+
+
+<div id="div_leaderboard">
+  <span class="button_race_normal button_play_overlay button_overlay_auto show_leaderboard">LEADERBOARD</span>
+  
+  <div id="div_leaderboard_table"></div>
+</div>
+
+<div id="div_settings_overlay">
+  <div>
+    <label class="label_page_overlay" for="page_overlay">Page Overlay : </label>
+    <input id="page_overlay" class="duration_auto" type="number" step="1" min="1" max="2" value="1" style="width: 30px">
+    <div id="page_overlay_force2">2</div>
+  </div>
+  
+  <div>
+  <div id="screenshot" class="button_action button_race_normal dev">Screenshot</div>
+  </div>
+</div>
+
+
+<div id="div_overlay_chrono">
+  <div>  
+    <div class="lap_counter_update" action="sub">-</div>
+    <input id="laps_to_go" class="duration_auto" type="number" step="1" value="3" min="1" max="34" style="width: 30px;height: 24px;line-height: 24px;">
+    <div class="lap_counter_update" action="add">+</div>
+    <div class="button_play button_play_overlay button_lap_counter dataOn overlay_clear_auto">Laps To GO</div>
+
+    <div id="clear_lap_counter" class="button_play button_play_overlay clear_overlay" style="width:50px!important;"/>Clear Lap</div>
+
+  </br>
+  <div class="button_play button_play_overlay button_sprint_lap dataOn overlay_clear_auto">Sprint Lap</div>
+  <div id="clear_sprint_lap" class="button_play button_play_overlay clear_overlay" />Clear Sp. Lap</div>
+  </br>
+    <div id="message_send_start_chrono" class="button_play button_play_overlay dataOn" />Start Chrono</div>
+    <div id="clear_chrono" class="button_play button_play_overlay clear_overlay" />Clear Chrono</div> 
+  </br>
+    <div style="padding: 5px;">Finish Time <input type="checkbox" id="auto_render_FinishTime2" class="checkbox_auto" name="auto_render_FinishTime" value="FinishTime" checked="">
+    </div>
+  </div>
+
+  
+
+</div>
+
+<!--
+<div id="div_special_buttons_horizontal">
+
+  <div lap="20" distance_to_go="5000" class="button_play button_play_overlay button_lap_counter dataOn" />Lap Counter 20</div>
+  <div lap="19" distance_to_go="4750" class="button_play button_play_overlay button_lap_counter dataOn" />Lap Counter 19</div>
+  <div lap="18" distance_to_go="4500" class="button_play button_play_overlay button_lap_counter dataOn" />Lap Counter 18</div>
+  <div lap="17" distance_to_go="4250" class="button_play button_play_overlay button_lap_counter dataOn" />Lap Counter 17</div>
+  <div lap="16" distance_to_go="4000" class="button_play button_play_overlay button_lap_counter dataOn" />Lap Counter 16</div>
+  <div lap="15" distance_to_go="3750" class="button_play button_play_overlay button_lap_counter dataOn" />Lap Counter 15</div>
+  <div lap="14" distance_to_go="3500" class="button_play button_play_overlay button_lap_counter dataOn" />Lap Counter 14</div>
+  <div lap="13" distance_to_go="3250" class="button_play button_play_overlay button_lap_counter dataOn" />Lap Counter 13</div>
+  <div lap="12" distance_to_go="3000" class="button_play button_play_overlay button_lap_counter dataOn" />Lap Counter 12</div>
+  <div lap="11" distance_to_go="2750" class="button_play button_play_overlay button_lap_counter dataOn" />Lap Counter 11</div>
+  <div lap="10" distance_to_go="2500" class="button_play button_play_overlay button_lap_counter dataOn" />Lap Counter 10</div>
+  <div lap="9" distance_to_go="2250" class="button_play button_play_overlay button_lap_counter dataOn" />Lap Counter 9</div>
+  <div lap="8" distance_to_go="2000" class="button_play button_play_overlay button_lap_counter dataOn" />Lap Counter 8</div>
+  <div lap="7" distance_to_go="1750" class="button_play button_play_overlay button_lap_counter dataOn" />Lap Counter 7</div>
+  <div lap="6" distance_to_go="1500" class="button_play button_play_overlay button_lap_counter dataOn" />Lap Counter 6</div>
+  <div lap="5" distance_to_go="1250" class="button_play button_play_overlay button_lap_counter dataOn" />Lap Counter 5</div>
+  <div lap="4" distance_to_go="1000" class="button_play button_play_overlay button_lap_counter dataOn" />Lap Counter 4</div>
+  <div lap="3" distance_to_go="750" class="button_play button_play_overlay button_lap_counter dataOn" />Lap Counter 3</div>
+  <div lap="2" distance_to_go="500" class="button_play button_play_overlay button_lap_counter dataOn" />Lap Counter 2</div>
+  <div lap="1" distance_to_go="250" class="button_play button_play_overlay button_lap_counter dataOn" />Lap Counter 1</div>
+
+</div>
+-->
+<div id="div_console">
+	<div id="console">
+	</div>
+
+  <div id="states">
+    <div id="timer_connection" class="state">
+      <div class="state_item">
+        Timer <span id="timer_state_connection" class="state_connection_off">OFF</span>
+      </div>
+      <div id="reconnect_timer" class="reconnect_button" />Reconnect Timer</div>
+      <div class="state_infos_time">
+        <span class="label_timer_time">Last Data : </span> <span id="last_datetime_timer_data" class="time_show">-</span></br>
+        Last msg : <span id="last_msg_timer">-</span>
+      </div>
+
+    
+    </div>
+    <div id="tracker_connection" class="state">
+      <div class="state_item">
+        Tracker<span id="tracker_state_connection" class="state_connection_off">OFF</span>
+      </div>
+      <div id="reconnect_tracker" class="reconnect_button" />Reconnect Tracker</div>
+      <div class="state_infos_time">
+        <span>Last Data : </span> <span id="last_datetime_tracker_data" class="time_show">-</span> - <span>Diff Time : </span> <span id="diff_datetime_tracker_data" class="time_show">-</span>
+      </div>
+    </div>
+    <div id="render_connection" class="state">
+      <div class="state_item">
+        Render<span id="render_state_connection" class="state_connection_off">OFF</span>
+      </div>
+      <div id="reconnect_render" class="reconnect_button" />Reconnect Render</div>
+    </div>
+
+    <div id="render2_connection" class="state" style="display:none">
+      <div class="state_item">
+        Render2<span id="render2_state_connection" class="state_connection_off">OFF</span>
+      </div>
+      <div id="reconnect_render2" class="reconnect_button" />Reconnect Render 2</div>
+    </div>
+<!--
+    <div id="div_clear_overlay" class="state">    
+      <input type="button" id="message_clear_overlay" value="CLEAR" />
+    </div>
+-->    
+  </div>
+
+</div>  
+<!--
+  <div id="footer">
+  		GEORACING - Powered by Trimaran -  © 2021
+  </div>
+-->
+
+<div id="data_race_preset" style="display:none">
+  <div id="data_race_#RACE_ID#" race_id="#RACE_ID#" class="div_data_race" style="display:none" />
+    <span id="#RACE_ID#_data_name" race_id="#RACE_ID#" class="data_race_name" />#RACE_NAME#</span></br>
+    <span>Override Race Name : <input id="#RACE_ID#_data_race_name_input_over" race_id="#RACE_ID#" type="text" value="" class="data_race_name_input_over" /></span>&nbsp;&nbsp;
+    <span>Override Race Name Line 2 : <input id="#RACE_ID#_data_race_name_line2_input_over" race_id="#RACE_ID#" type="text" value="" class="data_race_name_line2_input_over" /></span>	
+	<span>&nbsp;&nbsp;&nbsp;Bib : <input id="#RACE_ID#_filter_rider" race_id="#RACE_ID#" type="text" value="" class="input_race_filter_rider" /></span>	
+    <br/>
+
+    <div class="buttons_race">
+		<div class="buttons_race_line">
+			
+      <div id="#RACE_ID#_data_StartList" race_id="#RACE_ID#" type="StartList" class="button_data_race button_play_overlay button_listing" />StartList <div class="tooltiptext"></div></div>
+			<div id="#RACE_ID#_data_StartListBracket" race_id="#RACE_ID#" type="StartList" class="button_data_startlist_bracket button_data_startlist_bracket button_play_overlay button_listing" />StartList Bracket<div class="tooltiptext"></div></div> 
+
+      <div id="#RACE_ID#_data_Results" race_id="#RACE_ID#" type="Results" class="button_data_race button_data_race button_play_overlay button_listing" />Results<div class="tooltiptext"></div></div>    
+			<div id="#RACE_ID#_data_ResultsBracket" race_id="#RACE_ID#" type="Results" class="button_data_results_bracket button_data_results_bracket button_play_overlay" />Results Bracket<div class="tooltiptext"></div></div>
+      <div id="#RACE_ID#_data_Winner" race_id="#RACE_ID#" type="Winner" class="button_data_winner button_play_overlay" />Winner<div class="tooltiptext"></div></div>
+
+      
+			<!--
+      <div id="#RACE_ID#_data_BigWinner" race_id="#RACE_ID#" type="Winner" class="button_data_big_winner button_play_overlay" />Big Winner<div class="tooltiptext"></div></div>
+			<div id="#RACE_ID#_data_BigWinnerRace" race_id="#RACE_ID#" type="WinnerRace" class="button_data_big_winner_race button_play_overlay" />Big Winner Race Type<div class="tooltiptext"></div></div>
+      -->
+      <div id="#RACE_ID#_data_FinishTime" race_id="#RACE_ID#" type="FinishTime" class="button_data_finish_time button_play_overlay" />Finish time<div class="tooltiptext"></div></div>      
+			<!--<span id="#RACE_ID#_data_RiderMaxSpeed" race_id="#RACE_ID#" type="" with_name="1" class="button_data_rider_max_speed button_play_overlay" />Max Speed<div class="tooltiptext"></div></span> -->
+			
+      <div id="#RACE_ID#_data_LeaderboardScratch" race_id="#RACE_ID#" type="LapResults" class="button_data_leaderboard_scratch button_play_overlay scratch" />Lead. Scratch<div class="tooltiptext"></div></div> 
+      
+      <div id="#RACE_ID#_data_LeaderboardElimination" race_id="#RACE_ID#" type="LeaderboardElimination" class="button_data_leaderboard_elimination button_play_overlay elimination" />Lead. Elimination<div class="tooltiptext"></div></div> 
+			
+		</div>
+		<div class="buttons_race_line elimination">		
+			<div id="#RACE_ID#_data_RiderEliminated" race_id="#RACE_ID#" type="RiderEliminated" class="button_data_rider_eliminated button_play_overlay elimination overlay_clear_auto" />Rider Eliminated<div class="tooltiptext"></div></div>
+			<div id="#RACE_ID#_data_RiderEliminatedData" race_id="#RACE_ID#" type="RiderEliminated" data="cardio" class="button_data_rider_eliminated_data button_play_overlay elimination overlay_clear_auto" />Rider Eliminated Cardio<div class="tooltiptext"></div></div>
+		</div>
+		<div class="buttons_race_line">			
+			<!--<div id="#RACE_ID#_SetupRaceMaclloyd" race_id="#RACE_ID#"  class="button_action button_race_normal is_master" />Setup ML Race</div>-->		  
+			
+      	<!--
+      <div id="#RACE_ID#_SetupCurrentRace" race_id="#RACE_ID#"  class="button_action button_race_normal is_master setup_current_race" />Setup Current Race</div>
+		
+      <div id="#RACE_ID#_SendMaclloydStartList" race_id="#RACE_ID#"  class="button_action button_race_normal is_master send_maclloyd_startlist" />Send Maclloyd StartList</div>
+			<div id="#RACE_ID#_StartMaclloydEngine" race_id="#RACE_ID#"  class="button_action button_race_normal is_master send_start_maclloyd_engine" />Start Maclloyd engine</div>
+			
+			<div id="#RACE_ID#_StartRaceLive" race_id="#RACE_ID#"  class="button_action button_race_normal is_master send_start_race_live" />Send Start AWS</div>
+			<div id="#RACE_ID#_StartMaclloydRace" race_id="#RACE_ID#"  class="button_action button_race_normal is_master send_start_maclloyd_race" />Start Maclloyd race</div>
+			<div id="#RACE_ID#_StopMaclloydRace" race_id="#RACE_ID#"  class="button_action button_race_normal is_master send_stop_maclloyd_race" />Stop Maclloyd race</div>
+			<div id="#RACE_ID#_StopMaclloydEngine" race_id="#RACE_ID#"  class="button_action button_race_normal is_master send_stop_maclloyd_engine" />Stop Maclloyd engine</div>
+			
+			-->
+			<!--<div id="#RACE_ID#_data_ManualWinner" race_id="#RACE_ID#" type="Results"  class="button_data_manual button_data_manual_winner button_play_overlay" />M. Winner<div class="tooltiptext"></div></div>-->	
+      <div id="#RACE_ID#_CleanRace" race_id="#RACE_ID#"  class="button_action button_race_normal button_clean_race dev"  />Clean race</div>
+      <div id="#RACE_ID#_GetMaxData" race_id="#RACE_ID#"  class="button_action button_race_normal button_get_max_data_race"  />Get Max Data</div>
+
+      <div id="#RACE_ID#_ShowGraph" race_id="#RACE_ID#" type="speed" class="button_action button_race_normal is_master button_show_graph"  />Graph speed</div>
+      <div id="#RACE_ID#_ShowGraph" race_id="#RACE_ID#" type="heartrate" class="button_action button_race_normal is_master button_show_graph"  />Graph heartrate</div>
+      <div id="#RACE_ID#_ShowGraph" race_id="#RACE_ID#" type="power" class="button_action button_race_normal is_master button_show_graph"  />Graph power</div>
+      <div id="#RACE_ID#_ShowGraph" race_id="#RACE_ID#" type="cadency" class="button_action button_race_normal is_master button_show_graph"  />Graph cadency</div>
+
+      <!--<div id="#RACE_ID#_ShowPreviousData" race_id="#RACE_ID#" class="button_action button_race_normal button_show_previous_data"  />Previous Data</div>-->
+		</div>	
+		
+		<!--
+		<div class="buttons_race_line">			
+			
+			<div id="#RACE_ID#_SetCurrentRace" race_id="#RACE_ID#"  class="button_action button_race_normal is_master set_current_race" />Setup Current Race</div>
+			<div id="#RACE_ID#_StartRace" race_id="#RACE_ID#"  class="button_action button_race_normal is_master send_start_race" />Start Race</div>
+			<div id="#RACE_ID#_StopMRace" race_id="#RACE_ID#"  class="button_action button_race_normal is_master send_stop_race" />Stop Race</div>
+		</div>
+  -->	
+	</div>
+<!--
+    <div id="#RACE_ID#_label_participants" class="race_participants_label" />Participants
+    </div>
+-->    
+    <table id="#RACE_ID#_data_participants" race_id="#RACE_ID#" class="table_race_participants" />
+      <thead>
+        <tr>
+          <!--<th class="participant_column_label">Sel.</th>-->
+          <th class="participant_column_label uciid">UCIID</th>
+          
+          
+          <th class="participant_column_label firstname">FirstName</th>
+          <th class="participant_column_label lastname">LastName</th>
+		  <th class="participant_column_label">NOC</th>
+		  <th class="participant_column_label bib">Bib</th>
+		  <th class="participant_column_label rank">Rank</th>
+		  <th class="participant_column_label">M.Rank</th>
+          <th class="participant_column_label speed">Speed</th>
+          <th class="participant_column_label heartrate">Heartrate</th>          
+          <th class="participant_column_label power">Power</th>
+          <th class="participant_column_label cadency">Cadency</th>
+          <!-- <th class="participant_column_label">Tracker</th> -->
+		  
+        </tr>
+      </thead>
+    </table>
+	
+	
+	
+    <div id="data_race_button_indiv_#RACE_ID#" race_id="#RACE_ID#" class="div_buttons_indiv_race">      
+	  <span class="button_race_normal button_action unselect_rider">Unselect / Clear</span>
+    <!-- 
+      &nbsp;&nbsp;&nbsp;&nbsp;<span>SPEED:<input type="radio" id="#RACE_ID#_radio_competitor_info" name="#RACE_ID#_radio_competitor_info" class="radio_competitor_info" value="speed" /></span>
+      &nbsp;&nbsp;&nbsp;&nbsp;<span>CARDIO:<input type="radio" id="#RACE_ID#_radio_competitor_info" name="#RACE_ID#_radio_competitor_info" class="radio_competitor_info" value="cardio" /></span>
+	  &nbsp;&nbsp;&nbsp;&nbsp;<span>POWER:<input type="radio" id="#RACE_ID#_radio_competitor_info" name="#RACE_ID#_radio_competitor_info" class="radio_competitor_info" value="power" /></span>
+	  &nbsp;&nbsp;&nbsp;&nbsp;<span>CADENCY:<input type="radio" id="#RACE_ID#_radio_competitor_info" name="#RACE_ID#_radio_competitor_info" class="radio_competitor_info" value="cadency" /></span>
+    
+	  &nbsp;&nbsp;&nbsp;&nbsp;<span class="button_data_presentation_competitor button_play_overlay dataOn">RIDER</span>
+	  -->
+	  &nbsp;&nbsp;&nbsp;&nbsp;<span class="button_race_normal button_play_overlay button_overlay_auto show_rider_data">DATA</span>
+
+	   <!--	  
+	  &nbsp;&nbsp;&nbsp;&nbsp;<span id="#RACE_ID#_data_RiderMaxData" race_id="#RACE_ID#" type="" class="button_data_rider_max_data button_play_overlay" />Max Data</span>
+	  
+	  &nbsp;&nbsp;&nbsp;&nbsp;<span id="#RACE_ID#_data_RiderMaxDataName" race_id="#RACE_ID#" type="" with_name="1" class="button_data_rider_max_data button_play_overlay" />Max Data & Name</span>
+     -->
+    &nbsp;&nbsp;&nbsp;&nbsp;<span id="#RACE_ID#_data_RiderMaxDataSlowMo" race_id="#RACE_ID#" overlay="CompetitorSlowMo"  class="button_data_rider_max_data_slow_mo button_play_overlay" />SlowMo Max</span>
+    &nbsp;&nbsp;&nbsp;&nbsp;<span id="#RACE_ID#_data_RiderCompareData" race_id="#RACE_ID#"  class="button_data_rider_compare_data button_play_overlay" />Compar. Max</span>
+
+	 
+    <!--
+	  &nbsp;&nbsp;&nbsp;&nbsp;<span class="button_data_competitor_heartrate dataOn">HR</span>
+  -->
+	</div>
+
+
+  <div id="data_race_button_video_#RACE_ID#" race_id="#RACE_ID#" class="div_generation_video"> 
+    <input race_id="#RACE_ID#" class="get_time_race"  type="button" value="Get Time Race"/>  </br></br>
+    <label for="race_first_data">First Data Race:</label> <span id="race_first_data_#RACE_ID#"></span></br>
+    <label for="race_last_data">Last Data Race:</label> <span id="race_last_data_#RACE_ID#"></span></br>
+    <label for="movie_first_data">First Data Movie:</label><input type="text" id="input_race_first_data_#RACE_ID#" /></br>
+    <label for="movie_first_data">First Data Movie:</label><input type="text" id="input_race_last_data_#RACE_ID#" /></br></br>
+
+    <span id="#RACE_ID#_data_RiderGenereVideo" race_id="#RACE_ID#"  class="button_data_rider_genere_video button_action button_race_normal" />Genere Video</span>
+  </div>
+
+
+  </div>
+</div>
+<div id="button_race_preset" style="display:none">
+  <div id="button_race_#RACE_ID#" race_id="#RACE_ID#" class="div_button_race" onclick="openRace('#RACE_ID#')">#RACE_NAME#</div>
+</div>
+
+<table id="data_participant_preset" style="display:none">
+    <tr id="div_participant_#UCIID#" uciid="#UCIID#" class="div_participant">
+      <!--
+      <td id="div_participant_data_#UCIID#_sel"><input name="radio_select_#RACE_ID#" type="radio" class="radio_competitor_select" value="#UCIID#"></td>
+    -->
+      <td id="div_participant_data_#UCIID#_UCIID" class="div_participant_data">#UCIID#</td>
+      
+      
+      <td id="div_participant_data_#UCIID#_FirstName" class="div_participant_data firstname">#FirstName#</td>
+      <td id="div_participant_data_#UCIID#_LastName" class="div_participant_data lastname">#LastName#</td>
+	  <td id="div_participant_data_#UCIID#_NOC" class="div_participant_data">#NOC#</td>
+	  <td id="div_participant_data_#UCIID#_Bib" class="div_participant_data bib">#Bib#</td>
+      <td id="div_participant_data_#UCIID#_Rank" class="div_participant_data rank">-</td>
+	  <td id="div_participant_data_#UCIID#_Manual_Rank" class="div_participant_data "><input id="input_#UCIID#_rank" uciid="#UCIID#" type="number" min="1" max="10" class="input_rank" style="width:35px" /></td>
+	  <td id="div_participant_data_#UCIID#_Speed" class="div_participant_data" type_data="speed">-</td>
+      <td id="div_participant_data_#UCIID#_Heartrate" class="div_participant_data" type_data="cardio">-</td>      
+      <td id="div_participant_data_#UCIID#_Power" class="div_participant_data" type_data="power">-</td>
+      <td id="div_participant_data_#UCIID#_Cadency" class="div_participant_data" type_data="cadency">-</td>
+
+      <!--<td id="div_participant_data_#UCIID#_Tracker" class="div_participant_data "><input id="input_#UCIID#_tracker" uciid="#UCIID#" type="number" min="1" max="10" class="input_tracker" style="width:35px" /></td>-->
+	  
+	</tr>
+</table>  
+
+
+<div id="div_chart">
+  <div id="close_chart">Close</div>
+  <canvas id="myChart"></canvas>
+</div>
+
+<div class="preview">
+  <div class="close">X</div>
+  <div class="title">PREVIEW</div>
+  <div class="send">SEND</div>
+  <div class="rects_container" ></div>
+  <!--img src=""  /-->
+  <canvas width="1066" height="600"></canvas>
+</div>
+
+
+
+
+
+
+
+
+
+
+<div id="div_previous_data" style="display:none">
+  <div class="close">Close</div>
+
+  <div id="div_previous_data_content">
+    <span id="previous_data_race_name"  class="data_race_name" /></span></br>
+    <br/>
+
+    <table class="table_race_participants" />
+      <thead>
+        <tr>
+          <th class="participant_column_label uciid">UCIID</th>
+          <th class="participant_column_label firstname">FirstName</th>
+          <th class="participant_column_label lastname">LastName</th>
+          <th class="participant_column_label">NOC</th>
+          <th class="participant_column_label bib">Bib</th>
+          <th class="participant_column_label rank">Rank</th>
+          <th class="participant_column_label">M.Rank</th>
+          <th class="participant_column_label speed">Speed</th>
+          <th class="participant_column_label heartrate">Heartrate</th>          
+          <th class="participant_column_label power">Power</th>
+          <th class="participant_column_label cadency">Cadency</th>
+        </tr>
+      </thead>
+    </table>
+	
+	
+	
+    <div id="data_race_button_indiv_#RACE_ID#" race_id="#RACE_ID#" class="div_buttons_indiv_race">      
+	    &nbsp;&nbsp;&nbsp;&nbsp;<span class="button_race_normal button_play_overlay button_overlay_auto show_rider_data">DATA</span>
+      &nbsp;&nbsp;&nbsp;&nbsp;<span id="#RACE_ID#_data_RiderMaxDataSlowMo" race_id="#RACE_ID#" overlay="CompetitorSlowMo"  class="button_data_rider_max_data_slow_mo button_play_overlay" />SlowMo Max</span>
+      &nbsp;&nbsp;&nbsp;&nbsp;<span id="#RACE_ID#_data_RiderCompareData" race_id="#RACE_ID#"  class="button_data_rider_compare_data button_play_overlay" />Compar. Max</span>
+	  </div>
+  </div>
+
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+</body>
+</html>

@@ -35,13 +35,13 @@ using System.Windows.Media;
 using static GeoLiveDectect.MainWindow;
 using System.Security.Policy;
 using GeoLiveDectect.Decklink;
-using Alchemy;
+using GeoRacing;
 using Emgu.CV.Features2D;
 using GeoSockNet;
 using System.Collections.Concurrent;
 using static System.Net.Mime.MediaTypeNames;
 using System.Resources;
-using Alchemy.Classes;
+using GeoRacing.Classes;
 using BridgeWebSocketGeoSocketConfigurator;
 using System.Net;
 using Newtonsoft.Json;
@@ -414,7 +414,7 @@ namespace GeoLiveDectect
             Start_GeoSocket_connection();
 
             logInformations(@"Start WebSocket connection ...");
-            //Start_WebSocket_connection();         //todo remettre quand alchemist corrigée
+            Start_WebSocket_connection();         //todo remettre quand alchemist corrigée
 
             logInformations(@"Start Serveurs Done !!!");
         }
@@ -2251,6 +2251,28 @@ namespace GeoLiveDectect
 
 
 
+
+        /****************************************************************************************************
+        *                                                                                                   *
+        ****************************************************************************************************/
+        public void test7()         // recherche un remplacant pour le WebSocket Server d'Alchemist.
+        {
+            Start_WebSocket_connection();
+
+
+            Tools.console_writeLine("Test WebSocket serveur started normaly");
+
+            Thread.Sleep(10000);
+
+            Tools.console_writeLine("send Something");
+            WebSocket_notifyNewMessage(2309, "{ \"test\": true }");           //JSON_GR_SETTRACKERS 		2309	// informations des Trackers (venatn de GeoLiveDetect)
+
+
+            Thread.Sleep(10000);
+
+            Tools.console_writeLine("send Something 2");
+            WebSocket_notifyNewMessage(2309, "{ \"test2\": true }");           //JSON_GR_SETTRACKERS 		2309	// informations des Trackers (venatn de GeoLiveDetect)
+        }
 
 
     }

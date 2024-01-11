@@ -1,0 +1,61 @@
+{
+    "Message": "Results",
+    "SeasonID": 2023,
+    "EventID": 202301,
+    "RaceID": 20230115,
+    "RaceType": "Sprint",
+    "State": "Provisional",
+    "League": "Men Sprint",
+    "Gender": "Men",
+    "RaceName": "Men's Sprint Semi-Finals Heat 2",
+    "Heat": 2,
+    "TotalHeats": 2,
+    "Round": 2,
+    "TotalRounds": 3,
+    "Laps": "3",
+    "Distance": "750",
+    "RaceTime": 10.282,
+    "RaceSpeed": 70.02528690916165,
+    "TimeStamp": "2023-10-21T16:54:00.0787193Z",
+    "Results": [
+      {
+        "Rank": 1,
+        "Bib": "19",
+        "UCIID": "10009535686",
+        "FirstName": "Harrie",
+        "LastName": "LAVREYSEN",
+        "ShortTVName": "",
+        "Team": "NETHERLANDS",
+        "NOC": "NED",
+        "Status": "OK",
+        "Laps": 0,
+        "Diff": 0
+      },
+      {
+        "Rank": 2,
+        "Bib": "25",
+        "UCIID": "10015145724",
+        "FirstName": "Matthew ",
+        "LastName": "RICHARDSON ",
+        "ShortTVName": "",
+        "Team": "AUSTRALIA",
+        "NOC": "AUS",
+        "Status": "OK",
+        "Laps": 0,
+        "Diff": 0.074
+      },
+      {
+        "Rank": 3,
+        "Bib": "23",
+        "UCIID": "10022807613",
+        "FirstName": "Lars",
+        "LastName": "ROMIJN",
+        "ShortTVName": "",
+        "Team": "NETHERLANDS",
+        "NOC": "NED",
+        "Status": "OK",
+        "Laps": 0,
+        "Diff": 0.527
+      }
+    ]
+  }
