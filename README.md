@@ -38,3 +38,15 @@ Setup the installation in order to install developpement desktops of
 - In __Project dependancies__ (Project tab), check all other projects
 
 7. Generate the solution to update all dependencies
+
+
+#### Notes :
+- GeoRender --> on peut supprimer les dll (GeoSocketNet)
+- Alchemy --> idem
+
+GeoLiveDetect.Decklink
+- Installer BlackMagic_Desktop_Video_Windows (installation par le .mi mais beaucoup de choses --> moyen mais bon)
+- Test avec juste Interop.DecklinkAPI.dll (serait la seule à remettre) + Générer (copie et build les dll dans le build) --> OK si Interop.DecklinkAPI.dll pas déjà à la place des dll : sera reconstruites bien avec les autres dll
+
+Decklink Capture --> sans avoir les trucs installés
+- --> ça ne marche pas, mais aucune exception est levée (ou alors plus loin) ==> Info ajoutée : Attention il ne faut pas mettre le mdoe "Decklink Capture" dans la config, sans avoir de Decklink installée ! ça planterait.
